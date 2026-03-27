@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Лаборатория</title>
+
+<style>
+body{background:#0b1220;color:white;font-family:Arial}
+.card{background:#1e293b;padding:10px;margin:10px;border-radius:10px}
+button{margin:5px}
+</style>
+</head>
+
+<body>
+
+<h2>🧪 Лаборатория</h2>
+<button onclick="window.location='/'">⬅ Назад</button>
+
+<div id="patients"></div>
+
+<script>
+
+async function load(){
+ let r = await fetch("/data")
+ let d = await r.json()
+
+ patients.innerHTML = d.patients.slice(0, 30).map(p=>`
+ <div class="card">
+ 👤 ${p.name} ❤️${p.hp}
+ <button onclick="act('lab',${p.id})">🧪 анализ</button>
+ </div>
+ `).join("")
+}
+
+async function act(type,id){
+ await fetch("/action/"+type,{
+ method:"POST",
+ headers:{"Content-Type":"application/json"},
+ body:JSON.stringify({id})
+ })
+
+ load()
+}
+
+setInterval(load, 1000)
+load()
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Xospital Game</title>
+
+<style>
+body{background:#0b1220;color:white;font-family:Arial}
+.card{background:#1e293b;padding:10px;margin:10px;border-radius:10px}
+button{margin:5px;padding:6px;cursor:pointer}
+
+.bar-bg{width:100%;height:10px;background:#333;border-radius:5px}
+.bar{height:10px;background:lime;width:0%}
+
+#patients{
+display:none;
+max-height:300px;
+overflow-y:auto;
+}
+
+#chat{
+display:none;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🏥 Xospital Game</h2>
+
+<div class="card">
+💰 <span id="money"></span> |
+💎 <span id="diamonds"></span><br><br>
+
+🏆 LVL: <span id="lvl"></span><br>
+⭐ XP: <span id="xp"></span> / <span id="need"></span>
+
+<div class="bar-bg">
+<div id="bar" class="bar"></div>
+</div>
+</div>
+
+<button onclick="window.location='/lab'">🧪 Лаборатория</button>
+<button onclick="togglePatients()">👥 Пациенты</button>
+<button onclick="toggleChat()">💬 Чат</button>
+
+<div class="card" id="selectedBox">❌ Пациент не выбран</div>
+
+<div class="card" id="patients"></div>
+
+<!-- 💬 ЧАТ -->
+<div class="card" id="chat">
+
+<h3>💬 Чат</h3>
+
+<div id="chatMessages" style="height:200px;overflow-y:auto;background:#0f172a;padding:5px"></div>
+
+<input id="chatInput" placeholder="Написать...">
+<button onclick="sendMsg()">Отправить</button>
+
+</div>
+
+<script>
+
+let opened = false;
+let chatOpen = false;
+
+// 👥 пациенты
+function togglePatients(){
+ opened = !opened;
+ document.getElementById("patients").style.display =
+ opened ? "block" : "none";
+}
+
+// 💬 чат
+function toggleChat(){
+ chatOpen = !chatOpen;
+ document.getElementById("chat").style.display =
+ chatOpen ? "block" : "none";
+}
+
+async function load(){
+
+ let d = await fetch("/data").then(r=>r.json())
+
+ money.innerText = d.player.money
+ diamonds.innerText = d.player.diamonds
+ xp.innerText = d.player.xp
+ lvl.innerText = d.player.level
+
+ let need = d.player.level * 50
+ needEl.innerText = need
+
+ bar.style.width = (d.player.xp / need * 100) + "%"
+
+ // пациент
+ let box = document.getElementById("selectedBox")
+
+ if(d.selected.id){
+   let sp = d.patients.find(p=>p.id === d.selected.id)
+
+   if(sp){
+     box.innerHTML = `
+     🎯 <b>${sp.name}</b><br>
+     ❤️ HP: ${sp.hp}<br><br>
+     <button onclick="act('heal',${sp.id})">💊 лечить</button>
+     <button onclick="act('lab',${sp.id})">🧪 лаба</button>
+     `
+   }
+ } else {
+   box.innerHTML = "❌ Пациент не выбран"
+ }
+
+ // список
+ let list = document.getElementById("patients")
+ list.innerHTML = ""
+
+ d.patients.slice(0, 30).forEach(p=>{
+   list.innerHTML += `
+   <div class="card">
+   👤 ${p.name} ❤️${p.hp}
+   <button onclick="selectPatient(${p.id})">✅ выбрать</button>
+   </div>
+   `
+ })
+
+ loadChat()
+}
+
+// выбрать
+async function selectPatient(id){
+ await fetch("/select",{
+ method:"POST",
+ headers:{"Content-Type":"application/json"},
+ body:JSON.stringify({id})
+ })
+ load()
+}
+
+// действия
+async function act(type,id){
+ await fetch("/action/"+type,{
+ method:"POST",
+ headers:{"Content-Type":"application/json"},
+ body:JSON.stringify({id})
+ })
+ load()
+}
+
+// 💬 чат загрузка
+async function loadChat(){
+ let c = await fetch("/chat/get").then(r=>r.json())
+
+ document.getElementById("chatMessages").innerHTML =
+ c.map(m=>`💬 ${m.text}`).join("<br>")
+}
+
+// 💬 отправка
+async function sendMsg(){
+ let text = document.getElementById("chatInput").value
+ if(!text) return
+
+ await fetch("/chat/send",{
+ method:"POST",
+ headers:{"Content-Type":"application/json"},
+ body:JSON.stringify({text})
+ })
+
+ document.getElementById("chatInput").value = ""
+ loadChat()
+}
+
+setInterval(load, 1000)
+load()
+
+</script>
+
+</body>
+</html>

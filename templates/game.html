@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Палата</title>
+</head>
+<body>
+
+<h1>🏥 Пациенты</h1>
+
+<p>Опыт: <span id="exp">{{ player.exp }}</span></p>
+<p>Деньги: <span id="money">{{ player.money }}</span></p>
+
+<button onclick="addPatient()">➕ Новый пациент</button>
+
+<ul id="patients">
+    {% for p in patients %}
+    <li>
+        {{ p.name }} — {{ p.disease }}
+        <button onclick="heal({{ p.id }})">Лечить</button>
+    </li>
+    {% endfor %}
+</ul>
+
+<br>
+<a href="/">Назад</a>
+
+<script>
+function heal(id) {
+    fetch("/heal", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({id: id})
+    })
+    .then(res => res.json())
+    .then(data => {
+        update(data);
+    });
+}
+
+function addPatient() {
+    fetch("/new_patient", {
+        method: "POST"
+    })
+    .then(res => res.json())
+    .then(data => {
+        renderPatients(data);
+    });
+}
+
+function update(data) {
+    document.getElementById("exp").innerText = data.exp;
+    document.getElementById("money").innerText = data.money;
+    renderPatients(data.patients);
+}
+
+function renderPatients(list) {
+    let ul = document.getElementById("patients");
+    ul.innerHTML = "";
+
+    list.forEach(p => {
+        ul.innerHTML += `
+            <li>
+                ${p.name} — ${p.disease}
+                <button onclick="heal(${p.id})">Лечить</button>
+            </li>
+        `;
+    });
+}
+</script>
+
+</body>
+</html>

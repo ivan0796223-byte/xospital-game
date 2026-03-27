@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>🏥 Xospital FULL GAME</title>
+
+<style>
+body{
+    background:#0f172a;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+
+.map{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin:20px;
+}
+
+.room{
+    background:#1e293b;
+    padding:20px;
+    border-radius:10px;
+}
+
+button{margin:5px;}
+</style>
+</head>
+
+<body>
+
+<h1>🏥 Xospital FULL GAME</h1>
+
+<div>
+⭐ XP: <span id="xp"></span> |
+🏆 Level: <span id="lvl"></span> |
+💰 Money: <span id="money"></span>
+</div>
+
+<div class="map">
+<div class="room">🏨 Приём</div>
+<div class="room">🧪 Лаборатория</div>
+<div class="room">🚑 Скорая</div>
+<div class="room">💊 Лечение</div>
+<div class="room">🧠 Диагнозы</div>
+<div class="room">💰 Магазин</div>
+</div>
+
+<button onclick="add()">➕ Пациент</button>
+<button onclick="ambulance()">🚑 Скорая</button>
+<button onclick="shop('medkit')">💊 Медкит</button>
+<button onclick="shop('boost')">⚡ Буст</button>
+
+<h2>👨‍⚕️ Пациенты</h2>
+<div id="patients"></div>
+
+<h2>📜 Логи</h2>
+<div id="logs"></div>
+
+<script>
+async function load(){
+    let p = await fetch("/patients").then(r=>r.json());
+    let l = await fetch("/logs").then(r=>r.json());
+    let u = await fetch("/player").then(r=>r.json());
+
+    xp.innerText=u.xp;
+    lvl.innerText=u.level;
+    money.innerText=u.money;
+
+    patients.innerHTML=p.map(x=>`
+        <div>
+        ${x.name} ❤️${x.hp} (${x.disease})
+        <button onclick="act('heal',${x.id})">💊</button>
+        <button onclick="act('lab',${x.id})">🧠</button>
+        <button onclick="act('scan',${x.id})">📡</button>
+        </div>
+    `).join("");
+
+    logs.innerHTML=l.map(x=>`<div>${x}</div>`).join("");
+}
+
+async function act(t,id){
+    await fetch("/action/"+t,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({id})
+    });
+    load();
+}
+
+async function add(){
+    await fetch("/add_patient",{method:"POST"});
+    load();
+}
+
+async function ambulance(){
+    await fetch("/ambulance");
+    load();
+}
+
+async function shop(i){
+    await fetch("/shop/"+i,{method:"POST"});
+    load();
+}
+
+setInterval(load,2000);
+load();
+</script>
+
+</body>
+</html>
