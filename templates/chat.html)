@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card">
+    <h2>💬 Чат больницы</h2>
+
+    <div class="card">Доктор: пациент стабилен</div>
+    <div class="card">Система: операция началась</div>
+
+    <input placeholder="Введите сообщение..." style="width:100%; padding:10px; border-radius:8px;">
+    <button>Отправить</button>
+</div>
+
+{% endblock %}
