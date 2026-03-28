@@ -1,1 +1,58 @@
-game.money
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+<style>
+body {
+    background:#0f172a;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    font-family:Arial;
+}
+
+.box {
+    background:#1e293b;
+    padding:20px;
+    border-radius:10px;
+    width:300px;
+}
+
+input, button {
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    border-radius:8px;
+    border:none;
+}
+
+button {
+    background:#3b82f6;
+    color:white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>🧑 Регистрация</h2>
+    <input id="name" placeholder="Имя">
+    <button onclick="reg()">Играть</button>
+</div>
+
+<script>
+function reg() {
+    fetch("/register", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({username:document.getElementById("name").value})
+    }).then(() => location.reload());
+}
+</script>
+
+</body>
+</html>
