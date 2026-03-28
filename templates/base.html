@@ -1,42 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Xospital</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #111;
-            color: white;
-            text-align: center;
-        }
-
-        button {
-            padding: 15px;
-            margin: 10px;
-            font-size: 16px;
-            background: red;
-            color: white;
-            border: none;
-            border-radius: 10px;
-        }
-
-        .box {
-            background: #222;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px;
-        }
-    </style>
+<style>
+body {background:#111;color:white;text-align:center;font-family:Arial;}
+button {padding:10px;margin:5px;background:red;color:white;border:none;border-radius:10px;}
+.bar {width:300px;height:20px;background:#333;margin:auto;border-radius:10px;}
+.fill {height:100%;background:lime;border-radius:10px;}
+</style>
 </head>
 <body>
 
 <h1>🏥 Xospital</h1>
 
-<div class="box">
-    💰 {{ player.money }} | ⭐ {{ player.exp }}
+<p>
+💰 {{ player.money }} | ⭐ {{ player.exp }} | 💎 {{ player.diamonds }}
+</p>
+
+<div class="bar">
+<div class="fill" style="width: {{ progress }}%;"></div>
 </div>
 
 {% block content %}{% endblock %}
-
 </body>
 </html>
