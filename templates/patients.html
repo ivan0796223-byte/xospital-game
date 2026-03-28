@@ -13,27 +13,18 @@
 
 <br>
 
-<!-- ПАГИНАЦИЯ -->
-<div>
-    {% if page > 1 %}
-        <a href="/patients?page={{ page - 1 }}">
-            <button>⬅ Назад</button>
-        </a>
-    {% endif %}
+{% if page > 1 %}
+<a href="/patients?page={{ page-1 }}"><button>⬅ Назад</button></a>
+{% endif %}
 
-    <span>Страница {{ page }}</span>
+Страница {{ page }}
 
-    {% if page * 20 < total %}
-        <a href="/patients?page={{ page + 1 }}">
-            <button>➡ Вперёд</button>
-        </a>
-    {% endif %}
-</div>
+{% if page*20 < total %}
+<a href="/patients?page={{ page+1 }}"><button>➡ Вперёд</button></a>
+{% endif %}
 
-<br>
+<br><br>
 
-<a href="/">
-    <button>🏠 Главная</button>
-</a>
+<a href="/"><button>🏠 Главная</button></a>
 
 {% endblock %}
