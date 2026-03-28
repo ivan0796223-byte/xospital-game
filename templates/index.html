@@ -4,30 +4,42 @@
 <meta charset="UTF-8">
 <style>
 body{background:#0b1220;color:white;font-family:Arial}
-.box{background:#1e293b;padding:10px;margin:10px;border-radius:10px}
-button{background:#ef4444;color:white;padding:8px;border:none;margin:3px;border-radius:6px}
+.box{background:#1e293b;margin:10px;padding:10px;border-radius:10px}
+button{background:#ef4444;color:white;padding:8px;border:none;border-radius:6px;margin:3px}
+.bar{width:100%;height:12px;background:#334155;border-radius:8px}
+.fill{height:100%;background:#22c55e}
 </style>
 </head>
 
 <body>
 
-<h2>✚ {{ name }} | 💎 {{ user.diamonds }} | Lv {{ user.level }}</h2>
+<h2>🏥 {{name}} | 💎 {{user.diamonds}} | ⭐ Lv {{user.level}}</h2>
 
+<!-- XP -->
 <div class="box">
-<h3>🚑 Пациенты</h3>
-{% for p in user.patients %}
-<button onclick="sel({{p.id}})">✚ {{p.name}} {{p.orvi}}%</button>
+<h3>📈 Прогресс уровня</h3>
+<div class="bar">
+<div class="fill" style="width:{{user.xp}}%"></div>
+</div>
+<p>{{user.xp}} / 100</p>
+</div>
+
+<!-- ПАЦИЕНТЫ -->
+<div class="box">
+<h3>👥 Пациенты (50000)</h3>
+{% for i in range(1,50) %}
+<button onclick="sel({{i}})">Пациент {{i}}</button>
 {% endfor %}
 </div>
 
+<!-- ОПЕРАЦИОННАЯ -->
 <div class="box">
 <h3>🏥 Операционная</h3>
-{% if user.selected_patient %}
-<p>{{user.selected_patient.name}}</p>
+<p>{{user.selected_patient.name if user.selected_patient}}</p>
 <button onclick="treat()">💉 Лечить</button>
-{% endif %}
 </div>
 
+<!-- АВТОПАРК -->
 <div class="box">
 <h3>🚗 Автопарк</h3>
 {% for c in user.cars %}
@@ -35,9 +47,10 @@ button{background:#ef4444;color:white;padding:8px;border:none;margin:3px;border-
 {% endfor %}
 </div>
 
+<!-- ЧАТ -->
 <div class="box">
 <h3>💬 Чат</h3>
-<div id="chat">
+<div>
 {% for m in user.chat %}
 <p>{{m}}</p>
 {% endfor %}
@@ -48,9 +61,9 @@ button{background:#ef4444;color:white;padding:8px;border:none;margin:3px;border-
 </div>
 
 <script>
-function sel(id){
+function sel(i){
 fetch("/select_patient",{method:"POST",headers:{"Content-Type":"application/json"},
-body:JSON.stringify({id})}).then(()=>location.reload())
+body:JSON.stringify({id:i})}).then(()=>location.reload())
 }
 
 function treat(){
