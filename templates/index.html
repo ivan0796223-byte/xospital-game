@@ -1,7 +1,17 @@
 {% extends "base.html" %}
+
 {% block content %}
 
-<h1>🏥 Xospital Mobi</h1>
-<p>Выбери локацию сверху 👆</p>
+<div class="card">
+    <h2>👨‍⚕️ Добро пожаловать в игру</h2>
+    <p>Выберите действие:</p>
+
+    <div class="grid">
+        <a href="/patients"><button>👤 Пациенты</button></a>
+        <a href="/operating"><button>🔪 Операционная</button></a>
+        <a href="/chat"><button>💬 Чат</button></a>
+        <a href="/garage"><button>🚑 Автопарк</button></a>
+    </div>
+</div>
 
 {% endblock %}
