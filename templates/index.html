@@ -13,8 +13,8 @@ body {
 }
 
 .header {
-    background:#111827;
     padding:15px;
+    background:#111827;
 }
 
 .container {
@@ -35,7 +35,6 @@ body {
     height:12px;
     background:#334155;
     border-radius:10px;
-    overflow:hidden;
 }
 
 .fill {
@@ -45,8 +44,8 @@ body {
 
 button {
     width:100%;
-    margin-top:10px;
     padding:10px;
+    margin-top:10px;
     border:none;
     border-radius:8px;
     background:#3b82f6;
@@ -58,35 +57,28 @@ button {
 <body>
 
 <div class="header">
-    👤 {{ name }} |
-    💰 {{ user.money }} |
-    💎 {{ user.diamonds }} |
-    🧬 Lv {{ user.level }}
+    🏥 Xospital Game
 </div>
 
 <div class="container">
 
     <div class="card">
         <h3>🦠 ОРВИ</h3>
-        <div class="bar">
-            <div class="fill" style="width: {{ user.orvi }}%"></div>
-        </div>
-        <p>{{ user.orvi }}%</p>
+        <div class="bar"><div class="fill" style="width:80%"></div></div>
+        <p>80%</p>
     </div>
 
     <div class="card">
         <h3>📈 XP</h3>
-        <div class="bar">
-            <div class="fill" style="width: {{ user.xp }}%"></div>
-        </div>
-        <p>{{ user.xp }}/100</p>
+        <div class="bar"><div class="fill" style="width:40%"></div></div>
+        <p>40/100</p>
 
         <button onclick="act()">💉 Лечить</button>
     </div>
 
     <div class="card">
         <h3>💎 Алмазы</h3>
-        <button onclick="act()">+1 алмаз</button>
+        <button onclick="act()">+1</button>
     </div>
 
 </div>
@@ -94,7 +86,6 @@ button {
 <script>
 function act() {
     fetch("/action", {method:"POST"})
-    .then(r => r.json())
     .then(() => location.reload());
 }
 </script>
