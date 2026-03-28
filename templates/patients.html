@@ -1,10 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>Главное меню</h2>
+<h2>👤 Пациенты</h2>
 
-<a href="/patients">
-    <button>👤 Пациенты</button>
+<form method="POST" action="/heal">
+    {% for patient in patients %}
+        <button name="patient" value="{{ patient }}">
+            🩺 {{ patient }} (+100💰 +10⭐)
+        </button><br>
+    {% endfor %}
+</form>
+
+<br>
+
+<!-- ПАГИНАЦИЯ -->
+<div>
+    {% if page > 1 %}
+        <a href="/patients?page={{ page - 1 }}">
+            <button>⬅ Назад</button>
+        </a>
+    {% endif %}
+
+    <span>Страница {{ page }}</span>
+
+    {% if page * 20 < total %}
+        <a href="/patients?page={{ page + 1 }}">
+            <button>➡ Вперёд</button>
+        </a>
+    {% endif %}
+</div>
+
+<br>
+
+<a href="/">
+    <button>🏠 Главная</button>
 </a>
 
 {% endblock %}
