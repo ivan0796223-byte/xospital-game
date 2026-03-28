@@ -1,61 +1,74 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Xospital Mobi</title>
+    <title>Xospital Game</title>
+
     <style>
         body {
-            margin:0;
-            font-family: Arial;
-            background:#111;
-            color:white;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(120deg, #0f172a, #1e293b);
+            color: white;
         }
 
-        .menu {
-            display:flex;
-            gap:10px;
-            padding:10px;
-            background:#222;
+        .header {
+            background: #111827;
+            padding: 15px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            border-bottom: 2px solid #ef4444;
         }
 
-        .menu a {
-            color:white;
-            text-decoration:none;
-            padding:10px;
-            background:#333;
-            border-radius:8px;
+        .container {
+            padding: 20px;
         }
 
-        .menu a:hover {
-            background:red;
-        }
-
-        .content {
-            padding:20px;
+        .card {
+            background: #1f2937;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+            box-shadow: 0 0 10px rgba(0,0,0,0.4);
         }
 
         button {
-            padding:10px;
-            margin:5px;
-            border:none;
-            border-radius:8px;
-            cursor:pointer;
+            background: #ef4444;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #dc2626;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .badge {
+            background: #22c55e;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 12px;
         }
     </style>
 </head>
+
 <body>
 
-<div class="menu">
-    <a href="/">🏠 Главная</a>
-    <a href="/patients">👤 Пациенты</a>
-    <a href="/lab">🧪 Лаборатория</a>
-    <a href="/operating">🔪 Операционная</a>
-    <a href="/doctor">🧑‍⚕️ Доктор</a>
-    <a href="/exchange">💱 Обменник</a>
+<div class="header">
+    🏥 XOSPITAL GAME
 </div>
 
-<div class="content">
+<div class="container">
     {% block content %}{% endblock %}
 </div>
 
