@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>🏥 Палаты</h2>
+
+<div class="box">
+    <p>Вы находитесь в палатах. Здесь пациенты отдыхают.</p>
+</div>
+
+<form method="POST" action="/ward_action">
+    <button name="action" value="check">🩺 Проверить пациентов (+5⭐)</button>
+    <button name="action" value="clean">🧹 Убрать палату (+10⭐)</button>
+    <button name="action" value="talk">💬 Поговорить (+3⭐)</button>
+</form>
+
+<br>
+
+<a href="/">
+    <button>🏠 Главная</button>
+</a>
+
+{% endblock %}
