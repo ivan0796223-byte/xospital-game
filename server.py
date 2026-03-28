@@ -1,32 +1,20 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
-app.secret_key = "secret"
 
 @app.route("/")
-def index():
-    return render_template("index.html")
-
-@app.route("/patients")
-def patients():
+def home():
     return render_template("patients.html")
 
-@app.route("/lab")
-def lab():
-    return render_template("lab.html")
+@app.route("/action", methods=["POST"])
+def action():
+    action = request.form.get("action")
 
-@app.route("/operating")
-def operating():
-    return render_template("operating.html")
+    if action == "patient1":
+        return "Лечение пациента 1"
+    elif action == "patient2":
+        return "Лечение пациента 2"
+    elif action == "patient3":
+        return "Лечение пациента 3"
 
-@app.route("/doctor")
-def doctor():
-    return render_template("doctor.html")
-
-@app.route("/exchange")
-def exchange():
-    return render_template("exchange.html")
-
-
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    return "Ошибка"
