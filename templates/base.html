@@ -18,18 +18,13 @@
             color: white;
             border: none;
             border-radius: 10px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: darkred;
         }
 
         .box {
             background: #222;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px;
         }
     </style>
 </head>
@@ -38,7 +33,7 @@
 <h1>🏥 Xospital</h1>
 
 <div class="box">
-    💰 Деньги: {{ player.money }} | ⭐ Опыт: {{ player.exp }}
+    💰 {{ player.money }} | ⭐ {{ player.exp }}
 </div>
 
 {% block content %}{% endblock %}
