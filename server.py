@@ -1,63 +1,75 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///game.db"
+app.config["SECRET_KEY"] = "secret"
 
-player = {
-    "money": 100,
-    "diamonds": 5,
-    "xp": 0,
-    "level": 1
-}
+db = SQLAlchemy(app)
 
-patients = [
-    {"id": 1, "name": "Пациент 1", "hp": 100},
-    {"id": 2, "name": "Пациент 2", "hp": 80}
-]
+# ===== МОДЕЛЬ ИГРОКА =====
+class Player(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    money = db.Column(db.Integer, default=100)
+    diamonds = db.Column(db.Integer, default=0)
+    xp = db.Column(db.Integer, default=0)
+    level = db.Column(db.Integer, default=1)
 
-selected = {"id": None}
-chat = []
+# ===== ЧАТ =====
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(200))
 
+with app.app_context():
+    db.create_all()
+
+# ===== ГЛАВНАЯ =====
 @app.route("/")
 def home():
     return render_template("index.html")
 
+# ===== ДАННЫЕ ИГРОКА =====
 @app.route("/data")
 def data():
+    player = Player.query.first()
+    if not player:
+        player = Player(name="Игрок")
+        db.session.add(player)
+        db.session.commit()
+
     return jsonify({
-        "player": player,
-        "patients": patients,
-        "selected": selected
+        "player": {
+            "money": player.money,
+            "diamonds": player.diamonds,
+            "xp": player.xp,
+            "level": player.level
+        }
     })
 
-@app.route("/select", methods=["POST"])
-def select():
-    selected["id"] = request.json["id"]
+# ===== ДЕНЬГИ (пример действия) =====
+@app.route("/earn", methods=["POST"])
+def earn():
+    player = Player.query.first()
+    player.money += 10
+    player.xp += 5
+    db.session.commit()
     return jsonify({"ok": True})
 
-@app.route("/action/<type>", methods=["POST"])
-def action(type):
-    for p in patients:
-        if p["id"] == request.json["id"]:
-            if type == "heal":
-                p["hp"] += 10
-                player["xp"] += 5
-            if type == "lab":
-                player["money"] += 10
-                player["xp"] += 10
-
-    if player["xp"] >= player["level"] * 50:
-        player["level"] += 1
-
+# ===== ЧАТ =====
+@app.route("/chat/send", methods=["POST"])
+def chat_send():
+    text = request.json["text"]
+    msg = Message(text=text)
+    db.session.add(msg)
+    db.session.commit()
     return jsonify({"ok": True})
 
 @app.route("/chat/get")
 def chat_get():
-    return jsonify(chat)
+    msgs = Message.query.all()
+    return jsonify([{"text": m.text} for m in msgs])
 
-@app.route("/chat/send", methods=["POST"])
-def chat_send():
-    chat.append({"text": request.json["text"]})
-    return jsonify({"ok": True})
-
+# ===== ЗАПУСК =====
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
