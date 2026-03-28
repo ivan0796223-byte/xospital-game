@@ -1,63 +1,26 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Hospital Game</title>
-
-<style>
-body {
-    font-family: Arial;
-    text-align: center;
-    background: #1e1e2f;
-    color: white;
-}
-
-.card {
-    background: #2b2b40;
-    padding: 20px;
-    margin: 20px auto;
-    width: 250px;
-    border-radius: 10px;
-}
-
-button {
-    padding: 10px 15px;
-    margin: 5px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.work { background: green; color: white; }
-.refresh { background: orange; color: black; }
-</style>
+    <meta charset="UTF-8">
+    <title>Xospital Game</title>
 </head>
-
 <body>
 
-<h1>🏥 Hospital Game</h1>
+<h1>🏥 Xospital Game</h1>
 
-<div class="card">
-    💰 Деньги: <span id="money">{{ player.money }}</span><br>
-    ⭐ Опыт: <span id="xp">{{ player.xp }}</span>
-</div>
+<p id="status">Игра загружена</p>
 
-<button class="work" onclick="work()">💼 Работать</button>
-<button class="refresh" onclick="updateData()">🔄 Обновить</button>
+<!-- 🔄 КНОПКА ОБНОВЛЕНИЯ -->
+<button onclick="refreshGame()">🔄 Обновить</button>
 
 <script>
-function updateData() {
-    fetch("/get_data")
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("money").innerText = data.money;
-        document.getElementById("xp").innerText = data.xp;
-    });
-}
-
-function work() {
-    fetch("/work")
-    .then(() => updateData());
+function refreshGame() {
+    fetch("/refresh")
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("status").innerText = "Обновлено ✔";
+            location.reload(); // перезагрузка страницы
+        });
 }
 </script>
 
