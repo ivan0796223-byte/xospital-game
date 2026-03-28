@@ -1,57 +1,26 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="UTF-8">
-<title>Login</title>
-<style>
-body {
-    margin:0;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:#0f172a;
-    color:white;
-    font-family:Arial;
-}
+<body style="background:#0f172a;color:white;text-align:center">
 
-.box {
-    background:#1e293b;
-    padding:20px;
-    border-radius:12px;
-    width:300px;
-}
+<h2>🏥 Вход / Регистрация</h2>
 
-input, button {
-    width:100%;
-    padding:10px;
-    margin-top:10px;
-    border:none;
-    border-radius:8px;
-}
+<input id="name" placeholder="Логин"><br>
+<input id="pass" placeholder="Пароль" type="password"><br>
 
-button {
-    background:#3b82f6;
-    color:white;
-}
-</style>
-</head>
-
-<body>
-
-<div class="box">
-    <h2>🏥 Xospital</h2>
-    <input id="name" placeholder="Введите имя">
-    <button onclick="reg()">Играть</button>
-</div>
+<button onclick="reg()">Регистрация</button>
+<button onclick="login()">Вход</button>
 
 <script>
-function reg() {
-    fetch("/register", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({username:document.getElementById("name").value})
-    }).then(() => location.reload());
+function reg(){
+fetch("/register",{method:"POST",headers:{"Content-Type":"application/json"},
+body:JSON.stringify({name:name.value,password:pass.value})})
+.then(()=>location.reload())
+}
+
+function login(){
+fetch("/login",{method:"POST",headers:{"Content-Type":"application/json"},
+body:JSON.stringify({name:name.value,password:pass.value})})
+.then(()=>location.reload())
 }
 </script>
 
