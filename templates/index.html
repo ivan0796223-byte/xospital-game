@@ -2,141 +2,64 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Xospital</title>
-
 <style>
-body {
-    margin:0;
-    font-family:Arial;
-    background:#0b1220;
-    color:white;
-}
-
-/* ШАПКА */
-.header {
-    padding:15px;
-    background:#111827;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-/* КРАСНЫЙ КРЕСТ */
-.cross {
-    color:#ef4444;
-    font-size:22px;
-    font-weight:bold;
-}
-
-/* КОНТЕЙНЕР */
-.container {
-    display:flex;
-    gap:15px;
-    padding:15px;
-}
-
-/* КАРТОЧКИ */
-.card {
-    flex:1;
-    background:#1e293b;
-    padding:15px;
-    border-radius:12px;
-    box-shadow:0 0 10px rgba(239,68,68,0.3);
-}
-
-/* КНОПКИ */
-button {
-    width:100%;
-    margin-top:5px;
-    padding:10px;
-    border:none;
-    border-radius:8px;
-    background:#ef4444;
-    color:white;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-button:hover {
-    background:#dc2626;
-}
-
-/* ШКАЛА */
-.bar {
-    width:100%;
-    height:12px;
-    background:#334155;
-    border-radius:10px;
-    overflow:hidden;
-}
-
-.fill {
-    height:100%;
-    background:#ef4444;
-}
+body{background:#0b1220;color:white;font-family:Arial}
+.box{background:#1e293b;padding:10px;margin:10px;border-radius:10px}
+button{background:#ef4444;color:white;padding:8px;border:none;margin:3px;border-radius:6px}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-    <div>
-        <span class="cross">✚</span> Xospital
-    </div>
+<h2>✚ {{ name }} | 💎 {{ user.diamonds }} | Lv {{ user.level }}</h2>
 
-    <div>
-        👤 {{ name }} |
-        💎 {{ user.diamonds }} |
-        🧬 Lv {{ user.level }}
-    </div>
+<div class="box">
+<h3>🚑 Пациенты</h3>
+{% for p in user.patients %}
+<button onclick="sel({{p.id}})">✚ {{p.name}} {{p.orvi}}%</button>
+{% endfor %}
 </div>
 
-<div class="container">
+<div class="box">
+<h3>🏥 Операционная</h3>
+{% if user.selected_patient %}
+<p>{{user.selected_patient.name}}</p>
+<button onclick="treat()">💉 Лечить</button>
+{% endif %}
+</div>
 
-    <!-- ПАЦИЕНТЫ -->
-    <div class="card">
-        <h3><span class="cross">✚</span> Пациенты</h3>
+<div class="box">
+<h3>🚗 Автопарк</h3>
+{% for c in user.cars %}
+<span style="font-size:30px">{{c}}</span>
+{% endfor %}
+</div>
 
-        {% for p in user.patients %}
-            <button onclick="selectPatient({{ p.id }})">
-                ✚ {{ p.name }} ({{ p.orvi }}%)
-            </button>
-        {% endfor %}
-    </div>
+<div class="box">
+<h3>💬 Чат</h3>
+<div id="chat">
+{% for m in user.chat %}
+<p>{{m}}</p>
+{% endfor %}
+</div>
 
-    <!-- ВЫБРАННЫЙ -->
-    <div class="card">
-        <h3><span class="cross">✚</span> Пациент</h3>
-
-        {% if user.selected_patient %}
-            <p>✚ {{ user.selected_patient.name }}</p>
-
-            <div class="bar">
-                <div class="fill" style="width: {{ user.selected_patient.orvi }}%"></div>
-            </div>
-
-            <p>{{ user.selected_patient.orvi }}%</p>
-
-            <button onclick="treat()">💉 Лечить</button>
-        {% else %}
-            <p>✚ Не выбран</p>
-        {% endif %}
-    </div>
-
+<input id="msg">
+<button onclick="send()">Отправить</button>
 </div>
 
 <script>
-function selectPatient(id) {
-    fetch("/select_patient", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({id})
-    }).then(() => location.reload());
+function sel(id){
+fetch("/select_patient",{method:"POST",headers:{"Content-Type":"application/json"},
+body:JSON.stringify({id})}).then(()=>location.reload())
 }
 
-function treat() {
-    fetch("/treat", {method:"POST"})
-    .then(() => location.reload());
+function treat(){
+fetch("/treat",{method:"POST"}).then(()=>location.reload())
+}
+
+function send(){
+fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},
+body:JSON.stringify({msg:msg.value})}).then(()=>location.reload())
 }
 </script>
 
