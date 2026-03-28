@@ -32,9 +32,9 @@ body {
 
 .bar {
     width:100%;
+    height:12px;
     background:#334155;
     border-radius:10px;
-    height:15px;
     overflow:hidden;
 }
 
@@ -58,47 +58,42 @@ button {
 <body>
 
 <div class="header">
-    👤 Игрок: {{ user }}
-    | 💰 50000
-    | 💎 Алмазы: {{ user.diamonds }}
-    | 🧬 Уровень: {{ user.level }}
+    👤 {{ name }} |
+    💰 {{ user.money }} |
+    💎 {{ user.diamonds }} |
+    🧬 Lv {{ user.level }}
 </div>
 
 <div class="container">
 
-    <!-- ОРВИ -->
     <div class="card">
-        <h3>🦠 ОРВИ пациента</h3>
+        <h3>🦠 ОРВИ</h3>
         <div class="bar">
             <div class="fill" style="width: {{ user.orvi }}%"></div>
         </div>
         <p>{{ user.orvi }}%</p>
     </div>
 
-    <!-- ПРОГРЕСС -->
     <div class="card">
-        <h3>📈 Прогресс</h3>
+        <h3>📈 XP</h3>
         <div class="bar">
             <div class="fill" style="width: {{ user.xp }}%"></div>
         </div>
-        <p>{{ user.xp }}/100 XP</p>
+        <p>{{ user.xp }}/100</p>
 
         <button onclick="act()">💉 Лечить</button>
     </div>
 
-    <!-- АЛМАЗЫ -->
     <div class="card">
-        <h3>💎 Магазин</h3>
-        <button onclick="act()">+ Алмаз</button>
+        <h3>💎 Алмазы</h3>
+        <button onclick="act()">+1 алмаз</button>
     </div>
 
 </div>
 
 <script>
 function act() {
-    fetch("/action", {
-        method:"POST"
-    })
+    fetch("/action", {method:"POST"})
     .then(r => r.json())
     .then(() => location.reload());
 }
