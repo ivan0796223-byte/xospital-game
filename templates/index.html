@@ -2,34 +2,53 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Login</title>
+<title>Xospital</title>
+
 <style>
 body {
-    background:#0f172a;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+    margin:0;
     font-family:Arial;
+    background:#0b1220;
+    color:white;
 }
 
-.box {
+.header {
+    background:#111827;
+    padding:15px;
+}
+
+.container {
+    display:flex;
+    gap:15px;
+    padding:15px;
+}
+
+.card {
+    flex:1;
     background:#1e293b;
-    padding:20px;
-    border-radius:10px;
-    width:300px;
+    padding:15px;
+    border-radius:12px;
 }
 
-input, button {
+.bar {
     width:100%;
-    padding:10px;
-    margin-top:10px;
-    border-radius:8px;
-    border:none;
+    background:#334155;
+    border-radius:10px;
+    height:15px;
+    overflow:hidden;
+}
+
+.fill {
+    height:100%;
+    background:#22c55e;
 }
 
 button {
+    width:100%;
+    margin-top:10px;
+    padding:10px;
+    border:none;
+    border-radius:8px;
     background:#3b82f6;
     color:white;
 }
@@ -38,19 +57,50 @@ button {
 
 <body>
 
-<div class="box">
-    <h2>🧑 Регистрация</h2>
-    <input id="name" placeholder="Имя">
-    <button onclick="reg()">Играть</button>
+<div class="header">
+    👤 Игрок: {{ user }}
+    | 💰 50000
+    | 💎 Алмазы: {{ user.diamonds }}
+    | 🧬 Уровень: {{ user.level }}
+</div>
+
+<div class="container">
+
+    <!-- ОРВИ -->
+    <div class="card">
+        <h3>🦠 ОРВИ пациента</h3>
+        <div class="bar">
+            <div class="fill" style="width: {{ user.orvi }}%"></div>
+        </div>
+        <p>{{ user.orvi }}%</p>
+    </div>
+
+    <!-- ПРОГРЕСС -->
+    <div class="card">
+        <h3>📈 Прогресс</h3>
+        <div class="bar">
+            <div class="fill" style="width: {{ user.xp }}%"></div>
+        </div>
+        <p>{{ user.xp }}/100 XP</p>
+
+        <button onclick="act()">💉 Лечить</button>
+    </div>
+
+    <!-- АЛМАЗЫ -->
+    <div class="card">
+        <h3>💎 Магазин</h3>
+        <button onclick="act()">+ Алмаз</button>
+    </div>
+
 </div>
 
 <script>
-function reg() {
-    fetch("/register", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({username:document.getElementById("name").value})
-    }).then(() => location.reload());
+function act() {
+    fetch("/action", {
+        method:"POST"
+    })
+    .then(r => r.json())
+    .then(() => location.reload());
 }
 </script>
 
