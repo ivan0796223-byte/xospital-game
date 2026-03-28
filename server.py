@@ -2,38 +2,45 @@ from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# Игрок
 player = {
     "money": 1000,
     "exp": 0
 }
+
+# Генерация 100000 пациентов
+patients_list = [f"Пациент №{i}" for i in range(1, 100001)]
 
 # Главная
 @app.route("/")
 def index():
     return render_template("index.html", player=player)
 
-# Пациенты
+# Пациенты (с пагинацией)
 @app.route("/patients")
 def patients():
-    return render_template("patients.html", player=player)
+    page = int(request.args.get("page", 1))
+    per_page = 20
 
-# Действия
-@app.route("/action", methods=["POST"])
-def action():
-    action = request.form.get("action")
+    start = (page - 1) * per_page
+    end = start + per_page
 
-    if action == "heal1":
-        player["money"] += 100
-        player["exp"] += 10
+    current_patients = patients_list[start:end]
 
-    elif action == "heal2":
-        player["money"] += 200
-        player["exp"] += 20
+    return render_template(
+        "patients.html",
+        player=player,
+        patients=current_patients,
+        page=page,
+        total=len(patients_list)
+    )
 
-    elif action == "heal3":
-        player["money"] += 300
-        player["exp"] += 30
+# Действие
+@app.route("/heal", methods=["POST"])
+def heal():
+    patient = request.form.get("patient")
+
+    player["money"] += 100
+    player["exp"] += 10
 
     return redirect(url_for("patients"))
 
