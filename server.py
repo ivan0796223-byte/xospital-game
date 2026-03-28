@@ -1,51 +1,17 @@
-    })
-from flask import Flask, render_template, jsonify
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///game.db"
-app.config["SECRET_KEY"] = "secret"
 
-db = SQLAlchemy(app)
-
-# ===== МОДЕЛЬ =====
-class Player(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    money = db.Column(db.Integer, default=100)
-    xp = db.Column(db.Integer, default=0)
-
-# ===== ГЛАВНАЯ =====
 @app.route("/")
-def index():
-    player = Player.query.first()
-    
-    if not player:
-        player = Player()
-        db.session.add(player)
-        db.session.commit()
-    
-    return render_template("index.html", player=player)
+def home():
+    return render_template("index.html")
 
-# ===== ПОЛУЧИТЬ ДАННЫЕ =====
-@app.route("/get_data")
-def get_data():
-    player = Player.query.first()
-    return jsonify({
-        "money": player.money,
-        "xp": player.xp
-    })
+# 🔄 маршрут для обновления
+@app.route("/refresh")
+def refresh():
+    return "ok"
 
-# ===== ДЕЙСТВИЕ (пример кнопки) =====
-@app.route("/work")
-def work():
-    player = Player.query.first()
-    player.money += 10
-    player.xp += 5
-    db.session.commit()
-    return jsonify({"status": "ok"})
-
-# ===== ЗАПУСК =====
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
