@@ -12,18 +12,21 @@
 <p>⭐ XP: <span id="xp"></span></p>
 <p>🏆 Уровень: <span id="level"></span></p>
 
-<button onclick="load()">🔄 Обновить</button>
+<!-- 🔥 КНОПКА ОБНОВЛЕНИЯ -->
+<button onclick="loadData()">🔄 Обновить</button>
 
 <script>
-async function load(){
-    let d = await fetch("/data").then(r => r.json())
+async function loadData(){
+    let res = await fetch("/data")
+    let d = await res.json()
 
     document.getElementById("money").innerText = d.money
     document.getElementById("xp").innerText = d.xp
     document.getElementById("level").innerText = d.level
 }
 
-load()
+// автозагрузка при входе
+loadData()
 </script>
 
 </body>
