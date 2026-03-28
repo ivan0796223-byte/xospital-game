@@ -1,8 +1,8 @@
-vfrom flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session
 import os
 
 app = Flask(__name__)
-app.secret_key = "xospital-secret"
+app.secret_key = "xospital-key"
 
 users = {}
 
@@ -32,10 +32,11 @@ def register():
     data = request.json
     username = data.get("username", "").strip()
 
-    if username == "":
+    if not username:
         return jsonify({"error": "empty"}), 400
 
     session["user"] = username
+
     if username not in users:
         create_user(username)
 
@@ -48,9 +49,9 @@ def action():
 
     user = users[session["user"]]
 
-    user["xp"] += 15
+    user["xp"] += 20
     user["diamonds"] += 1
-    user["orvi"] = max(0, user["orvi"] - 7)
+    user["orvi"] = max(0, user["orvi"] - 8)
 
     if user["xp"] >= 100:
         user["level"] += 1
