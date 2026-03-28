@@ -1,17 +1,10 @@
 {% extends "base.html" %}
-
 {% block content %}
 
-<div class="card">
-    <h2>👨‍⚕️ Добро пожаловать в игру</h2>
-    <p>Выберите действие:</p>
+<h2>Главное меню</h2>
 
-    <div class="grid">
-        <a href="/patients"><button>👤 Пациенты</button></a>
-        <a href="/operating"><button>🔪 Операционная</button></a>
-        <a href="/chat"><button>💬 Чат</button></a>
-        <a href="/garage"><button>🚑 Автопарк</button></a>
-    </div>
-</div>
+<a href="/patients">
+    <button>👤 Пациенты</button>
+</a>
 
 {% endblock %}
