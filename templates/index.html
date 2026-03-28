@@ -12,39 +12,67 @@ body {
     color:white;
 }
 
+/* ШАПКА */
 .header {
     padding:15px;
     background:#111827;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
+/* КРАСНЫЙ КРЕСТ */
+.cross {
+    color:#ef4444;
+    font-size:22px;
+    font-weight:bold;
+}
+
+/* КОНТЕЙНЕР */
 .container {
     display:flex;
     gap:15px;
     padding:15px;
 }
 
+/* КАРТОЧКИ */
 .card {
     flex:1;
     background:#1e293b;
     padding:15px;
     border-radius:12px;
-    max-height:400px;
-    overflow:auto;
+    box-shadow:0 0 10px rgba(239,68,68,0.3);
 }
 
+/* КНОПКИ */
 button {
     width:100%;
     margin-top:5px;
-    padding:8px;
+    padding:10px;
     border:none;
     border-radius:8px;
-    background:#3b82f6;
+    background:#ef4444;
     color:white;
     cursor:pointer;
+    font-weight:bold;
 }
 
-.selected {
-    background:#22c55e;
+button:hover {
+    background:#dc2626;
+}
+
+/* ШКАЛА */
+.bar {
+    width:100%;
+    height:12px;
+    background:#334155;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.fill {
+    height:100%;
+    background:#ef4444;
 }
 </style>
 </head>
@@ -52,35 +80,46 @@ button {
 <body>
 
 <div class="header">
-    👤 {{ name }} |
-    💎 {{ user.diamonds }} |
-    🧬 Lv {{ user.level }}
+    <div>
+        <span class="cross">✚</span> Xospital
+    </div>
+
+    <div>
+        👤 {{ name }} |
+        💎 {{ user.diamonds }} |
+        🧬 Lv {{ user.level }}
+    </div>
 </div>
 
 <div class="container">
 
-    <!-- СПИСОК ПАЦИЕНТОВ -->
+    <!-- ПАЦИЕНТЫ -->
     <div class="card">
-        <h3>🚑 Пациенты</h3>
+        <h3><span class="cross">✚</span> Пациенты</h3>
 
         {% for p in user.patients %}
             <button onclick="selectPatient({{ p.id }})">
-                {{ p.name }} ({{ p.orvi }}%)
+                ✚ {{ p.name }} ({{ p.orvi }}%)
             </button>
         {% endfor %}
     </div>
 
     <!-- ВЫБРАННЫЙ -->
     <div class="card">
-        <h3>🧑‍⚕️ Выбранный пациент</h3>
+        <h3><span class="cross">✚</span> Пациент</h3>
 
         {% if user.selected_patient %}
-            <p>{{ user.selected_patient.name }}</p>
-            <p>ОРВИ: {{ user.selected_patient.orvi }}%</p>
+            <p>✚ {{ user.selected_patient.name }}</p>
+
+            <div class="bar">
+                <div class="fill" style="width: {{ user.selected_patient.orvi }}%"></div>
+            </div>
+
+            <p>{{ user.selected_patient.orvi }}%</p>
 
             <button onclick="treat()">💉 Лечить</button>
         {% else %}
-            <p>Не выбран</p>
+            <p>✚ Не выбран</p>
         {% endif %}
     </div>
 
