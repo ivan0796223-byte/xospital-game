@@ -28,28 +28,23 @@ body {
     background:#1e293b;
     padding:15px;
     border-radius:12px;
-}
-
-.bar {
-    width:100%;
-    height:12px;
-    background:#334155;
-    border-radius:10px;
-}
-
-.fill {
-    height:100%;
-    background:#22c55e;
+    max-height:400px;
+    overflow:auto;
 }
 
 button {
     width:100%;
-    padding:10px;
-    margin-top:10px;
+    margin-top:5px;
+    padding:8px;
     border:none;
     border-radius:8px;
     background:#3b82f6;
     color:white;
+    cursor:pointer;
+}
+
+.selected {
+    background:#22c55e;
 }
 </style>
 </head>
@@ -57,35 +52,51 @@ button {
 <body>
 
 <div class="header">
-    🏥 Xospital Game
+    👤 {{ name }} |
+    💎 {{ user.diamonds }} |
+    🧬 Lv {{ user.level }}
 </div>
 
 <div class="container">
 
+    <!-- СПИСОК ПАЦИЕНТОВ -->
     <div class="card">
-        <h3>🦠 ОРВИ</h3>
-        <div class="bar"><div class="fill" style="width:80%"></div></div>
-        <p>80%</p>
+        <h3>🚑 Пациенты</h3>
+
+        {% for p in user.patients %}
+            <button onclick="selectPatient({{ p.id }})">
+                {{ p.name }} ({{ p.orvi }}%)
+            </button>
+        {% endfor %}
     </div>
 
+    <!-- ВЫБРАННЫЙ -->
     <div class="card">
-        <h3>📈 XP</h3>
-        <div class="bar"><div class="fill" style="width:40%"></div></div>
-        <p>40/100</p>
+        <h3>🧑‍⚕️ Выбранный пациент</h3>
 
-        <button onclick="act()">💉 Лечить</button>
-    </div>
+        {% if user.selected_patient %}
+            <p>{{ user.selected_patient.name }}</p>
+            <p>ОРВИ: {{ user.selected_patient.orvi }}%</p>
 
-    <div class="card">
-        <h3>💎 Алмазы</h3>
-        <button onclick="act()">+1</button>
+            <button onclick="treat()">💉 Лечить</button>
+        {% else %}
+            <p>Не выбран</p>
+        {% endif %}
     </div>
 
 </div>
 
 <script>
-function act() {
-    fetch("/action", {method:"POST"})
+function selectPatient(id) {
+    fetch("/select_patient", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({id})
+    }).then(() => location.reload());
+}
+
+function treat() {
+    fetch("/treat", {method:"POST"})
     .then(() => location.reload());
 }
 </script>
