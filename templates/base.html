@@ -1,1 +1,63 @@
 
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Xospital Mobi</title>
+    <style>
+        body {
+            margin:0;
+            font-family: Arial;
+            background:#111;
+            color:white;
+        }
+
+        .menu {
+            display:flex;
+            gap:10px;
+            padding:10px;
+            background:#222;
+        }
+
+        .menu a {
+            color:white;
+            text-decoration:none;
+            padding:10px;
+            background:#333;
+            border-radius:8px;
+        }
+
+        .menu a:hover {
+            background:red;
+        }
+
+        .content {
+            padding:20px;
+        }
+
+        button {
+            padding:10px;
+            margin:5px;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="menu">
+    <a href="/">🏠 Главная</a>
+    <a href="/patients">👤 Пациенты</a>
+    <a href="/lab">🧪 Лаборатория</a>
+    <a href="/operating">🔪 Операционная</a>
+    <a href="/doctor">🧑‍⚕️ Доктор</a>
+    <a href="/exchange">💱 Обменник</a>
+</div>
+
+<div class="content">
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>
