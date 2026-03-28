@@ -1,24 +1,13 @@
-from flask import Flask, render_template, request, jsonify, session
+vfrom flask import Flask, render_template, request, jsonify, session
 import os
 
 app = Flask(__name__)
-app.secret_key = "secret-key"
+app.secret_key = "xospital-secret"
 
-# простая база (в памяти)
 users = {}
 
-@app.route("/")
-def home():
-    if "user" not in session:
-        return render_template("login.html")
-    return render_template("index.html", user=users[session["user"]])
-
-@app.route("/register", methods=["POST"])
-def register():
-    data = request.json
-    username = data["username"]
-
-    users[username] = {
+def create_user(name):
+    users[name] = {
         "money": 50000,
         "diamonds": 0,
         "orvi": 100,
@@ -26,16 +15,42 @@ def register():
         "xp": 0
     }
 
+@app.route("/")
+def home():
+    if "user" not in session:
+        return render_template("login.html")
+
+    user = session["user"]
+
+    if user not in users:
+        create_user(user)
+
+    return render_template("index.html", user=users[user], name=user)
+
+@app.route("/register", methods=["POST"])
+def register():
+    data = request.json
+    username = data.get("username", "").strip()
+
+    if username == "":
+        return jsonify({"error": "empty"}), 400
+
     session["user"] = username
+    if username not in users:
+        create_user(username)
+
     return jsonify({"ok": True})
 
 @app.route("/action", methods=["POST"])
 def action():
+    if "user" not in session:
+        return jsonify({"error": "no user"}), 401
+
     user = users[session["user"]]
 
-    user["xp"] += 10
+    user["xp"] += 15
     user["diamonds"] += 1
-    user["orvi"] -= 5
+    user["orvi"] = max(0, user["orvi"] - 7)
 
     if user["xp"] >= 100:
         user["level"] += 1
