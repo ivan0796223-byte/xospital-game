@@ -7,7 +7,7 @@ player = {
     "exp": 0
 }
 
-# Генерация 100000 пациентов
+# 100000 пациентов
 patients_list = [f"Пациент №{i}" for i in range(1, 100001)]
 
 # Главная
@@ -15,7 +15,7 @@ patients_list = [f"Пациент №{i}" for i in range(1, 100001)]
 def index():
     return render_template("index.html", player=player)
 
-# Пациенты (с пагинацией)
+# Пациенты
 @app.route("/patients")
 def patients():
     page = int(request.args.get("page", 1))
@@ -34,15 +34,31 @@ def patients():
         total=len(patients_list)
     )
 
-# Действие
+# Лечение
 @app.route("/heal", methods=["POST"])
 def heal():
-    patient = request.form.get("patient")
-
     player["money"] += 100
     player["exp"] += 10
-
     return redirect(url_for("patients"))
+
+# Палаты
+@app.route("/ward")
+def ward():
+    return render_template("ward.html", player=player)
+
+# Действия в палатах
+@app.route("/ward_action", methods=["POST"])
+def ward_action():
+    action = request.form.get("action")
+
+    if action == "check":
+        player["exp"] += 5
+    elif action == "clean":
+        player["exp"] += 10
+    elif action == "talk":
+        player["exp"] += 3
+
+    return redirect(url_for("ward"))
 
 if __name__ == "__main__":
     app.run(debug=True)
