@@ -3,17 +3,14 @@
 
 <div class="card">
 💰 {{ user[0] }} | 💎 {{ user[1] }}
-<br>
-Уровень {{ user[3] }}
+<br>Уровень {{ user[3] }}
 
 <div class="bar" style="width:{{ user[2] }}%"></div>
 </div>
 
 <div class="card">
-<h3>🔔 Уведомления</h3>
-{% for n in notes %}
-<p>{{ n[0] }}</p>
-{% endfor %}
+🎲 Текущий ход: {{ turn }}
+<a href="/roll"><button>Бросить кубик</button></a>
 </div>
 
 {% endblock %}
