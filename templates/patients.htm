@@ -1,22 +1,13 @@
+
 {% extends "base.html" %}
+
 {% block content %}
 
-<h2>Пациенты</h2>
+<h2>👤 Пациенты</h2>
 
-<form method="POST" action="/heal">
-{% for p in patients %}
-<button>{{ p }}</button><br>
-{% endfor %}
-</form>
-
-{% if page > 1 %}
-<a href="/patients?page={{ page-1 }}"><button>⬅</button></a>
-{% endif %}
-
-Страница {{ page }}
-
-{% if page*20 < total %}
-<a href="/patients?page={{ page+1 }}"><button>➡</button></a>
-{% endif %}
+<button>Пациент №1</button>
+<button>Пациент №2</button>
+<button>Пациент №3</button>
+<button>Пациент №4</button>
 
 {% endblock %}
