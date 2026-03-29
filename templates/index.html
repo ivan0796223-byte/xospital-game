@@ -1,15 +1,45 @@
-{% extends "base.html" %}
-{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  background:#0f172a;
+  color:white;
+  font-family:Arial;
+}
+
+.card {
+  background:#1e293b;
+  padding:15px;
+  margin:10px;
+  border-radius:15px;
+}
+
+button {
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  background:#22c55e;
+  color:white;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🏥 Hospital Game</h2>
 
 <div class="card">
-💰 {{ user[0] }} | 💎 {{ user[1] }}<br>
-Уровень {{ user[3]}
-<div class="bar" style="width:{{ user[2] }}%"></div>
+👤 {{user.username}}<br>
+💰 {{user.coins}} 💎 {{user.diamonds}}<br>
+⭐ {{user.exp}} / {{user.level*100}} (Lvl {{user.level}})
 </div>
 
-<div class="card">
-🎲 {{ turn }}
-<a href="/roll"><button>Бросить кубик</button></a>
-</div>
+<a href="/patients"><button>Пациенты</button></a>
+<a href="/chat"><button>Чат</button></a>
+<a href="/surgery"><button>Операционная</button></a>
+<a href="/lab"><button>Лаборатория</button></a>
+<a href="/reward"><button>Получить награду</button></a>
 
-{% endblock %}
+</body>
+</html>
