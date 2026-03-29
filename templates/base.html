@@ -5,22 +5,13 @@
 body{background:#111;color:white;text-align:center;font-family:Arial}
 button{padding:10px;margin:5px;background:red;color:white;border:none;border-radius:10px}
 .box{background:#222;padding:10px;margin:10px;border-radius:10px}
-.bar{width:300px;height:20px;background:#333;margin:auto}
-.fill{height:100%;background:lime}
 </style>
 </head>
 <body>
 
 <h1>🏥 Xospital</h1>
 
-<div class="box">
-💰 {{ player.money }} | ⭐ {{ player.exp }} | 💎 {{ player.diamonds }}
-</div>
-
-<div class="bar">
-<div class="fill" style="width: {{ progress }}%;"></div>
-</div>
-
 {% block content %}{% endblock %}
+
 </body>
 </html>
