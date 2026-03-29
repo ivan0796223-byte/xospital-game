@@ -1,28 +1,25 @@
-{% extends "base.html" %}
+return render_template("diagnosis.html")
 
-{% block content %}
+# ===== GARAGE =====
+cars = {"🚑": 1, "🚗": 2, "🚓": 3}
 
-<h3>💬 Чат больницы</h3>
+@app.route("/garage")
+def garage():
+    return render_template("garage.html", cars=cars)
 
-<div class="card">
+@app.route("/call/<car>")
+def call(car):
+    pid = random.randint(1,100000)
+    p = patients[pid]
+    rooms.append(p)
+    return redirect("/garage")
 
-<form method="post">
-    <input name="msg" placeholder="Написать сообщение..." required>
-    <button type="submit">Отправить</button>
-</form>
+# ===== ONLINE =====
+@app.route("/online")
+def online():
+    con = db()
+    cur = con.cursor()
+    cur.execute("SELECT COUNT(*) FROM users")
+    return f"Онлайн: {cur.fetchone()[0]}"
 
-</div>
-
-<div class="card">
-
-{% if msgs %}
-    {% for m in msgs %}
-        <p>🗨 {{ m[0] }}</p>
-    {% endfor %}
-{% else %}
-    <p>❌ Сообщений пока нет</p>
-{% endif %}
-
-</div>
-
-{% endblock %}
+app.run(debug=True)
