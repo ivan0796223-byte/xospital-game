@@ -1,93 +1,38 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+return render_template("diagnosis.html")
 
-app = Flask(__name__)
-app.secret_key = "secret"
+# ===== АВТОПАРК =====
+@app.route("/garage")
+def garage():
+    now = time.time()
+    for c in cars:
+        if cars[c]["busy"] and now >= cars[c]["return"]:
+            cars[c]["busy"] = False
+    return render_template("garage.html", cars=cars)
 
-# ====== ДАННЫЕ ======
-game = {
-    "messages": [],
-    "users": {}
-}
+# ===== ВЫЗОВ =====
+@app.route("/call/<car>")
+def call(car):
+    cars[car]["busy"] = True
+    cars[car]["return"] = time.time()+10
 
-# ====== ГЛАВНАЯ ======
-@app.route("/")
-def index():
-    if "user" not in session:
-        return redirect(url_for("login"))
-    user = game["users"][session["user"]]
-    return render_template("index.html", user=user)
+    pid = random.randint(1,100000)
 
-# ====== ЛОГИН (НЕ ТРОГАЕМ ЛОГИКУ, ТОЛЬКО ЧИТАЕМ) ======
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        username = request.form["username"]
+    con = db()
+    cur = con.cursor()
 
-        if username in game["users"]:
-            session["user"] = username
-            return redirect(url_for("index"))
-        else:
-            return "❌ Нет такого пользователя"
+    cur.execute("UPDATE users SET coins=coins+30, exp=exp+15 WHERE username=?", (session["user"],))
+    cur.execute("INSERT INTO notifications VALUES(?)", (f"🚑 Привезен пациент #{pid}",))
 
-    return render_template("login.html")
+    con.commit()
+    return redirect("/garage")
 
-# ====== РЕГИСТРАЦИЯ (НОВАЯ, ПРАВИЛЬНАЯ) ======
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    if request.method == "POST":
-        username = request.form["username"]
+# ===== ОНЛАЙН =====
+@app.route("/online")
+def online():
+    con = db()
+    cur = con.cursor()
+    cur.execute("SELECT COUNT(*) FROM users")
+    count = cur.fetchone()[0]
+    return f"Онлайн: {count}"
 
-        if username in game["users"]:
-            return "❌ Уже существует"
-
-        game["users"][username] = {
-            "coins": 100,
-            "diamonds": 5
-        }
-
-        session["user"] = username
-        return redirect(url_for("index"))
-
-    return render_template("register.html")
-
-# ====== ЧАТ ======
-@app.route("/chat", methods=["GET", "POST"])
-def chat():
-    if "user" not in session:
-        return redirect(url_for("login"))
-
-    if request.method == "POST":
-        msg = request.form["msg"]
-        game["messages"].append(f"{session['user']}: {msg}")
-
-    return render_template("chat.html", game=game)
-
-# ====== ОБМЕННИК ======
-@app.route("/exchange")
-def exchange():
-    user = game["users"][session["user"]]
-
-    if user["coins"] >= 50:
-        user["coins"] -= 50
-        user["diamonds"] += 1
-
-    return render_template("exchange.html", user=user)
-
-# ====== МАГАЗИН ======
-@app.route("/shop")
-def shop():
-    return render_template("shop.html")
-
-# ====== ЛАБА ======
-@app.route("/lab")
-def lab():
-    result = "🦠 Вирус обнаружен"
-    return render_template("lab.html", result=result)
-
-# ====== ДИАГНОСТИКА ======
-@app.route("/diagnosis")
-def diagnosis():
-    return render_template("diagnosis.html")
-
-if __name__ == "__main__":
-    app.run(debug=True)
+app.run(debug=True)
