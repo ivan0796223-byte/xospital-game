@@ -1,6 +1,7 @@
-{% extends "base.html" %}
-{% block content %}
-<form method="POST" action="/operate">
-<button>Операция (+500)</button>
-</form>
-{% endblock %}
+<h2>🎲 Операция</h2>
+
+<p>Бросок кубика: {{roll}}</p>
+<p>{{result}}</p>
+
+<a href="/surgery">Бросить ещё</a>
+<a href="/">Назад</a>
