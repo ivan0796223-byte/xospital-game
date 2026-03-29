@@ -5,12 +5,14 @@
 
 {% for p in patients %}
 <div class="card">
-{{ p.name }} ({{ p.age }}) — {{ p.disease }}
+👤 {{ p.name }} ({{ p.age }})<br>
+🦠 {{ p.disease }}
 <a href="/select/{{ p.id }}"><button>Выбрать</button></a>
 </div>
 {% endfor %}
 
-<h3>Палаты</h3>
+<h3>🏥 Палаты</h3>
+
 {% for r in rooms %}
 <div class="card">
 {{ r.name }}
