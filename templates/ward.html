@@ -1,8 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
+
+<h2>Палаты</h2>
+
+{% if selected %}
+<h3>Выбран: {{ selected }}</h3>
+{% endif %}
+
+<form method="POST" action="/select_patient">
+{% for p in patients %}
+<button name="patient" value="{{ p }}">{{ p }}</button><br>
+{% endfor %}
+</form>
+
 <form method="POST" action="/ward_action">
-<button name="action" value="clean">Убрать</button>
 <button name="action" value="check">Проверить</button>
+<button name="action" value="clean">Убрать</button>
 <button name="action" value="talk">Поговорить</button>
 </form>
+
 {% endblock %}
