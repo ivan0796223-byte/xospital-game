@@ -1,15 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h3>Операционная</h3>
+<h2>🔪 ОПЕРАЦИОННАЯ</h2>
 
-<a href="/roll"><button>🎲 Кубик (кто выполняет действие)</button></a>
+<div class="card">
+<h3>🎲 Выбор врача (кубик)</h3>
+<a href="/roll"><button>Бросить кубик</button></a>
+</div>
+
+<div class="card">
+<h3>👥 Пациенты в операционной</h3>
+
+{% if operation|length == 0 %}
+<p>Нет пациентов</p>
+{% endif %}
 
 {% for p in operation %}
 <div class="card">
-{{ p.name }} — {{ p.disease }}
-<a href="/finish/{{ p.id }}"><button>Завершить</button></a>
+👤 {{ p.name }}<br>
+🦠 {{ p.disease }}<br>
+📅 Возраст: {{ p.age }}
+
+<br><br>
+
+<a href="/finish/{{ p.id }}">
+<button>✅ Завершить операцию</button>
+</a>
 </div>
 {% endfor %}
+
+</div>
+
+<div class="card">
+<h3>⚡ Система действий</h3>
+<p>После кубика выбирается игрок, который выполняет операцию</p>
+
+<a href="/operation">
+<button>🔄 Обновить список</button>
+</a>
+</div>
 
 {% endblock %}
