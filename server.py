@@ -1,29 +1,36 @@
-return render_template("diagnosis.html")
+return render_template("operation.html", operation=operation)
 
-# ===== АВТОПАРК =====
-@app.route("/garage")
-def garage():
-    now = time.time()
-    for c in cars:
-        if cars[c]["busy"] and now >= cars[c]["return"]:
-            cars[c]["busy"] = False
-    return render_template("garage.html", cars=cars)
-
-# ===== ВЫЗОВ =====
-@app.route("/call/<car>")
-def call(car):
-    cars[car]["busy"] = True
-    cars[car]["return"] = time.time()+10
-
-    pid = random.randint(1,100000)
-
+# ===== ИССЛЕДОВАНИЕ =====
+@app.route("/research")
+def research():
     con = db()
     cur = con.cursor()
 
-    cur.execute("UPDATE users SET coins=coins+30, exp=exp+15 WHERE username=?", (session["user"],))
-    cur.execute("INSERT INTO notifications VALUES(?)", (f"🚑 Привезен пациент #{pid}",))
-
+    cur.execute("UPDATE users SET coins=coins-20, exp=exp+10 WHERE coins>=20 AND username=?", (session["user"],))
     con.commit()
+
+    result = random.choice(["Новая вакцина","Улучшение лечения","Ошибка исследования"])
+    return render_template("lab.html", result=result)
+
+# ===== ОБМЕН =====
+@app.route("/exchange")
+def exchange():
+    con = db()
+    cur = con.cursor()
+    cur.execute("UPDATE users SET coins=coins-50, diamonds=diamonds+1 WHERE coins>=50 AND username=?", (session["user"],))
+    con.commit()
+    return redirect("/")
+
+# ===== АВТО =====
+@app.route("/garage")
+def garage():
+    return render_template("garage.html", cars=cars)
+
+@app.route("/call/<car>")
+def call(car):
+    pid = random.randint(1,100000)
+    p = next(x for x in patients if x["id"] == pid)
+    rooms.append(p)
     return redirect("/garage")
 
 # ===== ОНЛАЙН =====
@@ -32,7 +39,6 @@ def online():
     con = db()
     cur = con.cursor()
     cur.execute("SELECT COUNT(*) FROM users")
-    count = cur.fetchone()[0]
-    return f"Онлайн: {count}"
+    return f"Онлайн: {cur.fetchone()[0]}"
 
 app.run(debug=True)
