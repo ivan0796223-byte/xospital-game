@@ -1,10 +1,5 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<h2>🔁 Обменник</h2>
-
-<p>Монеты → Алмазы (50 = 1 💎)</p>
-<p>💰: {{ user.coins }} | 💎: {{ user.diamonds }}</p>
-
+<p>💰 {{ user.coins }} → 💎 {{ user.diamonds }}</p>
 {% endblock %}
