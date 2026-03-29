@@ -1,28 +1,8 @@
-<!DOCTYPE html>
-<html>
-<body style="background:#0b1220;color:white;text-align:center">
+<form method="post">
+<input name="username" placeholder="логин">
+<button>Войти</button>
+</form>
 
-<h2>🏥 Xospital Login</h2>
-
-<input id="n" placeholder="login"><br>
-<input id="p" type="password" placeholder="password"><br>
-
-<button onclick="r()">Регистрация</button>
-<button onclick="l()">Вход</button>
-
-<script>
-function r(){
-fetch("/register",{method:"POST",headers:{"Content-Type":"application/json"},
-body:JSON.stringify({name:n.value,password:p.value})})
-.then(()=>location.reload())
-}
-
-function l(){
-fetch("/login",{method:"POST",headers:{"Content-Type":"application/json"},
-body:JSON.stringify({name:n.value,password:p.value})})
-.then(()=>location.reload())
-}
-</script>
-
-</body>
-</html>
+<a href="/register">
+<button>Регистрация</button>
+</a>
