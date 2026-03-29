@@ -1,11 +1,11 @@
 from flask import Flask, render_template, request, redirect, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import random
-from datetime import datetime
+import time
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///game.db"
-app.config["SECRET_KEY"] = "secret"
+app.config["SECRET_KEY"] = "supersecret"
 db = SQLAlchemy(app)
 
 # =====================
@@ -29,18 +29,18 @@ class Message(db.Model):
 db.create_all()
 
 # =====================
-# HOME
+# ONLINE TRACK
 # =====================
-@app.route("/")
-def index():
-    if "user_id" not in session:
-        return redirect("/login")
+online_users = {}
 
-    user = User.query.get(session["user_id"])
-    return render_template("index.html", user=user)
+def add_exp(u, val):
+    u.exp += val
+    if u.exp >= u.level * 100:
+        u.level += 1
+        u.exp = 0
 
 # =====================
-# REGISTER / LOGIN
+# AUTH
 # =====================
 @app.route("/register", methods=["GET","POST"])
 def register():
@@ -62,6 +62,7 @@ def login():
         user = User.query.filter_by(username=u, password=p).first()
         if user:
             session["user_id"] = user.id
+            online_users[user.id] = time.time()
             return redirect("/")
         return "error"
     return render_template("login.html")
@@ -72,13 +73,15 @@ def logout():
     return redirect("/login")
 
 # =====================
-# LEVEL SYSTEM
+# HOME
 # =====================
-def add_exp(user, amount):
-    user.exp += amount
-    if user.exp >= user.level * 100:
-        user.level += 1
-        user.exp = 0
+@app.route("/")
+def index():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    u = User.query.get(session["user_id"])
+    return render_template("index.html", user=u)
 
 # =====================
 # REWARD
@@ -108,48 +111,75 @@ def chat():
 @app.route("/patients")
 def patients():
     page = int(request.args.get("page", 1))
-    per_page = 10
-
     patients = []
-    for i in range(per_page):
+
+    for i in range(12):
         pid = random.randint(1, 100000)
         patients.append({
             "id": pid,
-            "name": f"Patient #{pid}",
-            "status": random.choice(["stable", "critical", "waiting"])
+            "name": f"Patient {pid}",
+            "status": random.choice(["stable","critical","waiting"])
         })
 
-    return render_template("patients.html", patients=patients, page=page)
+    return render_template("patients.html", patients=patients)
 
 # =====================
-# AMBULANCE / CAR CALL
+# SELECT PATIENT
 # =====================
-@app.route("/ambulance/<int:pid>")
-def ambulance(pid):
-    return f"🚑 Patient {pid} sent to hospital"
+@app.route("/select_patient/<int:pid>")
+def select_patient(pid):
+    session["patient"] = pid
+    return redirect("/patients")
 
 # =====================
-# OPERATING ROOM (DICE GAME)
+# AMBULANCE / AUTOPARK
+# =====================
+@app.route("/car_call/<int:pid>")
+def car_call(pid):
+    return f"🚗 Car sent for patient {pid}"
+
+# =====================
+# SURGERY (DICE)
 # =====================
 @app.route("/surgery")
 def surgery():
     roll = random.randint(1, 6)
 
     if roll <= 2:
-        result = "❌ Failed operation"
+        res = "❌ Fail"
     elif roll <= 5:
-        result = "⚠️ Stable condition"
+        res = "⚠ Stable"
     else:
-        result = "✅ Success!"
+        res = "✅ Success"
 
-    return render_template("surgery.html", roll=roll, result=result)
+    return render_template("surgery.html", roll=roll, result=res)
 
 # =====================
 # LAB
 # =====================
 @app.route("/lab")
 def lab():
-    return f"🧪 Analysis result: {random.choice(['Virus', 'Healthy', 'Infection', 'Unknown'])}"
+    return f"🧪 Result: {random.choice(['Virus','Healthy','Infection','Unknown'])}"
+
+# =====================
+# EXCHANGE
+# =====================
+@app.route("/exchange")
+def exchange():
+    u = User.query.get(session["user_id"])
+    if u.coins >= 500:
+        u.coins -= 500
+        u.diamonds += 1
+        db.session.commit()
+        return "Exchanged!"
+    return "Not enough coins"
+
+# =====================
+# ONLINE COUNT
+# =====================
+@app.route("/online")
+def online():
+    return jsonify({"online": len(online_users)})
 
 # =====================
 # API STATS
@@ -166,3 +196,4 @@ def stats():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+    
