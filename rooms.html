@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>🏥 Палаты</h2>
+
+{% for id, status in game.rooms.items() %}
+<p>Палата {{ id }} — {{ status }}</p>
+{% endfor %}
+
+{% endblock %}
