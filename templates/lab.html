@@ -1,10 +1,13 @@
 {% extends "base.html" %}
+
 {% block content %}
 
 <h2>🧪 Лаборатория</h2>
 
-<button>Анализ крови</button>
-<button>Анализ мочи</button>
-<button>Биохимия</button>
+<div class="card">
+<p>{{ game.lab_result }}</p>
+</div>
+
+<a href="/lab"><button>Запустить анализ</button></a>
 
 {% endblock %}
