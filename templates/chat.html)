@@ -1,13 +1,12 @@
-{% extends "base.html" %}
-{% block content %}
+<h2>💬 Чат</h2>
 
 <form method="post">
-<input name="msg">
+<input name="text">
 <button>Отправить</button>
 </form>
 
-{% for m in msgs %}
-<p>{{ m[0] }}</p>
+{% for m in messages %}
+<p><b>{{m.user}}:</b> {{m.text}}</p>
 {% endfor %}
 
-{% endblock %}
+<a href="/">Назад</a>
