@@ -1,82 +1,85 @@
-from flask import Flask, render_template, request, redirect, url_for
-import random
 
-app = Flask(__name__)
+{% extends "base.html" %}
+{% block content %}
 
-# ===================== ДАННЫЕ =====================
-patients_list = [f"Пациент №{i}" for i in range(1, 100001)]
-
-selected_patient = None
-
-car_calls = []
-
-car_status = {
-    "🚑 Скорая 1": "свободна",
-    "🚑 Скорая 2": "свободна",
-    "🚑 Скорая 3": "свободна"
+<style>
+.car-card{
+    background:#222;
+    padding:12px;
+    margin:10px;
+    border-radius:12px;
 }
 
-# ===================== ГЛАВНАЯ =====================
-@app.route("/")
-def index():
-    return render_template("index.html")
+.car-icon{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:34px;
+    margin:auto;
+    box-shadow:0 0 12px red;
+    background:#111;
+}
 
-# ===================== ПАЛАТЫ =====================
-@app.route("/ward")
-def ward():
-    page = int(request.args.get("page", 1))
-    per = 10
+.status-free{color:lime}
+.status-busy{color:orange}
+.status-call{color:red}
+</style>
 
-    start = (page - 1) * per
-    end = start + per
+<h2>🚑 Автопарк</h2>
 
-    return render_template(
-        "ward.html",
-        patients=patients_list[start:end],
-        page=page,
-        total=len(patients_list),
-        selected=selected_patient
-    )
+<a href="/new_call">
+    <button>📞 Новый вызов</button>
+</a>
 
-@app.route("/select_patient", methods=["POST"])
-def select_patient():
-    global selected_patient
-    selected_patient = request.form.get("patient")
-    return redirect(url_for("ward"))
+<!-- 📍 ВЫЗОВЫ -->
+<div class="box">
+<h3>📍 Вызовы</h3>
 
-# ===================== АВТОПАРК =====================
-@app.route("/cars")
-def cars():
-    return render_template(
-        "cars.html",
-        car_calls=car_calls,
-        car_status=car_status
-    )
+{% if car_calls %}
+    {% for c in car_calls %}
+        <p class="status-call">👤 {{ c.patient }} | ⚠️ Срочность: {{ c.severity }}</p>
+    {% endfor %}
+{% else %}
+    <p>Нет вызовов</p>
+{% endif %}
+</div>
 
-@app.route("/new_call")
-def new_call():
-    car_calls.append({
-        "patient": random.choice(patients_list),
-        "severity": random.randint(1, 10)
-    })
-    return redirect(url_for("cars"))
+<!-- 🚑 МАШИНЫ -->
+<div class="box">
+<h3>🚑 Машины</h3>
 
-@app.route("/send_car", methods=["POST"])
-def send_car():
-    car = request.form.get("car")
+{% for car, status in car_status.items() %}
 
-    if car_calls and car_status[car] == "свободна":
-        call = car_calls.pop(0)
-        car_status[car] = f"🚨 в пути к {call['patient']} | ⚠️ {call['severity']}"
+<div class="car-card">
 
-    return redirect(url_for("cars"))
+    <div class="car-icon">🚑</div>
 
-@app.route("/return_car", methods=["POST"])
-def return_car():
-    car = request.form.get("car")
-    car_status[car] = "свободна"
-    return redirect(url_for("cars"))
+    <p><b>{{ car }}</b></p>
 
-# ===================== ЗАПУСК =====================
-if __name__ == "__main__":
-    app.run(debug=True)
+    {% if "свободна" in status %}
+        <p class="status-free">🟢 {{ status }}</p>
+    {% elif "в пути" in status %}
+        <p class="status-busy">🟠 {{ status }}</p>
+    {% else %}
+        <p>{{ status }}</p>
+    {% endif %}
+
+    <form method="POST" action="/send_car">
+        <input type="hidden" name="car" value="{{ car }}">
+        <button>🚨 Отправить</button>
+    </form>
+
+    <form method="POST" action="/return_car">
+        <input type="hidden" name="car" value="{{ car }}">
+        <button>🏥 Вернулась</button>
+    </form>
+
+</div>
+
+{% endfor %}
+</div>
+
+{% endblock %}
