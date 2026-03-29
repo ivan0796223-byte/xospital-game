@@ -1,11 +1,7 @@
-<h2>🏥 Пациенты</h2>
-
 {% for p in patients %}
-<div>
+<p>
 {{p.name}} ({{p.status}})
-<a href="/select/{{p.id}}">[Выбрать]</a>
-<a href="/call/{{p.id}}">🚑 Вызвать</a>
-</div>
+<a href="/select/{{p.id}}">Выбрать</a>
+<a href="/call/{{p.id}}">🚑</a>
+</p>
 {% endfor %}
-
-<a href="/">Назад</a>
