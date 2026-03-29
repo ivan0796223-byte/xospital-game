@@ -1,17 +1,19 @@
-
 from flask import Flask, render_template, request, redirect, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import random
+import os
 
 app = Flask(__name__)
+
+# ================== CONFIG ==================
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///game.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"] = "super-secret"
+app.config["SECRET_KEY"] = "super-secret-key"
 
 db = SQLAlchemy(app)
 
-# ===================== MODELS =====================
+# ================== MODELS ==================
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -21,19 +23,13 @@ class User(db.Model):
     diamonds = db.Column(db.Integer, default=0)
     exp = db.Column(db.Integer, default=0)
     level = db.Column(db.Integer, default=1)
-    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
-
-class Patient(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    status = db.Column(db.String(50), default="waiting")  # waiting, in_room, surgery
-    assigned_to = db.Column(db.String(100))
+    last_online = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.String(100))
     text = db.Column(db.String(500))
-    time = db.Column(db.String(50))
+    time = db.Column(db.String(20))
 
 class Inventory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -44,30 +40,40 @@ class Vehicle(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.String(100))
     name = db.Column(db.String(100))
-    level = db.Column(db.Integer, default=1)
 
 class Operation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     doctor = db.Column(db.String(100))
     patient_id = db.Column(db.Integer)
-    result = db.Column(db.String(100))
     dice = db.Column(db.Integer)
+    result = db.Column(db.String(50))
 
-# ===================== INIT DB =====================
+# ================== INIT DB SAFE ==================
 
-with app.app_context():
-    db.create_all()
+def init_db():
+    with app.app_context():
+        db.create_all()
 
-# ===================== HELPERS =====================
+init_db()
 
-def level_progress(user):
+# ================== HELPERS ==================
+
+def progress(user):
     need = user.level * 100
     return int((user.exp / need) * 100)
 
-def get_online_users():
-    return User.query.filter(User.last_seen != None).all()
+def get_online():
+    return User.query.filter(User.last_online != None).count()
 
-# ===================== ROUTES =====================
+def virtual_patient(pid):
+    return {
+        "id": pid,
+        "name": f"Patient #{pid}",
+        "room": f"Room {pid % 50 + 1}",
+        "status": "waiting"
+    }
+
+# ================== ROUTES ==================
 
 @app.route("/")
 def index():
@@ -75,13 +81,18 @@ def index():
         return redirect("/login")
 
     user = User.query.filter_by(username=session["user"]).first()
-    user.last_seen = datetime.utcnow()
+    if not user:
+        return redirect("/login")
+
+    user.last_online = datetime.utcnow()
     db.session.commit()
 
-    return render_template("index.html", user=user, progress=level_progress(user))
+    return render_template("index.html",
+                           user=user,
+                           progress=progress(user),
+                           online=get_online())
 
-
-# ===================== AUTH =====================
+# ================== AUTH ==================
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -119,20 +130,15 @@ def logout():
     session.clear()
     return redirect("/login")
 
-# ===================== PATIENT SYSTEM (100K VIRTUAL) =====================
+# ================== PATIENTS (100K VIRTUAL) ==================
 
 @app.route("/patients")
 def patients():
     if "user" not in session:
         return redirect("/login")
 
-    # показываем только часть (реально не храним 100k)
-    sample = [
-        {"id": i, "name": f"Patient #{i}", "status": "waiting"}
-        for i in range(1, 51)
-    ]
-
-    return render_template("patients.html", patients=sample)
+    data = [virtual_patient(i) for i in range(1, 51)]
+    return render_template("patients.html", patients=data)
 
 
 @app.route("/select_patient/<int:pid>")
@@ -140,15 +146,16 @@ def select_patient(pid):
     session["patient"] = pid
     return redirect("/operating")
 
-
-# ===================== OPERATING ROOM + DICE =====================
+# ================== OPERATING + DICE ==================
 
 @app.route("/operating")
 def operating():
     if "user" not in session:
         return redirect("/login")
 
-    patient = session.get("patient", None)
+    pid = session.get("patient", 1)
+    patient = virtual_patient(pid)
+
     return render_template("operating.html", patient=patient)
 
 
@@ -160,62 +167,52 @@ def dice():
     if roll >= 4:
         result = "SUCCESS"
 
-    op = Operation(
+    db.session.add(Operation(
         doctor=session.get("user"),
         patient_id=session.get("patient", 0),
-        result=result,
-        dice=roll
-    )
-    db.session.add(op)
+        dice=roll,
+        result=result
+    ))
     db.session.commit()
 
     return jsonify({"roll": roll, "result": result})
 
-
-# ===================== CHAT =====================
+# ================== CHAT ==================
 
 @app.route("/chat", methods=["GET", "POST"])
 def chat():
     if request.method == "POST":
-        msg = Message(
+        db.session.add(Message(
             user=session.get("user"),
             text=request.form["text"],
-            time=str(datetime.now().strftime("%H:%M"))
-        )
-        db.session.add(msg)
+            time=datetime.now().strftime("%H:%M")
+        ))
         db.session.commit()
-
         return redirect("/chat")
 
     return render_template("chat.html", messages=Message.query.all())
 
-
-# ===================== SHOP =====================
+# ================== SHOP ==================
 
 @app.route("/shop")
 def shop():
-    items = ["Medkit", "Scanner", "Upgrade Tool", "Car Engine"]
+    items = ["Medkit", "Scanner", "Upgrade", "Armor"]
     return render_template("shop.html", items=items)
-
 
 @app.route("/buy/<item>")
 def buy(item):
     user = User.query.filter_by(username=session["user"]).first()
-    user.coins -= 10
-
+    user.coins += 0  # можно заменить логикой
     db.session.add(Inventory(user=user.username, item=item))
     db.session.commit()
-
     return redirect("/shop")
 
-
-# ===================== VEHICLES =====================
+# ================== GARAGE ==================
 
 @app.route("/garage")
 def garage():
     cars = Vehicle.query.filter_by(user=session["user"]).all()
     return render_template("garage.html", cars=cars)
-
 
 @app.route("/add_car/<name>")
 def add_car(name):
@@ -223,16 +220,14 @@ def add_car(name):
     db.session.commit()
     return redirect("/garage")
 
-
-# ===================== API =====================
+# ================== ONLINE API ==================
 
 @app.route("/api/online")
 def online():
-    users = User.query.all()
-    return jsonify(len(users))
+    return jsonify({"online": get_online()})
 
-
-# ===================== RUN =====================
+# ================== RUN ==================
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
