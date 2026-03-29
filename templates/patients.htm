@@ -1,23 +1,11 @@
-{% extends "base.html" %}
-{% block content %}
-
-<h3>Пациенты</h3>
+<h2>🏥 Пациенты</h2>
 
 {% for p in patients %}
-<div class="card">
-👤 {{ p.name }} ({{ p.age }})<br>
-🦠 {{ p.disease }}
-<a href="/select/{{ p.id }}"><button>Выбрать</button></a>
+<div>
+{{p.name}} ({{p.status}})
+<a href="/select/{{p.id}}">[Выбрать]</a>
+<a href="/call/{{p.id}}">🚑 Вызвать</a>
 </div>
 {% endfor %}
 
-<h3>🏥 Палаты</h3>
-
-{% for r in rooms %}
-<div class="card">
-{{ r.name }}
-<a href="/operate/{{ r.id }}"><button>В операцию</button></a>
-</div>
-{% endfor %}
-
-{% endblock %}
+<a href="/">Назад</a>
