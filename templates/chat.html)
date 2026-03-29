@@ -1,12 +1,8 @@
-<h2>💬 Чат</h2>
-
-<form method="post">
+<form method="POST">
 <input name="text">
 <button>Отправить</button>
 </form>
 
 {% for m in messages %}
-<p><b>{{m.user}}:</b> {{m.text}}</p>
+<p>{{m.user}}: {{m.text}}</p>
 {% endfor %}
-
-<a href="/">Назад</a>
