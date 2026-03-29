@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>🚗 Автопарк</h2>
+
+{% for name, car in game.cars.items() %}
+<p>
+    {{ name }} —
+    {% if car.busy %}
+        ⏳ в поездке
+    {% else %}
+        🟢 свободна
+        <a href="/send_car/{{ name }}"><button>Отправить</button></a>
+    {% endif %}
+</p>
+{% endfor %}
+
+{% endblock %}
