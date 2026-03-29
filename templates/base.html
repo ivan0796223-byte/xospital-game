@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -7,14 +6,20 @@
 </head>
 <body>
 
-    <nav>
-        <a href="/">Главная</a> |
-        <a href="/patients">Пациенты</a>
-    </nav>
+<nav>
+    <a href="/">Главная</a> |
+    <a href="/patients">Пациенты</a> |
+    <a href="/rooms">Палаты</a> |
+    <a href="/garage">Автопарк</a>
+</nav>
 
-    <hr>
+<hr>
 
-    {% block content %}{% endblock %}
+<h3>💰 Монеты: {{ game.coins }} | 💎 Алмазы: {{ game.diamonds }}</h3>
+
+<hr>
+
+{% block content %}{% endblock %}
 
 </body>
 </html>
