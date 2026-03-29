@@ -1,21 +1,63 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Hospital Game</title>
+<meta charset="UTF-8">
+<title>HOSPITAL DARK</title>
+
+<style>
+body {
+    background: #0b0f14;
+    color: white;
+    font-family: Arial;
+}
+
+nav {
+    background: #111827;
+    padding: 10px;
+}
+
+a {
+    color: #ff3b3b;
+    margin-right: 10px;
+    text-decoration: none;
+}
+
+.card {
+    background: #111827;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
+    border: 1px solid #2a2a2a;
+}
+
+.red-cross {
+    color: red;
+    font-size: 30px;
+}
+button {
+    background: red;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+}
+</style>
 </head>
+
 <body>
 
+<div class="card">
+    <span class="red-cross">✚ HOSPITAL SYSTEM</span>
+</div>
+
 <nav>
-    <a href="/">Главная</a> |
-    <a href="/patients">Пациенты</a> |
-    <a href="/rooms">Палаты</a> |
-    <a href="/garage">Автопарк</a>
+    <a href="/">Главная</a>
+    <a href="/chat">Чат</a>
+    <a href="/exchange">Обменник</a>
+    <a href="/shop">Магазин</a>
+    <a href="/lab">Лаборатория</a>
+    <a href="/diagnosis">Диагностика</a>
 </nav>
-
-<hr>
-
-<h3>💰 Монеты: {{ game.coins }} | 💎 Алмазы: {{ game.diamonds }}</h3>
 
 <hr>
 
