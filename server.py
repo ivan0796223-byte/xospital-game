@@ -1,76 +1,68 @@
-from flask import Flask, render_template, redirect, url_for
-import time
+from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
+app.secret_key = "secret"
 
-# ====== ДАННЫЕ ИГРЫ ======
+# ====== ИГРОВЫЕ ДАННЫЕ ======
 game = {
     "coins": 100,
     "diamonds": 10,
-    "cars": {
-        "Скорая №1": {"busy": False, "return_time": 0},
-        "Скорая №2": {"busy": False, "return_time": 0},
-    },
-    "patients": [
-        {"id": 1, "name": "Иван", "disease": "Аппендицит", "room": 1, "healed": False},
-        {"id": 2, "name": "Олег", "disease": "Перелом", "room": 2, "healed": False},
-        {"id": 3, "name": "Анна", "disease": "Грипп", "room": 3, "healed": False},
-    ],
-    "rooms": {
-        1: "Свободна",
-        2: "Свободна",
-        3: "Свободна"
-    }
+    "messages": [],
+    "users": {},
+    "lab_result": "Нет анализов"
 }
 
 # ====== ГЛАВНАЯ ======
 @app.route("/")
 def index():
-    check_cars()
+    if "user" not in session:
+        return redirect(url_for("login"))
     return render_template("index.html", game=game)
 
-# ====== ПАЦИЕНТЫ ======
-@app.route("/patients")
-def patients():
-    return render_template("patients.html", game=game)
+# ====== РЕГИСТРАЦИЯ / ЛОГИН ======
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        session["user"] = username
+        game["users"][username] = {"coins": 100, "diamonds": 5}
+        return redirect(url_for("index"))
+    return render_template("login.html")
 
-# ====== ПАЛАТЫ ======
-@app.route("/rooms")
-def rooms():
-    return render_template("rooms.html", game=game)
+# ====== ЧАТ ======
+@app.route("/chat", methods=["GET", "POST"])
+def chat():
+    if request.method == "POST":
+        msg = request.form["msg"]
+        user = session.get("user", "anon")
+        game["messages"].append(f"{user}: {msg}")
+    return render_template("chat.html", game=game)
 
-# ====== ГАРАЖ ======
-@app.route("/garage")
-def garage():
-    check_cars()
-    return render_template("garage.html", game=game)
+# ====== ОБМЕННИК ======
+@app.route("/exchange")
+def exchange():
+    user = session["user"]
+    u = game["users"][user]
+    if u["coins"] >= 50:
+        u["coins"] -= 50
+        u["diamonds"] += 1
+    return render_template("exchange.html", user=u)
 
-# ====== ОПЕРАЦИЯ ======
-@app.route("/heal/<int:pid>")
-def heal(pid):
-    for p in game["patients"]:
-        if p["id"] == pid:
-            p["healed"] = True
-            game["coins"] += 20
-            game["diamonds"] += 1
-    return redirect(url_for("patients"))
+# ====== МАГАЗИН ======
+@app.route("/shop")
+def shop():
+    return render_template("shop.html")
 
-# ====== ПОЕЗДКА ======
-@app.route("/send_car/<name>")
-def send_car(name):
-    now = time.time()
-    game["cars"][name]["busy"] = True
-    game["cars"][name]["return_time"] = now + 10  # 10 сек поездка
-    game["coins"] += 5
-    return redirect(url_for("garage"))
+# ====== ЛАБОРАТОРИЯ ======
+@app.route("/lab")
+def lab():
+    game["lab_result"] = "Анализ: вирус найден 🦠"
+    return render_template("lab.html", game=game)
 
-# ====== ПРОВЕРКА МАШИН ======
-def check_cars():
-    now = time.time()
-    for car in game["cars"]:
-        if game["cars"][car]["busy"]:
-            if now >= game["cars"][car]["return_time"]:
-                game["cars"][car]["busy"] = False
+# ====== ДИАГНОСТИКА ======
+@app.route("/diagnosis")
+def diagnosis():
+    return render_template("diagnosis.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
