@@ -1,22 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>Палаты</h2>
+<h2>🏥 Палаты</h2>
 
 {% if selected %}
-<h3>Выбран: {{ selected }}</h3>
+<div class="box">
+👤 Выбран: {{ selected }}
+</div>
 {% endif %}
 
 <form method="POST" action="/select_patient">
+<div class="box">
+<h3>📋 Пациенты</h3>
+
 {% for p in patients %}
-<button name="patient" value="{{ p }}">{{ p }}</button><br>
-{% endfor %}
+<button name="patient" value="{{ p }}">👤 {{ p }}</button>
+
+endfor %}
+</div>
 </form>
 
-<form method="POST" action="/ward_action">
-<button name="action" value="check">Проверить</button>
-<button name="action" value="clean">Убрать</button>
-<button name="action" value="talk">Поговорить</button>
-</form>
+<div>
+{% if page > 1 %}
+<a href="/ward?page={{ page-1 }}"><button>⬅</button></a>
+{% endif %}
+
+Страница {{ page }}
+
+{% if page*10 < total %}
+<a href="/ward?page={{ page+1 }}"><button>➡</button></a>
+{% endif %}
+</div>
 
 {% endblock %}
