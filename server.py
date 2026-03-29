@@ -5,7 +5,7 @@ import time
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///game.db"
-app.config["SECRET_KEY"] = "supersecret"
+app.config["SECRET_KEY"] = "secretkey"
 db = SQLAlchemy(app)
 
 # =====================
@@ -29,9 +29,9 @@ class Message(db.Model):
 db.create_all()
 
 # =====================
-# ONLINE TRACK
+# ONLINE SYSTEM
 # =====================
-online_users = {}
+online = {}
 
 def add_exp(u, val):
     u.exp += val
@@ -47,11 +47,14 @@ def register():
     if request.method == "POST":
         u = request.form["username"]
         p = request.form["password"]
+
         if User.query.filter_by(username=u).first():
             return "exists"
+
         db.session.add(User(username=u, password=p))
         db.session.commit()
         return redirect("/login")
+
     return render_template("register.html")
 
 @app.route("/login", methods=["GET","POST"])
@@ -59,12 +62,14 @@ def login():
     if request.method == "POST":
         u = request.form["username"]
         p = request.form["password"]
+
         user = User.query.filter_by(username=u, password=p).first()
         if user:
             session["user_id"] = user.id
-            online_users[user.id] = time.time()
+            online[user.id] = time.time()
             return redirect("/")
         return "error"
+
     return render_template("login.html")
 
 @app.route("/logout")
@@ -100,9 +105,11 @@ def reward():
 @app.route("/chat", methods=["GET","POST"])
 def chat():
     u = User.query.get(session["user_id"])
+
     if request.method == "POST":
         db.session.add(Message(user=u.username, text=request.form["text"]))
         db.session.commit()
+
     return render_template("chat.html", messages=Message.query.all())
 
 # =====================
@@ -110,14 +117,13 @@ def chat():
 # =====================
 @app.route("/patients")
 def patients():
-    page = int(request.args.get("page", 1))
     patients = []
 
-    for i in range(12):
+    for _ in range(12):
         pid = random.randint(1, 100000)
         patients.append({
             "id": pid,
-            "name": f"Patient {pid}",
+            "name": f"Patient #{pid}",
             "status": random.choice(["stable","critical","waiting"])
         })
 
@@ -126,27 +132,27 @@ def patients():
 # =====================
 # SELECT PATIENT
 # =====================
-@app.route("/select_patient/<int:pid>")
-def select_patient(pid):
+@app.route("/select/<int:pid>")
+def select(pid):
     session["patient"] = pid
     return redirect("/patients")
 
 # =====================
 # AMBULANCE / AUTOPARK
 # =====================
-@app.route("/car_call/<int:pid>")
-def car_call(pid):
-    return f"🚗 Car sent for patient {pid}"
+@app.route("/call/<int:pid>")
+def call(pid):
+    return f"🚑 Ambulance sent to patient {pid}"
 
 # =====================
-# SURGERY (DICE)
+# SURGERY (DICE SYSTEM)
 # =====================
 @app.route("/surgery")
 def surgery():
     roll = random.randint(1, 6)
 
     if roll <= 2:
-        res = "❌ Fail"
+        res = "❌ Failure"
     elif roll <= 5:
         res = "⚠ Stable"
     else:
@@ -159,7 +165,7 @@ def surgery():
 # =====================
 @app.route("/lab")
 def lab():
-    return f"🧪 Result: {random.choice(['Virus','Healthy','Infection','Unknown'])}"
+    return f"🧪 Diagnosis: {random.choice(['Virus','Healthy','Infection','Unknown'])}"
 
 # =====================
 # EXCHANGE
@@ -167,6 +173,7 @@ def lab():
 @app.route("/exchange")
 def exchange():
     u = User.query.get(session["user_id"])
+
     if u.coins >= 500:
         u.coins -= 500
         u.diamonds += 1
@@ -178,11 +185,11 @@ def exchange():
 # ONLINE COUNT
 # =====================
 @app.route("/online")
-def online():
-    return jsonify({"online": len(online_users)})
+def online_count():
+    return jsonify({"online": len(online)})
 
 # =====================
-# API STATS
+# API
 # =====================
 @app.route("/api/stats")
 def stats():
