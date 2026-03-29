@@ -1,13 +1,21 @@
-
 {% extends "base.html" %}
 
 {% block content %}
 
 <h2>👤 Пациенты</h2>
 
-<button>Пациент №1</button>
-<button>Пациент №2</button>
-<button>Пациент №3</button>
-<button>Пациент №4</button>
+{% for p in game.patients %}
+<div>
+    <p>
+        {{ p.name }} — {{ p.disease }}
+        {% if p.healed %}
+            ✅ вылечен
+        {% else %}
+            ❌ болен
+            <a href="/heal/{{ p.id }}"><button>Операция</button></a>
+        {% endif %}
+    </p>
+</div>
+{% endfor %}
 
 {% endblock %}
