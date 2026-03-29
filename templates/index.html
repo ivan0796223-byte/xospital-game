@@ -2,14 +2,13 @@
 {% block content %}
 
 <div class="card">
-💰 {{ user[0] }} | 💎 {{ user[1] }}
-<br>Уровень {{ user[3] }}
-
+💰 {{ user[0] }} | 💎 {{ user[1] }}<br>
+Уровень {{ user[3]}
 <div class="bar" style="width:{{ user[2] }}%"></div>
 </div>
 
 <div class="card">
-🎲 Текущий ход: {{ turn }}
+🎲 {{ turn }}
 <a href="/roll"><button>Бросить кубик</button></a>
 </div>
 
