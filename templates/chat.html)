@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block content %}
 
 <form method="post">
@@ -7,8 +6,8 @@
 <button>Отправить</button>
 </form>
 
-{% for m in game.messages %}
-<p>{{ m }}</p>
+{% for m in msgs %}
+<p>{{ m[0] }}</p>
 {% endfor %}
 
 {% endblock %}
