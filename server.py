@@ -1,25 +1,17 @@
-return render_template("operation.html", operation=operation)
-
-# ===== ИССЛЕДОВАНИЕ =====
-@app.route("/research")
-def research():
-    con = db()
-    cur = con.cursor()
-
-    cur.execute("UPDATE users SET coins=coins-20, exp=exp+10 WHERE coins>=20 AND username=?", (session["user"],))
-    con.commit()
-
-    result = random.choice(["Новая вакцина","Улучшение лечения","Ошибка исследования"])
-    return render_template("lab.html", result=result)
-
-# ===== ОБМЕН =====
-@app.route("/exchange")
-def exchange():
-    con = db()
-    cur = con.cursor()
-    cur.execute("UPDATE users SET coins=coins-50, diamonds=diamonds+1 WHERE coins>=50 AND username=?", (session["user"],))
+cur.execute("UPDATE users SET coins=coins-50, diamonds=diamonds+1 WHERE coins>=50 AND username=?", (session["user"],))
     con.commit()
     return redirect("/")
+
+# ===== ЛАБА =====
+@app.route("/lab")
+def lab():
+    result = random.choice(["🦠 Вирус","✅ Здоров","⚠ Инфекция"])
+    return render_template("lab.html", result=result)
+
+# ===== ДИАГНОСТИКА =====
+@app.route("/diagnosis")
+def diag():
+    return render_template("diagnosis.html")
 
 # ===== АВТО =====
 @app.route("/garage")
