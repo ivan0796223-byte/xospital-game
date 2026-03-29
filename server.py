@@ -1,19 +1,31 @@
-cur.execute("UPDATE users SET coins=coins-50, diamonds=diamonds+1 WHERE coins>=50")
+return render_template("operating.html", operation=operation)
+
+# ================= EXCHANGE =================
+@app.route("/exchange")
+def exchange():
+    con = db()
+    cur = con.cursor()
+    cur.execute("""
+        UPDATE users 
+        SET coins = coins - 50, diamonds = diamonds + 1 
+        WHERE coins >= 50
+    """)
     con.commit()
     return redirect("/")
 
-# ===== LAB =====
+# ================= LAB =================
 @app.route("/lab")
 def lab():
-    result = random.choice(["🧪 Чисто", "🦠 Вирус", "⚠ Риск"])
-    return render_template("lab.html", result=result)
+    return render_template("lab.html",
+        result=random.choice(["🧪 Чисто", "🦠 Вирус", "⚠ Риск"])
+    )
 
-# ===== DIAGNOSIS =====
+# ================= DIAGNOSIS =================
 @app.route("/diagnosis")
 def diagnosis():
     return render_template("diagnosis.html")
 
-# ===== GARAGE =====
+# ================= GARAGE =================
 cars = ["🚑", "🚗", "🚓"]
 
 @app.route("/garage")
@@ -22,23 +34,20 @@ def garage():
 
 @app.route("/call/<car>")
 def call(car):
-    pid = random.randint(1, 99999)
-    p = get_patient(pid)
-
+    p = get_patient(random.randint(1, 99999))
     if p:
         rooms.append(p)
-
     return redirect("/garage")
 
-# ===== ONLINE =====
+# ================= ONLINE =================
 @app.route("/online")
 def online():
     con = db()
     cur = con.cursor()
     cur.execute("SELECT COUNT(*) FROM users")
-    return f"Онлайн игроков: {cur.fetchone()[0]}"
+    return f"👥 Онлайн: {cur.fetchone()[0]}"
 
-# ===== RUN SAFE (RENDER FIX) =====
+# ================= SAFE RUN =================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
