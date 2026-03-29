@@ -5,11 +5,13 @@ import time
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///game.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "secretkey"
+
 db = SQLAlchemy(app)
 
 # =====================
-# USER
+# МОДЕЛИ
 # =====================
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,30 +28,34 @@ class Message(db.Model):
     user = db.Column(db.String(80))
     text = db.Column(db.Text)
 
-db.create_all()
+# =====================
+# FIX CONTEXT ERROR (ГЛАВНОЕ ИСПРАВЛЕНИЕ)
+# =====================
+with app.app_context():
+    db.create_all()
 
 # =====================
 # ONLINE SYSTEM
 # =====================
-online = {}
+online_users = {}
 
-def add_exp(u, val):
-    u.exp += val
-    if u.exp >= u.level * 100:
-        u.level += 1
-        u.exp = 0
+def add_exp(user, amount):
+    user.exp += amount
+    if user.exp >= user.level * 100:
+        user.level += 1
+        user.exp = 0
 
 # =====================
 # AUTH
 # =====================
-@app.route("/register", methods=["GET","POST"])
+@app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
         u = request.form["username"]
         p = request.form["password"]
 
         if User.query.filter_by(username=u).first():
-            return "exists"
+            return "User exists"
 
         db.session.add(User(username=u, password=p))
         db.session.commit()
@@ -57,7 +63,8 @@ def register():
 
     return render_template("register.html")
 
-@app.route("/login", methods=["GET","POST"])
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         u = request.form["username"]
@@ -66,11 +73,12 @@ def login():
         user = User.query.filter_by(username=u, password=p).first()
         if user:
             session["user_id"] = user.id
-            online[user.id] = time.time()
+            online_users[user.id] = time.time()
             return redirect("/")
-        return "error"
+        return "Wrong login"
 
     return render_template("login.html")
+
 
 @app.route("/logout")
 def logout():
@@ -85,29 +93,30 @@ def index():
     if "user_id" not in session:
         return redirect("/login")
 
-    u = User.query.get(session["user_id"])
-    return render_template("index.html", user=u)
+    user = User.query.get(session["user_id"])
+    return render_template("index.html", user=user)
 
 # =====================
 # REWARD
 # =====================
 @app.route("/reward")
 def reward():
-    u = User.query.get(session["user_id"])
-    u.coins += 100
-    add_exp(u, 20)
+    user = User.query.get(session["user_id"])
+    user.coins += 100
+    add_exp(user, 20)
     db.session.commit()
     return redirect("/")
 
 # =====================
 # CHAT
 # =====================
-@app.route("/chat", methods=["GET","POST"])
+@app.route("/chat", methods=["GET", "POST"])
 def chat():
-    u = User.query.get(session["user_id"])
+    user = User.query.get(session["user_id"])
 
     if request.method == "POST":
-        db.session.add(Message(user=u.username, text=request.form["text"]))
+        msg = Message(user=user.username, text=request.form["text"])
+        db.session.add(msg)
         db.session.commit()
 
     return render_template("chat.html", messages=Message.query.all())
@@ -124,7 +133,7 @@ def patients():
         patients.append({
             "id": pid,
             "name": f"Patient #{pid}",
-            "status": random.choice(["stable","critical","waiting"])
+            "status": random.choice(["stable", "critical", "waiting"])
         })
 
     return render_template("patients.html", patients=patients)
@@ -138,69 +147,73 @@ def select(pid):
     return redirect("/patients")
 
 # =====================
-# AMBULANCE / AUTOPARK
+# AMBULANCE / AUTO
 # =====================
 @app.route("/call/<int:pid>")
 def call(pid):
     return f"🚑 Ambulance sent to patient {pid}"
 
 # =====================
-# SURGERY (DICE SYSTEM)
+# SURGERY (DICE GAME)
 # =====================
 @app.route("/surgery")
 def surgery():
     roll = random.randint(1, 6)
 
     if roll <= 2:
-        res = "❌ Failure"
+        result = "❌ Failure"
     elif roll <= 5:
-        res = "⚠ Stable"
+        result = "⚠ Stable"
     else:
-        res = "✅ Success"
+        result = "✅ Success"
 
-    return render_template("surgery.html", roll=roll, result=res)
+    return render_template("surgery.html", roll=roll, result=result)
 
 # =====================
 # LAB
 # =====================
 @app.route("/lab")
 def lab():
-    return f"🧪 Diagnosis: {random.choice(['Virus','Healthy','Infection','Unknown'])}"
+    return f"🧪 Result: {random.choice(['Virus', 'Healthy', 'Infection', 'Unknown'])}"
 
 # =====================
 # EXCHANGE
 # =====================
 @app.route("/exchange")
 def exchange():
-    u = User.query.get(session["user_id"])
+    user = User.query.get(session["user_id"])
 
-    if u.coins >= 500:
-        u.coins -= 500
-        u.diamonds += 1
+    if user.coins >= 500:
+        user.coins -= 500
+        user.diamonds += 1
         db.session.commit()
         return "Exchanged!"
+
     return "Not enough coins"
 
 # =====================
 # ONLINE COUNT
 # =====================
 @app.route("/online")
-def online_count():
-    return jsonify({"online": len(online)})
+def online():
+    return jsonify({"online": len(online_users)})
 
 # =====================
-# API
+# API STATS
 # =====================
 @app.route("/api/stats")
 def stats():
-    u = User.query.get(session["user_id"])
+    user = User.query.get(session["user_id"])
+
     return jsonify({
-        "coins": u.coins,
-        "diamonds": u.diamonds,
-        "exp": u.exp,
-        "level": u.level
+        "coins": user.coins,
+        "diamonds": user.diamonds,
+        "exp": user.exp,
+        "level": user.level
     })
 
+# =====================
+# RUN
+# =====================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-    
