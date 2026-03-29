@@ -1,6 +1,41 @@
 {% extends "base.html" %}
 {% block content %}
-<form method="POST" action="/buy_car">
-<button>Купить авто (-500)</button>
+
+<h2>🚑 Автопарк</h2>
+
+<a href="/new_call"><button>📞 Новый вызов</button></a>
+
+<div class="box">
+<h3>📍 Вызовы</h3>
+
+{% if car_calls %}
+    {% for c in car_calls %}
+        <p>👤 {{ c.patient }} | ⚠️ {{ c.severity }}</p>
+    {% endfor %}
+{% else %}
+    <p>Нет вызовов</p>
+{% endif %}
+</div>
+
+<div class="box">
+<h3>🚑 Машины</h3>
+
+{% for car, status in car_status.items() %}
+<div class="box">
+<p><b>{{ car }}</b></p>
+<p>{{ status }}</p>
+
+<form method="POST" action="/send_car">
+<input type="hidden" name="car" value="{{ car }}">
+<button>🚨 Отправить</button>
 </form>
+
+<form method="POST" action="/return_car">
+<input type="hidden" name="car" value="{{ car }}">
+<button>🏥 Вернулась</button>
+</form>
+</div>
+{% endfor %}
+</div>
+
 {% endblock %}
