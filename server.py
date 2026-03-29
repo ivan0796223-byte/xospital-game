@@ -12,8 +12,8 @@ db = SQLAlchemy(app)
 # ================== USER ==================
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True)
-    password = db.Column(db.String(80))
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(80), nullable=False)
     coins = db.Column(db.Integer, default=0)
     diamonds = db.Column(db.Integer, default=0)
     xp = db.Column(db.Integer, default=0)
@@ -32,29 +32,30 @@ with app.app_context():
 @app.route("/")
 def home():
     if "user" in session:
-        return f"🏥 Hospital Game | Пользователь: {session['user']}"
+        return f"🏥 Hospital Game | {session['user']}"
     return redirect("/login")
 
 # ================== REGISTER ==================
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        u = request.form["username"]
-        p = request.form["password"]
+        username = request.form["username"]
+        password = request.form["password"]
 
-        if User.query.filter_by(username=u).first():
-            return "User exists"
+        if User.query.filter_by(username=username).first():
+            return "❌ User already exists"
 
-        user = User(username=u, password=p, coins=100, diamonds=5, xp=0)
+        user = User(username=username, password=password)
         db.session.add(user)
         db.session.commit()
 
         return redirect("/login")
 
     return """
+    <h2>Register</h2>
     <form method="post">
-        <input name="username" placeholder="login">
-        <input name="password" type="password" placeholder="password">
+        <input name="username" placeholder="login"><br>
+        <input name="password" type="password" placeholder="password"><br>
         <button>Register</button>
     </form>
     """
@@ -63,57 +64,62 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        u = request.form["username"]
-        p = request.form["password"]
+        username = request.form["username"]
+        password = request.form["password"]
 
-        user = User.query.filter_by(username=u, password=p).first()
+        user = User.query.filter_by(username=username, password=password).first()
         if user:
             session["user"] = user.username
             return redirect("/")
-        return "error login"
+        return "❌ Wrong login"
 
     return """
+    <h2>Login</h2>
     <form method="post">
-        <input name="username">
-        <input name="password" type="password">
+        <input name="username"><br>
+        <input name="password" type="password"><br>
         <button>Login</button>
     </form>
     """
 
-# ================== PATIENTS ==================
+# ================== PATIENTS (LAZY LOAD) ==================
 @app.route("/patients")
 def patients():
     if "user" not in session:
         return redirect("/login")
 
+    limit = int(request.args.get("limit", 50))
+
     return jsonify([
         {"id": i, "name": f"Patient {i}", "status": "waiting"}
-        for i in range(1, 100001)
+        for i in range(1, limit + 1)
     ])
 
-# ================== AUTO PARK ==================
+# ================== AMBULANCE ==================
 @app.route("/ambulance")
 def ambulance():
     return jsonify([
         {"id": 1, "car": "🚑 Basic Ambulance"},
         {"id": 2, "car": "🚑 Fast Ambulance"},
+        {"id": 3, "car": "🚑 Elite Rescue"}
     ])
 
-# ================== OPERATION (DICE GAME) ==================
+# ================== OPERATION (DICE) ==================
 @app.route("/operate")
 def operate():
-    result = random.randint(1, 6)
-    if result >= 4:
-        return "Operation SUCCESS 🎉"
-    return "Operation FAILED 💀"
+    roll = random.randint(1, 6)
 
-# ================== CHAT (SIMPLE MOCK) ==================
+    if roll >= 5:
+        return jsonify({"result": "SUCCESS", "roll": roll})
+    return jsonify({"result": "FAIL", "roll": roll})
+
+# ================== CHAT (SIMPLE) ==================
 messages = []
 
 @app.route("/chat", methods=["GET", "POST"])
 def chat():
     if request.method == "POST":
-        msg = request.json["msg"]
+        msg = request.json.get("msg", "")
         messages.append(msg)
         return {"ok": True}
 
@@ -122,7 +128,10 @@ def chat():
 # ================== REKVIZITY ==================
 @app.route("/rekvizity")
 def rekvizity():
-    return "<h1>Hospital Game Requisites</h1>"
+    return """
+    <h1>Hospital Game</h1>
+    <p>Working system ✔</p>
+    """
 
 # ================== RUN ==================
 if __name__ == "__main__":
