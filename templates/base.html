@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-
 <style>
-body { background:#0b0f14; color:white; font-family:Arial; }
-nav { background:#111; padding:10px; }
-a { color:red; margin-right:10px; }
-.card { background:#111; padding:10px; margin:10px; border-radius:10px; }
-button { background:red; color:white; border:none; padding:8px; }
+body{background:#0b0f14;color:white;font-family:Arial}
+nav a{color:red;margin:6px}
+.card{background:#111;padding:12px;margin:10px;border-radius:12px}
+.bar{height:12px;background:lime}
+.circle{width:70px;height:70px;border-radius:50%;background:#222;text-align:center;line-height:70px;font-size:30px;display:inline-block}
+button{background:red;color:white;border:none;padding:6px;border-radius:6px}
 </style>
-
 </head>
 
 <body>
@@ -19,16 +17,16 @@ button { background:red; color:white; border:none; padding:8px; }
 
 <nav>
 <a href="/">Главная</a>
+<a href="/patients">Пациенты</a>
 <a href="/chat">Чат</a>
-<a href="/exchange">Обменник</a>
 <a href="/shop">Магазин</a>
-<a href="/lab">Лаборатория</a>
-<a href="/diagnosis">Диагностика</a>
+<a href="/exchange">Обмен</a>
+<a href="/lab">Лаб</a>
+<a href="/diagnosis">Диагноз</a>
+<a href="/garage">Авто</a>
+<a href="/online">Онлайн</a>
 </nav>
 
-<hr>
-
 {% block content %}{% endblock %}
-
 </body>
 </html>
