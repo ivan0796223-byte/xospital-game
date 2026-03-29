@@ -10,4 +10,8 @@
 </div>
 {% endfor %}
 
+{% if operation|length == 0 %}
+<p>Нет пациентов</p>
+{% endif %}
+
 {% endblock %}
