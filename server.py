@@ -1,4 +1,4 @@
-1 server from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for
 import random
 
 app = Flask(__name__)
