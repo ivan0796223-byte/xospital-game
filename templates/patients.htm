@@ -5,8 +5,16 @@
 
 {% for p in patients %}
 <div class="card">
-{{ p.name }} — {{ p.disease }}
+{{ p.name }} ({{ p.age }} лет) — {{ p.disease }}
 <a href="/select/{{ p.id }}"><button>Выбрать</button></a>
+</div>
+{% endfor %}
+
+<h3>🏥 В палатах</h3>
+{% for r in rooms %}
+<div class="card">
+{{ r.name }}
+<a href="/operate/{{ r.id }}"><button>В операцию</button></a>
 </div>
 {% endfor %}
 
