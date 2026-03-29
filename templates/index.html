@@ -1,52 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-<style>
-body{background:#0b1220;color:white;font-family:Arial}
-.card{background:#111a2e;padding:15px;margin:10px;border-radius:15px}
-button{padding:10px;border-radius:10px;background:#22c55e;border:none;color:white;margin:5px}
-.circle{width:50px;height:50px;border-radius:50%;background:#1f2937;display:inline-block;text-align:center;line-height:50px}
-</style>
-</head>
+<h2>🏥 Hospital</h2>
 
-<body>
+<p>{{user.username}}</p>
+<p>💰 {{user.coins}} 💎 {{user.diamonds}}</p>
 
-<h2>🏥 Hospital Game</h2>
-
-<div class="card">
-👤 {{user.username}}<br>
-💰 {{user.coins}} 💎 {{user.diamonds}}<br>
-⭐ Level {{user.level}}<br>
 <progress value="{{user.exp}}" max="{{user.level*100}}"></progress>
-</div>
 
-<div class="card">
-<a href="/patients"><button>Пациенты</button></a>
-<a href="/chat"><button>Чат</button></a>
-<a href="/surgery"><button>Операционная</button></a>
-<a href="/lab"><button>Лаборатория</button></a>
-<a href="/exchange"><button>Обменник</button></a>
-<a href="/reward"><button>Награда</button></a>
-</div>
+<a href="/patients">Пациенты</a>
+<a href="/chat">Чат</a>
+<a href="/surgery">Операции</a>
+<a href="/lab">Лаб</a>
+<a href="/exchange">Обмен</a>
+<a href="/reward">Награда</a>
 
-<div class="card">
-🚗 Автопарк:
-<div class="circle">🚑</div>
-<div class="circle">🚗</div>
-<div class="circle">🚓</div>
-</div>
-
-<div class="card">
-👥 Онлайн: <span id="online">0</span>
-</div>
+<p>Онлайн: <span id="o">0</span></p>
 
 <script>
 setInterval(()=>{
 fetch("/online").then(r=>r.json()).then(d=>{
-document.getElementById("online").innerText = d.online;
+document.getElementById("o").innerText=d.online
 })
 },2000)
 </script>
-
-</body>
-</html>
