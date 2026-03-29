@@ -1,36 +1,28 @@
-cur.execute("UPDATE users SET coins=coins-50, diamonds=diamonds+1 WHERE coins>=50 AND username=?", (session["user"],))
-    con.commit()
-    return redirect("/")
+{% extends "base.html" %}
 
-# ===== ЛАБА =====
-@app.route("/lab")
-def lab():
-    result = random.choice(["🦠 Вирус","✅ Здоров","⚠ Инфекция"])
-    return render_template("lab.html", result=result)
+{% block content %}
 
-# ===== ДИАГНОСТИКА =====
-@app.route("/diagnosis")
-def diag():
-    return render_template("diagnosis.html")
+<h3>💬 Чат больницы</h3>
 
-# ===== АВТО =====
-@app.route("/garage")
-def garage():
-    return render_template("garage.html", cars=cars)
+<div class="card">
 
-@app.route("/call/<car>")
-def call(car):
-    pid = random.randint(1,100000)
-    p = next(x for x in patients if x["id"] == pid)
-    rooms.append(p)
-    return redirect("/garage")
+<form method="post">
+    <input name="msg" placeholder="Написать сообщение..." required>
+    <button type="submit">Отправить</button>
+</form>
 
-# ===== ОНЛАЙН =====
-@app.route("/online")
-def online():
-    con = db()
-    cur = con.cursor()
-    cur.execute("SELECT COUNT(*) FROM users")
-    return f"Онлайн: {cur.fetchone()[0]}"
+</div>
 
-app.run(debug=True)
+<div class="card">
+
+{% if msgs %}
+    {% for m in msgs %}
+        <p>🗨 {{ m[0] }}</p>
+    {% endfor %}
+{% else %}
+    <p>❌ Сообщений пока нет</p>
+{% endif %}
+
+</div>
+
+{% endblock %}
