@@ -1,7 +1,19 @@
 {% extends "base.html" %}
-
 {% block content %}
 
-<h3>💰 {{ user.coins }} | 💎 {{ user.diamonds }}</h3>
+<div class="card">
+💰 {{ user[0] }} | 💎 {{ user[1] }}
+<br>
+Уровень {{ user[3] }}
+
+<div class="bar" style="width:{{ user[2] }}%"></div>
+</div>
+
+<div class="card">
+<h3>🔔 Уведомления</h3>
+{% for n in notes %}
+<p>{{ n[0] }}</p>
+{% endfor %}
+</div>
 
 {% endblock %}
