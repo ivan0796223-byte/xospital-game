@@ -1,16 +1,11 @@
-
 <!DOCTYPE html>
 <html>
 <head>
 <style>
-body {
-  background:#0f172a;
-  color:white;
-  font-family:Arial;
-}
+body {background:#0b1220;color:white;font-family:Arial}
 
 .card {
-  background:#1e293b;
+  background:#111a2e;
   padding:15px;
   margin:10px;
   border-radius:15px;
@@ -18,10 +13,21 @@ body {
 
 button {
   padding:10px;
-  border-radius:10px;
+  border-radius:12px;
   border:none;
   background:#22c55e;
   color:white;
+}
+
+.circle {
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  background:#1f2937;
+  display:inline-block;
+  margin:5px;
+  text-align:center;
+  line-height:50px;
 }
 </style>
 </head>
@@ -33,14 +39,37 @@ button {
 <div class="card">
 👤 {{user.username}}<br>
 💰 {{user.coins}} 💎 {{user.diamonds}}<br>
-⭐ {{user.exp}} / {{user.level*100}} (Lvl {{user.level}})
+
+⭐ Level {{user.level}}<br>
+<progress value="{{user.exp}}" max="{{user.level*100}}"></progress>
 </div>
 
+<div class="card">
 <a href="/patients"><button>Пациенты</button></a>
 <a href="/chat"><button>Чат</button></a>
 <a href="/surgery"><button>Операционная</button></a>
 <a href="/lab"><button>Лаборатория</button></a>
-<a href="/reward"><button>Получить награду</button></a>
+<a href="/exchange"><button>Обменник</button></a>
+</div>
+
+<div class="card">
+🚗 Автопарк:
+<div class="circle">🚑</div>
+<div class="circle">🚓</div>
+<div class="circle">🚗</div>
+</div>
+
+<div class="card">
+👥 Онлайн: <span id="online">...</span>
+</div>
+
+<script>
+setInterval(()=>{
+ fetch("/online").then(r=>r.json()).then(d=>{
+  document.getElementById("online").innerText = d.online
+ })
+},2000)
+</script>
 
 </body>
 </html>
