@@ -2,17 +2,13 @@
 
 {% block content %}
 
-<h2>💬 Чат больницы</h2>
-
 <form method="post">
-    <input name="msg" placeholder="сообщение">
-    <button>Отправить</button>
+<input name="msg">
+<button>Отправить</button>
 </form>
 
-<div class="card">
 {% for m in game.messages %}
 <p>{{ m }}</p>
 {% endfor %}
-</div>
 
 {% endblock %}
