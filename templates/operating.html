@@ -1,1 +1,13 @@
-p.name
+{% extends "base.html" %}
+{% block content %}
+
+<h3>Операционная</h3>
+
+{% for p in operation %}
+<div class="card">
+{{ p.name }} — {{ p.disease }}
+<a href="/finish/{{ p.id }}"><button>Завершить</button></a>
+</div>
+{% endfor %}
+
+{% endblock %}
