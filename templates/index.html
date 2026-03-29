@@ -1,25 +1,7 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Hospital Game</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<nav>
-    <a href="/">Главная</a> |
-    <a href="/patients">Пациенты</a> |
-    <a href="/rooms">Палаты</a> |
-    <a href="/garage">Автопарк</a>
-</nav>
+{% block content %}
 
-<hr>
+<h1>🏥 Больница</h1>
 
-<h3>💰 Монеты: {{ game.coins }} | 💎 Алмазы: {{ game.diamonds }}</h3>
-
-<hr>
-
-{% block content %}{% endblock %}
-
-</body>
-</html>
+{% endblock %}
