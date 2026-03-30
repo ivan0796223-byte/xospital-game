@@ -1,12 +1,49 @@
-<h1>🏥 Hospital Game</h1>
+<style>
+body {
+    background:#000;
+    color:white;
+    font-family:Arial;
+}
 
-<p>👤 Игрок: {{user.username}}</p>
-<p>💰 Монеты: {{user.coins}}</p>
-<p>💎 Алмазы: {{user.diamonds}}</p>
-<p>⭐ Уровень: {{user.level}}</p>
-<p>👥 Онлайн: {{online}}</p>
+.card {
+    border:2px solid red;
+    border-radius:12px;
+    padding:10px;
+    margin:10px;
+}
 
-<hr>
+button {
+    background:red;
+    color:white;
+    border:none;
+    padding:5px;
+}
 
-<a href="/patients">Пациенты</a><br>
-<a href="/operation">Операция (кубик)</a>
+.patient {
+    border:1px solid red;
+    margin:5px;
+    padding:5px;
+}
+</style>
+
+<h1>🏥 XOSPITAL</h1>
+
+<div class="card">
+💰 {{player.coins}} |
+💎 {{player.diamonds}} |
+⭐ {{player.xp}} |
+🏆 Lv {{player.level}}
+</div>
+
+<a href="/add_patient"><button>➕ Пациент</button></a>
+<a href="/operation"><button>🎲 Операция</button></a>
+<a href="/chat"><button>💬 Чат</button></a>
+
+<h2>👤 Пациенты</h2>
+
+{% for p in patients %}
+<div class="patient">
+{{p.name}} - {{p.status}}
+<a href="/select_patient/{{p.id}}"><button>Выбрать</button></a>
+</div>
+{% endfor %}
