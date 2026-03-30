@@ -1,12 +1,12 @@
 <style>
 body {background:black;color:white;}
-.msg {border-left:3px solid red;padding:5px;margin:5px;}
+.card {border:2px solid red;margin:5px;padding:5px;}
 </style>
 
-<h2>💬 ЧАТ</h2>
+<h2>✚ Чат</h2>
 
 {% for m in messages %}
-<div class="msg">{{m.user}}: {{m.msg}}</div>
+<div class="card">{{m.user}}: {{m.msg}}</div>
 {% endfor %}
 
 <form method="POST">
