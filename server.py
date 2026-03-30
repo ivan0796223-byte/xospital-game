@@ -7,14 +7,12 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 app.secret_key = "secret"
 
-# БАЗА (fallback если нет PostgreSQL)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///game.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-# ================= МОДЕЛИ =================
-
+# ===== МОДЕЛИ =====
 class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True)
@@ -44,26 +42,12 @@ alliances = []
 with app.app_context():
     db.create_all()
 
-# ================= SAFE PLAYER =================
 def get_player():
     username = session.get("user")
-    if not username:
-        return None
-    return Player.query.filter_by(username=username).first()
+    return Player.query.filter_by(username=username).first() if username else None
 
-# ================= AUTH =================
-@app.route("/register", methods=["GET","POST"])
-def register():
-    if request.method == "POST":
-        db.session.add(Player(
-            username=request.form["username"],
-            password=request.form["password"]
-        ))
-        db.session.commit()
-        return redirect("/login")
-    return render_template("register.html")
-
-@app.route("/login", methods=["GET","POST"])
+# ===== ВХОД =====
+@app.route("/", methods=["GET","POST"])
 def login():
     if request.method == "POST":
         user = Player.query.filter_by(
@@ -75,22 +59,33 @@ def login():
             return redirect("/game")
     return render_template("login.html")
 
-# ================= GAME =================
+# ===== РЕГИСТРАЦИЯ =====
+@app.route("/register", methods=["GET","POST"])
+def register():
+    if request.method == "POST":
+        db.session.add(Player(
+            username=request.form["username"],
+            password=request.form["password"]
+        ))
+        db.session.commit()
+        return redirect("/")
+    return render_template("register.html")
+
+# ===== ИГРА =====
 @app.route("/game")
 def game():
     player = get_player()
     if player:
         online_users.add(player.username)
 
-    return render_template(
-        "game.html",
+    return render_template("game.html",
         player=player,
         patients=Patient.query.all(),
         cars=Car.query.all(),
         online=len(online_users)
     )
 
-# ================= ЧАТ =================
+# ===== ЧАТ =====
 @app.route("/chat", methods=["GET","POST"])
 def chat():
     if request.method == "POST":
@@ -101,7 +96,7 @@ def chat():
         db.session.commit()
     return render_template("chat.html", messages=Chat.query.all())
 
-# ================= ПАЦИЕНТЫ =================
+# ===== ПАЦИЕНТЫ =====
 @app.route("/add_patient")
 def add_patient():
     db.session.add(Patient(name=f"Patient {random.randint(1,999)}"))
@@ -116,15 +111,15 @@ def select_patient(id):
         db.session.commit()
     return redirect("/game")
 
-@app.route("/patients_big")
-def patients_big():
-    return "📊 50 000 пациентов (виртуально)"
-
 @app.route("/event_patients")
 def event_patients():
     return f"🚨 Событие: {random.randint(5,20)} пациентов"
 
-# ================= АВТОПАРК =================
+@app.route("/patients_big")
+def patients_big():
+    return "📊 50 000 пациентов"
+
+# ===== АВТОПАРК =====
 @app.route("/add_car")
 def add_car():
     db.session.add(Car(name=random.choice(["🚑 Ambulance","🚓 Medic","🏥 Van"])))
@@ -135,13 +130,13 @@ def add_car():
 def call_patient():
     return f"🚑 Вызов: {random.choice(['Ambulance','Medic','Van'])}"
 
-# ================= ОПЕРАЦИЯ =================
+# ===== ОПЕРАЦИЯ =====
 @app.route("/operation")
 def operation():
     roll = random.randint(1,6)
     return f"🎲 {roll} → {'✔ УСПЕХ' if roll>=4 else '❌ ПРОВАЛ'}"
 
-# ================= ЭКОНОМИКА =================
+# ===== ЭКОНОМИКА =====
 @app.route("/exchange")
 def exchange():
     p = get_player()
@@ -149,7 +144,7 @@ def exchange():
         p.coins -= 100
         p.diamonds += 1
         db.session.commit()
-        return "💱 100 монет → 1 алмаз"
+        return "💱 100 → 1 💎"
     return "❌ мало монет"
 
 @app.route("/buy_diamonds")
@@ -158,10 +153,10 @@ def buy_diamonds():
     if p:
         p.diamonds += 10
         db.session.commit()
-        return "💎 +10 алмазов"
+        return "💎 +10"
     return "❌ вход нужен"
 
-# ================= СОЮЗЫ =================
+# ===== СОЮЗЫ =====
 @app.route("/create_alliance", methods=["POST"])
 def create_alliance():
     p = get_player()
@@ -173,7 +168,7 @@ def create_alliance():
         db.session.commit()
         return f"🤝 Союз: {name}"
 
-    return "❌ нужно 500 алмазов"
+    return "❌ нужно 500💎"
 
 @app.route("/search_player")
 def search_player():
@@ -186,12 +181,11 @@ def search_alliance():
     name = request.args.get("name")
     return f"🤝 {name}" if name in alliances else "❌ нет"
 
-# ================= ВРЕМЯ =================
+# ===== ВРЕМЯ =====
 @app.route("/time_msk")
 def time_msk():
     msk = datetime.utcnow() + timedelta(hours=3)
     return f"🕒 {msk.strftime('%H:%M:%S')}"
 
-# ================= RUN =================
 if __name__ == "__main__":
     app.run()
