@@ -1,43 +1,40 @@
 <style>
-body {background:#0a0a0a;color:white;font-family:Arial;}
-.card {border:2px solid red;border-radius:15px;padding:10px;margin:10px;background:#111;}
-button {background:red;color:white;border:none;padding:8px;margin:5px;border-radius:10px;}
-.progress {width:200px;height:10px;background:#222;}
+body {background:#0a0a0a;color:white;text-align:center;}
+.card {border:2px solid red;border-radius:15px;padding:10px;margin:10px;}
+button {background:red;color:white;padding:8px;}
+.circle {border:2px solid red;border-radius:50%;padding:10px;margin:5px;display:inline-block;}
+.progress {width:200px;height:10px;background:#222;margin:auto;}
 .bar {height:10px;background:red;}
 </style>
 
-<h1>🏥 XOSPITAL</h1>
+<h1>✚ XOSPITAL</h1>
 
 <div class="card">
 {% if player %}
 💰 {{player.coins}} 💎 {{player.diamonds}} ⭐ {{player.xp}} LVL {{player.level}}
-{% else %}
-Войдите
 {% endif %}
 <br>🟢 Онлайн: {{online}}
 </div>
 
-<div class="card">
 <div class="progress">
 <div class="bar" style="width:{{player.xp if player else 0}}px"></div>
 </div>
-</div>
 
-<a href="/add_patient"><button>➕ Пациент</button></a>
+<a href="/add_patient"><button>Пациент</button></a>
 <a href="/add_car"><button>🚑 Машины</button></a>
-<a href="/operation"><button>🎲 Операция</button></a>
-<a href="/chat"><button>💬 Чат</button></a>
-<a href="/call_patient"><button>📞 Вызов</button></a>
+<a href="/operation"><button>🎲</button></a>
+<a href="/chat"><button>💬</button></a>
+<a href="/call_patient"><button>📞</button></a>
 
-<a href="/exchange"><button>💱 Обмен</button></a>
-<a href="/buy_diamonds"><button>💎 Купить</button></a>
-<a href="/time_msk"><button>🕒 МСК</button></a>
+<a href="/exchange"><button>💱</button></a>
+<a href="/buy_diamonds"><button>💎</button></a>
+<a href="/time_msk"><button>🕒</button></a>
 
 <div class="card">
-<h2>👤 Пациенты</h2>
+<h3>Пациенты</h3>
 {% for p in patients %}
-<div style="border-radius:50px;border:2px solid red;padding:10px;">
-🏥 {{p.name}} - {{p.status}}
+<div class="circle">
+{{p.name}}<br>{{p.status}}<br>
 <a href="/select_patient/{{p.id}}">
 <button>Выбрать</button>
 </a>
@@ -46,10 +43,27 @@ button {background:red;color:white;border:none;padding:8px;margin:5px;border-rad
 </div>
 
 <div class="card">
-<h2>🚑 Автопарк</h2>
+<h3>🚑 Автопарк</h3>
 {% for c in cars %}
-<div style="border-radius:50%;border:2px solid red;padding:10px;">
-🚗 {{c.name}}
-</div>
+<div class="circle">{{c.name}}</div>
 {% endfor %}
+</div>
+
+<div class="card">
+<form method="POST" action="/create_alliance">
+<input name="name" placeholder="Союз">
+<button>Создать (500💎)</button>
+</form>
+</div>
+
+<div class="card">
+<form action="/search_player">
+<input name="name" placeholder="Игрок">
+<button>Найти</button>
+</form>
+
+<form action="/search_alliance">
+<input name="name" placeholder="Союз">
+<button>Найти</button>
+</form>
 </div>
