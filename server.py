@@ -1,13 +1,13 @@
 import os
 import random
-from datetime import datetime
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.secret_key = "secret-key"
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+# DATABASE SAFE
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///game.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
@@ -39,10 +39,17 @@ class Car(db.Model):
     name = db.Column(db.String(80))
 
 online_users = set()
-alliances = []
 
 with app.app_context():
     db.create_all()
+
+# ================= SAFE PLAYER =================
+
+def get_player():
+    username = session.get("user")
+    if not username:
+        return None
+    return Player.query.filter_by(username=username).first()
 
 # ================= AUTH =================
 
@@ -71,13 +78,14 @@ def login():
 
     return render_template("login.html")
 
-# ================= GAME =================
+# ================= GAME SAFE =================
 
 @app.route("/game")
 def game():
-    player = Player.query.filter_by(username=session.get("user")).first()
+    player = get_player()
 
-    online_users.add(session.get("user"))
+    if session.get("user"):
+        online_users.add(session.get("user"))
 
     return render_template(
         "game.html",
@@ -93,7 +101,7 @@ def game():
 def chat():
     if request.method == "POST":
         db.session.add(Chat(
-            user=session.get("user"),
+            user=session.get("user", "guest"),
             msg=request.form["msg"]
         ))
         db.session.commit()
@@ -111,11 +119,12 @@ def add_patient():
 @app.route("/select_patient/<int:id>")
 def select_patient(id):
     p = Patient.query.get(id)
-    p.status = "selected"
-    db.session.commit()
+    if p:
+        p.status = "selected"
+        db.session.commit()
     return redirect("/game")
 
-# ================= CAR / CALL =================
+# ================= CAR =================
 
 @app.route("/add_car")
 def add_car():
@@ -125,75 +134,14 @@ def add_car():
 
 @app.route("/call_patient")
 def call_patient():
-    return f"🚑 Вызов: {random.choice(['Ambulance', 'Medic Car', 'Hospital Van'])}"
+    return f"🚑 Вызов: {random.choice(['Ambulance','Medic Car','Hospital Van'])}"
 
-# ================= OPERATION (DICE) =================
+# ================= OPERATION =================
 
 @app.route("/operation")
 def operation():
     roll = random.randint(1, 6)
-    return f"🎲 Кубик: {roll} → {'✔ УСПЕХ' if roll >= 4 else '❌ ПРОВАЛ'}"
-
-# ================= TIME (MSK) =================
-
-@app.route("/time")
-def time_msk():
-    return f"🕒 МСК: {datetime.utcnow()} (UTC approx)"
-
-# ================= EVENTS =================
-
-@app.route("/patients_event")
-def patients_event():
-    return f"🚨 Событие: {random.randint(1,20)} пациентов появилось"
-
-@app.route("/patients_50000")
-def patients_50000():
-    return "📊 Пациенты: 50 000 (виртуально)"
-
-# ================= ALLIANCES =================
-
-@app.route("/create_alliance", methods=["POST"])
-def create_alliance():
-    name = request.form.get("name")
-    player = Player.query.filter_by(username=session.get("user")).first()
-
-    if player and player.diamonds >= 500:
-        player.diamonds -= 500
-        alliances.append(name)
-        db.session.commit()
-        return f"🤝 Союз создан: {name}"
-
-    return "❌ Не хватает алмазов"
-
-@app.route("/alliances")
-def show_alliances():
-    return {"alliances": alliances}
-
-# ================= SEARCH =================
-
-@app.route("/search_player/<name>")
-def search_player(name):
-    u = Player.query.filter_by(username=name).first()
-    return f"👤 {u.username} LVL {u.level}" if u else "❌ не найден"
-
-@app.route("/search_alliance/<name>")
-def search_alliance(name):
-    return f"🤝 найден: {name}" if name in alliances else "❌ не найден"
-
-# ================= SHOP / BANK =================
-
-@app.route("/shop")
-def shop():
-    return "🏪 Магазин: скальпель / авто / аптечки"
-
-@app.route("/bank")
-def bank():
-    return "🏦 Банк: обмен валют (в разработке)"
-
-@app.route("/doctor_room")
-def doctor_room():
-    player = Player.query.filter_by(username=session.get("user")).first()
-    return f"🏥 Кабинет: {player.username} 💰{player.coins} 💎{player.diamonds}"
+    return f"🎲 {roll} → {'✔ УСПЕХ' if roll >= 4 else '❌ ПРОВАЛ'}"
 
 # ================= RUN =================
 
