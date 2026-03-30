@@ -1,16 +1,13 @@
 <style>
-body {background:#000;color:white;}
-.box {border:2px solid red;padding:10px;}
-.msg {border-left:3px solid red;margin:5px;padding:5px;}
+body {background:black;color:white;}
+.msg {border-left:3px solid red;padding:5px;margin:5px;}
 </style>
 
 <h2>💬 ЧАТ</h2>
 
-<div class="box">
 {% for m in messages %}
 <div class="msg">{{m.user}}: {{m.msg}}</div>
 {% endfor %}
-</div>
 
 <form method="POST">
 <input name="msg">
