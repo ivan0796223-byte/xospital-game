@@ -12,30 +12,38 @@ db = SQLAlchemy(app)
 online_users = set()
 messages = []
 
-# ================= PATIENTS (50k) =================
-patients = [{"id": i, "name": f"Patient #{i}", "hp": random.randint(50, 100)} for i in range(50000)]
+# ================= 50 000 PATIENTS =================
+def patient(pid):
+    random.seed(pid)
+    return {
+        "id": pid,
+        "name": f"🧍 Patient #{pid}",
+        "hp": random.randint(30, 100),
+        "room": random.randint(1, 50)
+    }
 
 # ================= CARS =================
-cars = {
+CARS = {
     "ambulance": 1000,
     "helicopter": 5000,
-    "supercar": 2000
+    "vip": 2000
 }
 
 user_cars = {}
+calls = {}
 
-# ================= ALLIANCES =================
+# ================= ALLIANCE =================
 alliances = {}
 
 # ================= USER =================
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True)
-
     password = db.Column(db.String(80))
 
-    coins = db.Column(db.Integer, default=100)
-    diamonds = db.Column(db.Integer, default=10)
+    coins = db.Column(db.Integer, default=200)
+    diamonds = db.Column(db.Integer, default=50)
+
     xp = db.Column(db.Integer, default=0)
     level = db.Column(db.Integer, default=1)
 
@@ -43,6 +51,46 @@ class User(db.Model):
 
 with app.app_context():
     db.create_all()
+
+# ================= UI STYLE =================
+STYLE = """
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#05070c;
+    color:white;
+}
+.card{
+    background:#0f1722;
+    border:2px solid red;
+    margin:10px;
+    padding:12px;
+    border-radius:15px;
+}
+button{
+    background:red;
+    color:white;
+    border:none;
+    padding:8px;
+    margin:5px;
+    border-radius:10px;
+}
+a{color:red}
+.icon{
+    width:45px;height:45px;
+    border-radius:50%;
+    border:2px solid red;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    margin:4px;
+}
+.bar{background:#222;height:10px;border-radius:20px}
+.fill{background:red;height:10px}
+h2{border-left:5px solid red;padding-left:10px}
+</style>
+"""
 
 # ================= HOME =================
 @app.route("/")
@@ -52,40 +100,33 @@ def home():
 
     user = User.query.filter_by(username=session["user"]).first()
 
-    xp_bar = user.xp % 100
+    xp = user.xp % 100
 
-    return f"""
-    <style>
-    body{{background:#05070c;color:white;font-family:Arial}}
-    .card{{background:#0f1722;border:2px solid red;padding:15px;margin:10px;border-radius:12px}}
-    .box{{display:inline-block;background:#111;border:1px solid red;padding:8px;margin:5px;border-radius:50px}}
-    .bar{{background:#222;height:10px;border-radius:10px}}
-    .fill{{background:red;height:10px;width:{xp_bar}%;border-radius:10px}}
-    button{{background:red;color:white;border:none;padding:8px;margin:5px;border-radius:10px}}
-    a{{color:red}}
-    </style>
-
+    return STYLE + f"""
     <div class="card">
-        <h2>🏥 Hospital PRO MAX</h2>
+        <h2>🏥 HOSPITAL MMO</h2>
 
-        👤 {user.username} <br>
-        🟢 Онлайн: {len(online_users)} <br>
+        👤 {user.username}<br>
+        🟢 Онлайн: {len(online_users)}<br>
 
-        <div class="box">💰 {user.coins}</div>
-        <div class="box">💎 {user.diamonds}</div>
-        <div class="box">⭐ LVL {user.level}</div>
+        <div class="icon">✚</div>
 
-        <p>XP</p>
-        <div class="bar"><div class="fill"></div></div>
+        <div class="card">
+            💰 {user.coins} | 💎 {user.diamonds} | ⭐ {user.level}
+        </div>
+
+        <div class="bar"><div class="fill" style="width:{xp}%"></div></div>
 
         <br>
 
-        <a href="/patients"><button>🧑‍⚕ Пациенты</button></a>
+        <a href="/patients"><button>🧍 Пациенты</button></a>
         <a href="/garage"><button>🚑 Автопарк</button></a>
         <a href="/operating"><button>🏥 Операционная</button></a>
         <a href="/lab"><button>🧪 Лаборатория</button></a>
+        <a href="/exchange"><button>💱 Обменник</button></a>
         <a href="/alliance"><button>🏛 Союзы</button></a>
         <a href="/chat"><button>💬 Чат</button></a>
+        <a href="/rooms"><button>🏨 Палаты</button></a>
 
         <br><br>
         <a href="/logout">🚪 выход</a>
@@ -107,14 +148,15 @@ def register():
 
         return redirect("/login")
 
-    return """
-    <style>body{background:#05070c;color:white;text-align:center}</style>
+    return STYLE + """
+    <div class='card'>
     <h2>🆕 REG</h2>
-    <form method="post">
-    <input name="username"><br>
-    <input name="password"><br>
+    <form method='post'>
+    <input name='username'><br>
+    <input name='password'><br>
     <button>create</button>
     </form>
+    </div>
     """
 
 # ================= LOGIN =================
@@ -133,87 +175,107 @@ def login():
 
         return redirect("/")
 
-    return "<form method='post'><input name='username'><input name='password'><button>login</button></form>"
+    return STYLE + "<div class='card'><form method='post'><input name='username'><input name='password'><button>login</button></form></div>"
 
 # ================= PATIENTS =================
 @app.route("/patients")
-def show_patients():
-    random_list = random.sample(patients, 20)
+def patients():
+    html = STYLE + "<div class='card'><h2>🧍 Пациенты (50 000)</h2>"
 
-    html = "<h2>🧑‍⚕ Пациенты (из 50k)</h2>"
+    for i in random.sample(range(50000), 10):
+        p = patient(i)
 
-    for p in random_list:
         html += f"""
-        <div style='border:1px solid red;margin:5px;padding:5px'>
-        {p['name']} | HP:{p['hp']}
-        <a href='/treat/{p['id']}'>лечить</a>
+        <div class='card'>
+            {p['name']}<br>
+            ❤️ {p['hp']} | 🏨 {p['room']}<br>
+            <a href='/treat/{p['id']}'><button>лечить</button></a>
         </div>
         """
 
-    return html
+    return html + "</div>"
 
-# ================= TREAT =================
 @app.route("/treat/<int:pid>")
 def treat(pid):
     user = User.query.filter_by(username=session["user"]).first()
-    user.xp += 5
-    user.coins += 10
+    user.xp += 10
+    user.coins += 20
     db.session.commit()
-
     return redirect("/patients")
 
 # ================= GARAGE =================
 @app.route("/garage")
 def garage():
-    return """
+    return STYLE + """
+    <div class='card'>
     <h2>🚑 Автопарк</h2>
-    <a href="/buy/ambulance">Купить Ambulance</a><br>
-    <a href="/send_call">📞 Вызов пациента</a>
+
+    <a href='/buy/ambulance'><button>Купить Ambulance</button></a>
+    <a href='/call'><button>📞 Вызов пациента</button></a>
+    </div>
     """
 
 @app.route("/buy/<car>")
 def buy(car):
     user = User.query.filter_by(username=session["user"]).first()
 
-    if user.coins >= cars[car]:
-        user.coins -= cars[car]
+    if user.coins >= CARS[car]:
+        user.coins -= CARS[car]
         user_cars.setdefault(user.username, []).append(car)
         db.session.commit()
 
     return redirect("/garage")
 
+@app.route("/call")
+def call():
+    pid = random.randint(0, 49999)
+    calls[pid] = "active"
+    return f"📞 вызов #{pid}"
+
 # ================= OPERATING =================
 @app.route("/operating")
 def operating():
     roll = random.randint(1, 6)
-    return f"""
+    return STYLE + f"""
+    <div class='card'>
     <h2>🏥 Операционная</h2>
-    🎲 Кубик: {roll}
+    🎲 кубик: {roll}
+    </div>
     """
 
 # ================= LAB =================
 @app.route("/lab")
 def lab():
-    return """
+    return STYLE + """
+    <div class='card'>
     <h2>🧪 Лаборатория</h2>
-    <a href='/analyze'>Взять анализ</a><br>
-    <a href='/heal'>Лечить</a>
+    <a href='/analyze'><button>анализ</button></a>
+    <a href='/heal'><button>лечить</button></a>
+    </div>
     """
 
 @app.route("/analyze")
 def analyze():
-    return "📊 анализ взят"
+    return "📊 анализ"
 
 @app.route("/heal")
 def heal():
-    return "💉 пациент вылечен"
+    return "💉 лечение"
+
+# ================= EXCHANGE =================
+@app.route("/exchange")
+def exchange():
+    return STYLE + "<div class='card'><h2>💱 обменник</h2></div>"
 
 # ================= ALLIANCE =================
 @app.route("/alliance")
 def alliance():
-    return """
+    return STYLE + """
+    <div class='card'>
     <h2>🏛 Союзы</h2>
-    <a href='/create_alliance'>Создать (500💎)</a><br>
+    <a href='/create_alliance'><button>создать (500💎)</button></a>
+    <a href='/zags'><button>ЗАГС</button></a>
+    </div>
     """
 
 @app.route("/create_alliance")
@@ -222,10 +284,19 @@ def create_alliance():
 
     if user.diamonds >= 500:
         user.diamonds -= 500
-        user.alliance = "Alliance#" + user.username
+        user.alliance = "AL_" + user.username
         db.session.commit()
 
     return redirect("/alliance")
+
+@app.route("/zags")
+def zags():
+    return STYLE + "<div class='card'>💍 ЗАГС союзов</div>"
+
+# ================= ROOMS =================
+@app.route("/rooms")
+def rooms():
+    return STYLE + "<div class='card'><h2>🏨 Палаты</h2></div>"
 
 # ================= CHAT =================
 @app.route("/chat", methods=["GET","POST"])
@@ -233,7 +304,13 @@ def chat():
     if request.method == "POST":
         messages.append(session["user"] + ": " + request.form["msg"])
 
-    return "<br>".join(messages[-30:]) + "<form method='post'><input name='msg'><button>send</button></form>"
+    return STYLE + "<div class='card'><h2>💬 чат</h2>" + "<br>".join(messages[-20:]) + """
+    <form method='post'>
+    <input name='msg'>
+    <button>send</button>
+    </form>
+    </div>
+    """
 
 # ================= LOGOUT =================
 @app.route("/logout")
