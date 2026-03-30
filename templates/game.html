@@ -1,51 +1,23 @@
 <style>
 body {background:#0a0a0a;color:white;font-family:Arial;}
-
-.card {
-    border:2px solid red;
-    border-radius:15px;
-    padding:10px;
-    margin:10px;
-    background:#111;
-}
-
-button {
-    background:red;
-    color:white;
-    border:none;
-    padding:8px;
-    margin:5px;
-    border-radius:10px;
-}
-
-.progress {
-    width:200px;
-    height:10px;
-    background:#222;
-    border-radius:10px;
-}
-
-.bar {
-    height:10px;
-    background:red;
-}
+.card {border:2px solid red;padding:10px;margin:10px;background:#111;}
+button {background:red;color:white;border:none;padding:8px;margin:5px;border-radius:10px;}
 </style>
 
-<h1>🏥 XOSPITAL V2 FULL</h1>
+<h1>🏥 XOSPITAL FIX V2</h1>
 
 <div class="card">
+{% if player %}
 💰 {{player.coins}} |
 💎 {{player.diamonds}} |
-⭐ {{player.xp}} |
-🏆 LVL {{player.level}} |
-🟢 Online {{online}}
-</div>
+⭐ XP {{player.xp}} |
+🏆 LVL {{player.level}}
+{% else %}
+⚠️ Войдите в аккаунт
+{% endif %}
 
-<div class="card">
-<h3>📊 XP</h3>
-<div class="progress">
-<div class="bar" style="width:{{player.xp}}px"></div>
-</div>
+<br>
+🟢 Online {{online}}
 </div>
 
 <a href="/add_patient"><button>➕ Пациент</button></a>
@@ -53,31 +25,23 @@ button {
 <a href="/operation"><button>🎲 Операция</button></a>
 <a href="/chat"><button>💬 Чат</button></a>
 <a href="/call_patient"><button>📞 Вызов</button></a>
-<a href="/time"><button>🕒 МСК</button></a>
-<a href="/shop"><button>🏪 Магазин</button></a>
-<a href="/bank"><button>🏦 Банк</button></a>
-<a href="/doctor_room"><button>🏥 Кабинет</button></a>
 
 <div class="card">
 <h2>👤 Пациенты</h2>
+
 {% for p in patients %}
 <div>🏥 {{p.name}} - {{p.status}}
-<a href="/select_patient/{{p.id}}"><button>Выбрать</button></a>
+<a href="/select_patient/{{p.id}}">
+<button>Выбрать</button>
+</a>
 </div>
 {% endfor %}
 </div>
 
 <div class="card">
 <h2>🚑 Автопарк</h2>
+
 {% for c in cars %}
 <div>🚗 {{c.name}}</div>
 {% endfor %}
-</div>
-
-<div class="card">
-<h3>🤝 Союз</h3>
-<form method="POST" action="/create_alliance">
-<input name="name" placeholder="Название">
-<button>Создать (500💎)</button>
-</form>
 </div>
