@@ -6,7 +6,7 @@ button {background:red;color:white;border:none;padding:8px;margin:5px;border-rad
 .bar {height:10px;background:red;}
 </style>
 
-<h1>🏥 XOSPITAL V2 ULTRA</h1>
+<h1>🏥 XOSPITAL</h1>
 
 <div class="card">
 {% if player %}
@@ -18,7 +18,9 @@ button {background:red;color:white;border:none;padding:8px;margin:5px;border-rad
 </div>
 
 <div class="card">
-<div class="progress"><div class="bar" style="width:{{player.xp}}px"></div></div>
+<div class="progress">
+<div class="bar" style="width:{{player.xp if player else 0}}px"></div>
+</div>
 </div>
 
 <a href="/add_patient"><button>➕ Пациент</button></a>
@@ -29,7 +31,6 @@ button {background:red;color:white;border:none;padding:8px;margin:5px;border-rad
 
 <a href="/exchange"><button>💱 Обмен</button></a>
 <a href="/buy_diamonds"><button>💎 Купить</button></a>
-<a href="/doctor_room"><button>🏥 Кабинет</button></a>
 <a href="/time_msk"><button>🕒 МСК</button></a>
 
 <div class="card">
@@ -51,23 +52,4 @@ button {background:red;color:white;border:none;padding:8px;margin:5px;border-rad
 🚗 {{c.name}}
 </div>
 {% endfor %}
-</div>
-
-<div class="card">
-<form method="POST" action="/create_alliance">
-<input name="name" placeholder="Союз">
-<button>Создать (500💎)</button>
-</form>
-</div>
-
-<div class="card">
-<form action="/search_player">
-<input name="name" placeholder="Игрок">
-<button>Найти</button>
-</form>
-
-<form action="/search_alliance">
-<input name="name" placeholder="Союз">
-<button>Найти</button>
-</form>
 </div>
