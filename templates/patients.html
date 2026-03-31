@@ -1,14 +1,13 @@
 {% extends "base.html" %}
+
 {% block content %}
+<h2>👤 Пациенты</h2>
 
-<h2>Пациенты</h2>
-
-<ul>
-    {% for p in patients %}
-        <li>{{ p }}</li>
-    {% endfor %}
-</ul>
-
-<a href="/">Назад</a>
+{% for patient in patients %}
+    <div class="card">
+        {{ patient }}<br><br>
+        <button>Выбрать</button>
+    </div>
+{% endfor %}
 
 {% endblock %}
