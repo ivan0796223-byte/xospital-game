@@ -1,32 +1,14 @@
+{% extends "base.html" %}
 
-<h2>🏥 Hospital Game</h2>
+{% block content %}
 
-<div>
-👤 {{user.username}}<br>
-💰 {{user.coins}} 💎 {{user.diamonds}}<br>
-⭐ {{user.level}}<br>
-<progress value="{{user.exp}}" max="{{user.level*100}}"></progress>
+<div class="box">
+    <p>💰 Монеты: {{ user.coins }}</p>
+    <p>💎 Алмазы: {{ user.diamonds }}</p>
+    <p>⭐ Опыт: {{ user.exp }}</p>
 </div>
 
-<a href="/patients">Пациенты</a>
-<a href="/chat">Чат</a>
-<a href="/surgery">Операции</a>
-<a href="/lab">Лаборатория</a>
-<a href="/shop">Магазин</a>
-<a href="/exchange">Обмен</a>
+<a href="/patients"><button>Пациенты</button></a>
+<a href="/logout"><button>Выйти</button></a>
 
-<h3>🚗 Автопарк</h3>
-<div style="display:flex;">
-<div style="width:50px;height:50px;border-radius:50%;background:#333;">🚑</div>
-<div style="width:50px;height:50px;border-radius:50%;background:#333;">🚗</div>
-</div>
-
-<p>Онлайн: <span id="o"></span></p>
-
-<script>
-setInterval(()=>{
-fetch("/online").then(r=>r.json()).then(d=>{
-document.getElementById("o").innerText=d.online
-})
-},2000)
-</script>
+{% endblock %}
