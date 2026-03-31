@@ -1,52 +1,22 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Xospital</title>
-    <style>
-        body {
-            background: #0b0b0b;
-            color: white;
-            font-family: Arial;
-            text-align: center;
-        }
-
-        .nav {
-            background: #111;
-            padding: 15px;
-            border-bottom: 2px solid red;
-        }
-
-        a {
-            color: white;
-            margin: 10px;
-            text-decoration: none;
-        }
-
-        .card {
-            border: 2px solid red;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px;
-            display: inline-block;
-        }
-
-        button {
-            background: red;
-            border: none;
-            padding: 10px;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
-<div class="nav">
-    <a href="/">🏠 Главная</a>
-    <a href="/patients">👤 Пациенты</a>
-</div>
+<header>
+    <span class="red-cross">✚</span>
+    <a href="/dashboard">Главная</a>
+    <a href="/patients">Пациенты</a>
+    <a href="/operating">Операционная</a>
+    <a href="/lab">Лаборатория</a>
+    <a href="/garage">Автопарк</a>
+    <a href="/shop">Магазин</a>
+    <a href="/alliance">Союз</a>
+    <a href="/doctor">Кабинет</a>
+    <a href="/logout">Выход</a>
+</header>
 
 {% block content %}{% endblock %}
 
