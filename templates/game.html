@@ -1,28 +1,16 @@
-
 <!DOCTYPE html>
 <html>
 <head>
+<title>Game</title>
 <style>
-body {background:#0a0a0a;color:white;font-family:Arial;}
+body {background:#0b0b0b;color:white;font-family:Arial;}
+.box {background:#1a1a1a;margin:10px;padding:10px;border-radius:12px;}
 .top {padding:10px;border-bottom:2px solid red;}
-.box {background:#1a1a1a;margin:10px;padding:10px;border-radius:15px;}
-.cross {color:red;}
-button {
-    background:red;
-    border:none;
-    color:white;
-    padding:10px;
-    border-radius:50px;
-}
-.icon {
-    width:40px;height:40px;
-    background:red;
-    border-radius:50%;
-    display:inline-block;
-}
-.progress {background:#333;border-radius:10px;}
-.progress div {background:red;height:10px;}
+.red {color:red;}
+button {background:red;color:white;border:none;padding:10px;border-radius:20px;}
 .chat {max-height:200px;overflow:auto;background:black;padding:10px;}
+.progress {background:#333;height:10px;border-radius:10px;}
+.progress div {background:red;height:10px;}
 </style>
 </head>
 
@@ -32,7 +20,7 @@ button {
 ❤️ Онлайн: {{online}} |
 💰 {{user.coins}} |
 💎 {{user.diamonds}} |
-⭐ {{level}} |
+⭐ Уровень {{level}} |
 🕒 {{time.strftime("%H:%M")}}
 </div>
 
@@ -41,51 +29,38 @@ button {
 </div>
 
 <div class="box">
-<h3 class="cross">✚ ЧАТ</h3>
+<h3 class="red">ЧАТ</h3>
+
 <div class="chat">
 {% for m in msgs %}
 <p>{{m.user}}: {{m.text}}</p>
 {% endfor %}
 </div>
+
 <form method="POST" action="/send">
 <input name="text">
-<button>➤</button>
+<button>Отправить</button>
 </form>
 </div>
 
 <div class="box">
-<h3 class="cross">✚ ПАЦИЕНТЫ</h3>
-<a href="/patients"><button>Выбрать</button></a>
+<h3 class="red">Пациенты</h3>
+<a href="/patients"><button>Открыть</button></a>
 </div>
 
 <div class="box">
-<h3 class="cross">✚ АВТОПАРК 🚑</h3>
-<a href="/garage"><button>Вызов</button></a>
-</div>
-
-<div class="box">
-<h3 class="cross">✚ ОПЕРАЦИОННАЯ 🎲</h3>
+<h3 class="red">Операция 🎲</h3>
 <a href="/operate"><button>Кубик</button></a>
 </div>
 
 <div class="box">
-<h3 class="cross">✚ ЛАБОРАТОРИЯ 🧪</h3>
+<h3 class="red">Лаборатория 🧪</h3>
 <a href="/lab"><button>Анализ</button></a>
 </div>
 
 <div class="box">
-<h3 class="cross">✚ ОБМЕННИК 💱</h3>
+<h3 class="red">Обмен 💱</h3>
 <a href="/exchange"><button>Обмен</button></a>
-</div>
-
-<div class="box">
-<h3 class="cross">✚ СОЮЗ 👥</h3>
-<a href="/alliance"><button>ЗАГС</button></a>
-</div>
-
-<div class="box">
-<h3 class="cross">✚ ДОКТОР 👨‍⚕️</h3>
-<a href="/doctor"><button>Кабинет</button></a>
 </div>
 
 </body>
