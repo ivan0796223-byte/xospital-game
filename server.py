@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+import logging
 
 app = Flask(__name__)
 
@@ -9,11 +11,14 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
+# Настроим логирование
+logging.basicConfig(level=logging.INFO)
+
 # ===== МОДЕЛЬ =====
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    login = db.Column(db.String(50), unique=True)
-    password = db.Column(db.String(50))
+    login = db.Column(db.String(50), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)
     coins = db.Column(db.Integer, default=100)
     diamonds = db.Column(db.Integer, default=10)
     exp = db.Column(db.Integer, default=0)
@@ -31,13 +36,19 @@ def index():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        login = request.form["login"]
-        password = request.form["password"]
+        login = request.form.get("login")
+        password = request.form.get("password")
+
+        if not login or not password:
+            return "Заполните все поля"
 
         if User.query.filter_by(login=login).first():
-            return "Пользователь уже есть"
+            return "Пользователь уже существует"
 
-        user = User(login=login, password=password)
+        # Хешируем пароль
+        password_hash = generate_password_hash(password)
+
+        user = User(login=login, password_hash=password_hash)
         db.session.add(user)
         db.session.commit()
 
@@ -49,16 +60,16 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        login = request.form["login"]
-        password = request.form["password"]
+        login = request.form.get("login")
+        password = request.form.get("password")
 
-        user = User.query.filter_by(login=login, password=password).first()
+        user = User.query.filter_by(login=login).first()
 
-        if user:
+        if user and check_password_hash(user.password_hash, password):
             session["user_id"] = user.id
             return redirect("/")
         else:
-            return "Ошибка входа"
+            return "Неверный логин или пароль"
 
     return render_template("login.html")
 
