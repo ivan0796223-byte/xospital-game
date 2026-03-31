@@ -1,12 +1,44 @@
+body {
+    background: #0b0b0b;
+    color: white;
+    font-family: Arial;
+}
 
-body { font-family: Arial, sans-serif; background: #f0f8ff; margin: 0; padding: 0; }
-.container { max-width: 500px; margin: auto; padding: 20px; text-align: center; }
-.stats p { font-size: 18px; margin: 5px 0; }
-.locations { margin: 10px 0; }
-.location-btn { padding: 8px 16px; margin: 5px; font-size: 16px; cursor: pointer; }
-.scene { margin: 15px 0; border: 1px solid #aaa; padding: 10px; background: #fff; }
-.scene-img { width: 100px; height: 100px; margin: 10px; }
-.actions button, .chat button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
-.chat { margin-top: 20px; border-top: 2px solid #ccc; padding-top: 10px; }
-#chat_box { max-height: 200px; overflow-y: auto; background: #fff; padding: 10px; border: 1px solid #aaa; margin-bottom: 10px; text-align: left; }
-.chat_msg { margin: 5px 0; }
+header {
+    background: #111;
+    padding: 10px;
+    border-bottom: 2px solid red;
+}
+
+button {
+    background: #1a1a1a;
+    color: white;
+    border: 1px solid red;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 10px;
+}
+
+.red-cross {
+    color: red;
+    font-size: 24px;
+}
+
+.card {
+    background: #111;
+    padding: 15px;
+    margin: 10px;
+    border-radius: 15px;
+    border: 1px solid red;
+}
+
+.progress {
+    background: #222;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: red;
+    height: 10px;
+}
