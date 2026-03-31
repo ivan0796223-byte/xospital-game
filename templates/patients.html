@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-
 {% block content %}
-<h2>👤 Пациенты</h2>
 
-{% for patient in patients %}
-    <div class="card">
-        {{ patient }}<br><br>
-        <button>Выбрать</button>
-    </div>
+<h2>Пациенты</h2>
+
+<button>Выбрать пациентов</button>
+
+{% for p in patients[:50] %}
+<div class="card">
+    {{ p.name }}
+</div>
 {% endfor %}
 
 {% endblock %}
