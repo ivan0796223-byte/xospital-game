@@ -1,55 +1,68 @@
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+import datetime
+import random
 
 app = Flask(__name__)
 
 app.config["SECRET_KEY"] = "secret"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///game.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-# ===== МОДЕЛЬ =====
+# ===== МОДЕЛИ =====
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    login = db.Column(db.String(50), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+    login = db.Column(db.String(50), unique=True)
+    password_hash = db.Column(db.String(200))
+    coins = db.Column(db.Integer, default=1000)
+    diamonds = db.Column(db.Integer, default=50)
+    exp = db.Column(db.Integer, default=0)
+
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(200))
+    user = db.Column(db.String(50))
+
+# ===== 5000 ПАЦИЕНТОВ =====
+patients_list = [f"Пациент {i}" for i in range(1, 5001)]
 
 # ===== ГЛАВНАЯ =====
 @app.route("/")
 def index():
     if "user_id" not in session:
         return redirect("/login")
-    return "Ты вошёл в игру 🎮"
+
+    user = User.query.get(session["user_id"])
+    online = User.query.count()
+    messages = Message.query.order_by(Message.id.desc()).limit(20)
+    time = datetime.datetime.utcnow() + datetime.timedelta(hours=3)
+
+    level = user.exp // 100
+    progress = user.exp % 100
+
+    return render_template("game.html", user=user, online=online,
+                           messages=messages, time=time,
+                           level=level, progress=progress)
 
 # ===== РЕГИСТРАЦИЯ =====
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        try:
-            login = request.form.get("login")
-            password = request.form.get("password")
+        login = request.form.get("login")
+        password = request.form.get("password")
 
-            print("LOGIN:", login)
+        if User.query.filter_by(login=login).first():
+            return "Пользователь уже есть"
 
-            if not login or not password:
-                return "❌ Заполни все поля"
+        user = User(login=login,
+                    password_hash=generate_password_hash(password))
 
-            if User.query.filter_by(login=login).first():
-                return "❌ Такой пользователь уже есть"
+        db.session.add(user)
+        db.session.commit()
 
-            password_hash = generate_password_hash(password)
-
-            user = User(login=login, password_hash=password_hash)
-            db.session.add(user)
-            db.session.commit()
-
-            return redirect("/login")
-
-        except Exception as e:
-            db.session.rollback()
-            return f"❌ Ошибка: {e}"
+        return redirect("/login")
 
     return render_template("register.html")
 
@@ -65,21 +78,60 @@ def login():
         if user and check_password_hash(user.password_hash, password):
             session["user_id"] = user.id
             return redirect("/")
-        else:
-            return "❌ Неверный логин или пароль"
 
     return render_template("login.html")
 
-# ===== ВЫХОД =====
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/login")
+# ===== ЧАТ =====
+@app.route("/send", methods=["POST"])
+def send():
+    user = User.query.get(session["user_id"])
+    text = request.form.get("text")
+
+    db.session.add(Message(text=text, user=user.login))
+    db.session.commit()
+
+    return redirect("/")
+
+# ===== ПАЦИЕНТЫ =====
+@app.route("/patients")
+def patients():
+    return render_template("patients.html", patients=patients_list[:100])
+
+# ===== АВТОПАРК =====
+@app.route("/garage")
+def garage():
+    call = random.choice(patients_list)
+    return f"🚑 Вызов: {call}"
+
+# ===== ОПЕРАЦИОННАЯ =====
+@app.route("/operate")
+def operate():
+    dice = random.randint(1, 6)
+    return f"🎲 Выпало: {dice}"
+
+# ===== ЛАБОРАТОРИЯ =====
+@app.route("/lab")
+def lab():
+    result = random.choice(["Анализ готов", "Ошибка анализа", "Редкое заболевание"])
+    return f"🧪 {result}"
+
+# ===== ОБМЕННИК =====
+@app.route("/exchange")
+def exchange():
+    user = User.query.get(session["user_id"])
+    user.coins -= 100
+    user.diamonds += 1
+    db.session.commit()
+    return redirect("/")
+
+# ===== СОЮЗ (ЗАГОТОВКА) =====
+@app.route("/alliance")
+def alliance():
+    return "👥 Союз + ЗАГС скоро"
 
 # ===== СОЗДАНИЕ БД =====
 with app.app_context():
     db.create_all()
 
-# ===== ЗАПУСК =====
 if __name__ == "__main__":
     app.run(debug=True)
