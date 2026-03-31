@@ -1,15 +1,20 @@
-{% extends "base.html" %}
 
-{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Вход</title>
+</head>
+<body>
 
 <h2>Вход</h2>
 
-<form method="post">
-    <input name="login" placeholder="Логин"><br>
-    <input name="password" placeholder="Пароль"><br>
+<form method="POST" action="/login">
+    <input type="text" name="login" placeholder="Логин"><br><br>
+    <input type="password" name="password" placeholder="Пароль"><br><br>
     <button type="submit">Войти</button>
 </form>
 
-<a href="/register"><button>Регистрация</button></a>
+<a href="/register">Регистрация</a>
 
-{% endblock %}
+</body>
+</html>
