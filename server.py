@@ -11,7 +11,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-# Настроим логирование
+# Настраиваем логирование
 logging.basicConfig(level=logging.INFO)
 
 # ===== МОДЕЛЬ =====
