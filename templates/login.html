@@ -1,14 +1,15 @@
-<style>
-body {background:black;color:white;text-align:center;}
-button {background:red;color:white;padding:10px;}
-</style>
+{% extends "base.html" %}
 
-<h2>✚ Вход</h2>
+{% block content %}
 
-<form method="POST">
-<input name="username" placeholder="Логин">
-<input name="password" type="password" placeholder="Пароль">
-<button>Войти</button>
+<h2>Вход</h2>
+
+<form method="post">
+    <input name="login" placeholder="Логин"><br>
+    <input name="password" placeholder="Пароль"><br>
+    <button type="submit">Войти</button>
 </form>
 
 <a href="/register"><button>Регистрация</button></a>
+
+{% endblock %}
