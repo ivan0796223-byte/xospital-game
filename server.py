@@ -1,113 +1,41 @@
-from flask import Flask, render_template, request, redirect, session
-from flask_sqlalchemy import SQLAlchemy
-import random
-import os
+
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-# 🔐 СЕКРЕТ
-app.config["SECRET_KEY"] = "xospital-secret-key"
+# Игровые данные (простые)
+player = {
+    "exp": 0,
+    "money": 100
+}
 
-# 🧠 ВАЖНО: безопасная БД для Render
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////tmp/game.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-db = SQLAlchemy(app)
-
-# 👤 МОДЕЛЬ ИГРОКА
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(80), nullable=False)
-    coins = db.Column(db.Integer, default=0)
-    xp = db.Column(db.Integer, default=0)
-    level = db.Column(db.Integer, default=1)
-
-# 🏥 ПАЦИЕНТЫ
-patients_list = [
-    "Пациент с переломом",
-    "Пациент с простудой",
-    "Пациент после аварии",
-    "Пациент с болью в животе"
-]
-
-# 🏠 ГЛАВНАЯ
 @app.route("/")
 def home():
-    if "user_id" not in session:
-        return redirect("/login")
+    return render_template("index.html", player=player)
 
-    user = User.query.get(session["user_id"])
-    return render_template("index.html", user=user)
+@app.route("/lab")
+def lab():
+    return render_template("lab.html", player=player)
 
-# 📝 РЕГИСТРАЦИЯ
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    if request.method == "POST":
-        if User.query.filter_by(username=request.form["username"]).first():
-            return "User exists"
+@app.route("/game")
+def game():
+    return render_template("game.html", player=player)
 
-        user = User(
-            username=request.form["username"],
-            password=request.form["password"]
-        )
-        db.session.add(user)
-        db.session.commit()
-        return redirect("/login")
+# ДЕЙСТВИЕ (кнопка)
+@app.route("/action", methods=["POST"])
+def action():
+    data = request.get_json()
+    act = data.get("action")
 
-    return render_template("register.html")
+    if act == "heal":
+        player["exp"] += 10
+        player["money"] += 20
 
-# 🔐 ЛОГИН
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        user = User.query.filter_by(
-            username=request.form["username"],
-            password=request.form["password"]
-        ).first()
+    elif act == "research":
+        player["exp"] += 20
+        player["money"] -= 10
 
-        if user:
-            session["user_id"] = user.id
-            return redirect("/")
+    return jsonify(player)
 
-        return "Wrong login"
-
-    return render_template("login.html")
-
-# 👤 ПАЦИЕНТЫ
-@app.route("/patients")
-def patients():
-    if "user_id" not in session:
-        return redirect("/login")
-
-    return render_template("patients.html", patients=patients_list)
-
-# ⚕️ ОПЕРАЦИЯ (ФАРМ)
-@app.route("/operate")
-def operate():
-    if "user_id" not in session:
-        return redirect("/login")
-
-    user = User.query.get(session["user_id"])
-
-    user.coins += random.randint(5, 20)
-    user.xp += 10
-
-    if user.xp >= 100:
-        user.level += 1
-        user.xp = 0
-
-    db.session.commit()
-    return redirect("/")
-
-# 🚪 ВЫХОД
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/login")
-
-# 🚀 ЗАПУСК
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(host="0.0.0.0", port=5000)
+    app.run(debug=True)
