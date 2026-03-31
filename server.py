@@ -8,7 +8,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-# ===== МОДЕЛЬ ПОЛЬЗОВАТЕЛЯ =====
+# ===== МОДЕЛЬ =====
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -27,7 +27,7 @@ def register():
         password = request.form.get("password")
 
         if not username or not password:
-            return "Ошибка: пустые поля"
+            return "Пустые поля"
 
         user = User(username=username, password=password)
         db.session.add(user)
@@ -50,7 +50,7 @@ def login():
             session["user_id"] = user.id
             return redirect(url_for("patients"))
         else:
-            return "Неверный логин или пароль"
+            return "Неверный логин"
 
     return render_template("login.html")
 
@@ -60,20 +60,25 @@ def patients():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
-    data = [
+    patients_list = [
         "Пациент №1",
         "Пациент №2",
         "Пациент №3",
         "Пациент №4"
     ]
 
-    return render_template("patients.html", patients=data)
+    return render_template("patients.html", patients=patients_list)
 
 # ===== ВЫХОД =====
 @app.route("/logout")
 def logout():
-    session.pop("user_id", None)
+    session.clear()
     return redirect(url_for("login"))
+
+# ===== ТЕСТ (ПРОВЕРКА СЕРВЕРА) =====
+@app.route("/test")
+def test():
+    return "OK сервер работает"
 
 # ===== СОЗДАНИЕ БД =====
 with app.app_context():
