@@ -1,14 +1,23 @@
-{% extends "base.html" %}
 
+{% extends "base.html" %}
 {% block content %}
 
-<div class="box">
-    <p>💰 Монеты: {{ user.coins }}</p>
-    <p>💎 Алмазы: {{ user.diamonds }}</p>
-    <p>⭐ Опыт: {{ user.exp }}</p>
-</div>
+<h2>Привет {{ user.username }}</h2>
 
-<a href="/patients"><button>Пациенты</button></a>
-<a href="/logout"><button>Выйти</button></a>
+<p>💰 Монеты: {{ user.coins }}</p>
+<p>⭐ XP: {{ user.xp }}</p>
+<p>📊 Уровень: {{ user.level }}</p>
+
+<a href="/operate">
+    <button>⚕️ В операционную</button>
+</a>
+
+<a href="/patients">
+    <button>👤 Пациенты</button>
+</a>
+
+<a href="/logout">
+    <button>🚪 Выйти</button>
+</a>
 
 {% endblock %}
