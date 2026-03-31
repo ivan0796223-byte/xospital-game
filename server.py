@@ -1,11 +1,9 @@
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-import datetime
-import random
+import datetime, random
 
 app = Flask(__name__)
-
 app.config["SECRET_KEY"] = "secret"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///game.db"
 
@@ -25,8 +23,7 @@ class Message(db.Model):
     text = db.Column(db.String(200))
     user = db.Column(db.String(50))
 
-# ===== 5000 ПАЦИЕНТОВ =====
-patients_list = [f"Пациент {i}" for i in range(1, 5001)]
+patients = [f"Пациент {i}" for i in range(1, 5001)]
 
 # ===== ГЛАВНАЯ =====
 @app.route("/")
@@ -36,15 +33,19 @@ def index():
 
     user = User.query.get(session["user_id"])
     online = User.query.count()
-    messages = Message.query.order_by(Message.id.desc()).limit(20)
-    time = datetime.datetime.utcnow() + datetime.timedelta(hours=3)
+    msgs = Message.query.order_by(Message.id.desc()).limit(20)
 
+    time = datetime.datetime.utcnow() + datetime.timedelta(hours=3)
     level = user.exp // 100
     progress = user.exp % 100
 
-    return render_template("game.html", user=user, online=online,
-                           messages=messages, time=time,
-                           level=level, progress=progress)
+    return render_template("game.html",
+                           user=user,
+                           online=online,
+                           msgs=msgs,
+                           time=time,
+                           level=level,
+                           progress=progress)
 
 # ===== РЕГИСТРАЦИЯ =====
 @app.route("/register", methods=["GET", "POST"])
@@ -58,7 +59,6 @@ def register():
 
         user = User(login=login,
                     password_hash=generate_password_hash(password))
-
         db.session.add(user)
         db.session.commit()
 
@@ -89,18 +89,17 @@ def send():
 
     db.session.add(Message(text=text, user=user.login))
     db.session.commit()
-
     return redirect("/")
 
 # ===== ПАЦИЕНТЫ =====
 @app.route("/patients")
-def patients():
-    return render_template("patients.html", patients=patients_list[:100])
+def patients_page():
+    return render_template("patients.html", patients=patients[:200])
 
 # ===== АВТОПАРК =====
 @app.route("/garage")
 def garage():
-    call = random.choice(patients_list)
+    call = random.choice(patients)
     return f"🚑 Вызов: {call}"
 
 # ===== ОПЕРАЦИОННАЯ =====
@@ -112,24 +111,34 @@ def operate():
 # ===== ЛАБОРАТОРИЯ =====
 @app.route("/lab")
 def lab():
-    result = random.choice(["Анализ готов", "Ошибка анализа", "Редкое заболевание"])
+    result = random.choice([
+        "Анализ чистый",
+        "Инфекция обнаружена",
+        "Редкое заболевание"
+    ])
     return f"🧪 {result}"
 
 # ===== ОБМЕННИК =====
 @app.route("/exchange")
 def exchange():
     user = User.query.get(session["user_id"])
-    user.coins -= 100
-    user.diamonds += 1
-    db.session.commit()
+    if user.coins >= 100:
+        user.coins -= 100
+        user.diamonds += 1
+        db.session.commit()
     return redirect("/")
 
-# ===== СОЮЗ (ЗАГОТОВКА) =====
+# ===== СОЮЗ =====
 @app.route("/alliance")
 def alliance():
-    return "👥 Союз + ЗАГС скоро"
+    return "👥 Союз / ЗАГС (скоро полный функционал)"
 
-# ===== СОЗДАНИЕ БД =====
+# ===== КАБИНЕТ ДОКТОРА =====
+@app.route("/doctor")
+def doctor():
+    return "👨‍⚕️ Кабинет доктора"
+
+# ===== БАЗА =====
 with app.app_context():
     db.create_all()
 
