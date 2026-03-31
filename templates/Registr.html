@@ -1,16 +1,24 @@
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        try:
+            login = request.form.get("login")
+            password = request.form.get("password")
 
-{% extends "base.html" %}
+            if not login or not password:
+                return "Заполни все поля"
 
-{% block content %}
+            # проверка существующего пользователя
+            if User.query.filter_by(login=login).first():
+                return "Пользователь уже есть"
 
-<h2>Регистрация</h2>
+            user = User(login=login, password=password)
+            db.session.add(user)
+            db.session.commit()
 
-<form method="post">
-    <input name="login" placeholder="Логин"><br>
-    <input name="password" placeholder="Пароль"><br>
-    <button type="submit">Создать</button>
-</form>
+            return redirect("/login")
 
-<a href="/login"><button>Назад</button></a>
+        except Exception as e:
+            return f"Ошибка: {e}"  # 👈 покажет причину
 
-{% endblock %}
+    return render_template("register.html")
