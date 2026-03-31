@@ -1,17 +1,14 @@
-<!DOCTYPE html>
-<html>
-<body style="background:#111;color:white;font-family:Arial;">
+{% extends "base.html" %}
+{% block content %}
 
-<h2 style="color:red;">Пациенты</h2>
+<h2>Пациенты</h2>
 
-{% for p in patients %}
-<button style="margin:5px;padding:10px;background:red;color:white;border:none;">
-{{p}}
-</button><br>
-{% endfor %}
+<ul>
+    {% for p in patients %}
+        <li>{{ p }}</li>
+    {% endfor %}
+</ul>
 
-<br>
 <a href="/">Назад</a>
 
-</body>
-</html>
+{% endblock %}
