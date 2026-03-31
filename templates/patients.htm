@@ -1,7 +1,17 @@
-<h2>Выбор пациента</h2>
+<!DOCTYPE html>
+<html>
+<body style="background:#111;color:white;font-family:Arial;">
+
+<h2 style="color:red;">Пациенты</h2>
 
 {% for p in patients %}
-<button>{{p}}</button><br>
+<button style="margin:5px;padding:10px;background:red;color:white;border:none;">
+{{p}}
+</button><br>
 {% endfor %}
 
+<br>
 <a href="/">Назад</a>
+
+</body>
+</html>
