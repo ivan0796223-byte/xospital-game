@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -25,27 +26,33 @@ class Message(db.Model):
 
 patients = [f"Пациент {i}" for i in range(1, 5001)]
 
-# ===== ГЛАВНАЯ =====
+# ===== ГЛАВНАЯ (БЕЗ ОШИБОК) =====
 @app.route("/")
 def index():
     if "user_id" not in session:
         return redirect("/login")
 
     user = User.query.get(session["user_id"])
+    if not user:
+        return redirect("/login")
+
     online = User.query.count()
     msgs = Message.query.order_by(Message.id.desc()).limit(20)
 
     time = datetime.datetime.utcnow() + datetime.timedelta(hours=3)
+
     level = user.exp // 100
     progress = user.exp % 100
 
-    return render_template("game.html",
-                           user=user,
-                           online=online,
-                           msgs=msgs,
-                           time=time,
-                           level=level,
-                           progress=progress)
+    return render_template(
+        "game.html",
+        user=user,
+        online=online,
+        msgs=msgs,
+        time=time,
+        level=level,
+        progress=progress
+    )
 
 # ===== РЕГИСТРАЦИЯ =====
 @app.route("/register", methods=["GET", "POST"])
@@ -54,11 +61,17 @@ def register():
         login = request.form.get("login")
         password = request.form.get("password")
 
-        if User.query.filter_by(login=login).first():
-            return "Пользователь уже есть"
+        if not login or not password:
+            return "Заполни поля"
 
-        user = User(login=login,
-                    password_hash=generate_password_hash(password))
+        if User.query.filter_by(login=login).first():
+            return "Уже есть"
+
+        user = User(
+            login=login,
+            password_hash=generate_password_hash(password)
+        )
+
         db.session.add(user)
         db.session.commit()
 
@@ -79,69 +92,56 @@ def login():
             session["user_id"] = user.id
             return redirect("/")
 
+        return "Неверный логин или пароль"
+
     return render_template("login.html")
 
 # ===== ЧАТ =====
 @app.route("/send", methods=["POST"])
 def send():
+    if "user_id" not in session:
+        return redirect("/login")
+
     user = User.query.get(session["user_id"])
     text = request.form.get("text")
 
-    db.session.add(Message(text=text, user=user.login))
-    db.session.commit()
+    if text:
+        db.session.add(Message(text=text, user=user.login))
+        db.session.commit()
+
     return redirect("/")
 
 # ===== ПАЦИЕНТЫ =====
 @app.route("/patients")
 def patients_page():
-    return render_template("patients.html", patients=patients[:200])
+    return render_template("patients.html", patients=patients[:50])
 
-# ===== АВТОПАРК =====
-@app.route("/garage")
-def garage():
-    call = random.choice(patients)
-    return f"🚑 Вызов: {call}"
-
-# ===== ОПЕРАЦИОННАЯ =====
+# ===== ОПЕРАЦИЯ (КУБИК) =====
 @app.route("/operate")
 def operate():
-    dice = random.randint(1, 6)
-    return f"🎲 Выпало: {dice}"
+    return f"🎲 Кубик: {random.randint(1,6)}"
 
 # ===== ЛАБОРАТОРИЯ =====
 @app.route("/lab")
 def lab():
-    result = random.choice([
-        "Анализ чистый",
-        "Инфекция обнаружена",
-        "Редкое заболевание"
-    ])
-    return f"🧪 {result}"
+    return f"🧪 {random.choice(['Чисто','Инфекция','Редкий случай'])}"
 
-# ===== ОБМЕННИК =====
+# ===== ОБМЕН =====
 @app.route("/exchange")
 def exchange():
+    if "user_id" not in session:
+        return redirect("/login")
+
     user = User.query.get(session["user_id"])
-    if user.coins >= 100:
-        user.coins -= 100
-        user.diamonds += 1
-        db.session.commit()
+    user.coins -= 100
+    user.diamonds += 1
+    db.session.commit()
+
     return redirect("/")
 
-# ===== СОЮЗ =====
-@app.route("/alliance")
-def alliance():
-    return "👥 Союз / ЗАГС (скоро полный функционал)"
-
-# ===== КАБИНЕТ ДОКТОРА =====
-@app.route("/doctor")
-def doctor():
-    return "👨‍⚕️ Кабинет доктора"
-
-# ===== БАЗА =====
+# ===== СОЗДАНИЕ БД =====
 with app.app_context():
     db.create_all()
 
 if __name__ == "__main__":
-    app.run(debug=True)
-                           
+    app.run()
