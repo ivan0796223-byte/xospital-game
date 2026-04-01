@@ -1,13 +1,13 @@
-from flask import Flask, request, redirect, session
+from flask import Flask, render_template, request, redirect, session
 
 app = Flask(__name__)
-app.secret_key = "secret123"
+app.secret_key = "123"
 
 users = {}
 
 @app.route("/")
 def home():
-    return "SERVER WORKS"
+    return redirect("/register")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -16,16 +16,21 @@ def register():
         password = request.form.get("password")
 
         users[login] = password
-        return "REGISTER OK"
+        return redirect("/login")
 
-    return '''
-    <h1>Регистрация</h1>
-    <form method="post">
-        <input name="login">
-        <input name="password">
-        <button type="submit">OK</button>
-    </form>
-    '''
+    return render_template("register.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        session["user"] = request.form.get("login")
+        return redirect("/dashboard")
+
+    return render_template("login.html")
+
+@app.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html")
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
