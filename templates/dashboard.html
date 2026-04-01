@@ -1,1 +1,38 @@
-<h1>ИГРА РАБОТАЕТ 🚀</h1>
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+<h3>👤 {{ user }}</h3>
+
+💰 {{ data.coins }} |
+💎 {{ data.diamonds }} |
+⭐ {{ data.exp }} |
+🏆 Lv {{ data.level }}
+
+<p>🟢 Онлайн игроков: {{ online }}</p>
+
+<div class="progress">
+<div class="bar" style="width:{{ data.exp }}%"></div>
+</div>
+</div>
+
+<div class="card">
+<h3>📍 Меню</h3>
+
+<a href="/patients">👥 Пациенты</a><br>
+<a href="/operate">⚕️ Операционная (кубики)</a><br>
+<a href="/lab">🧪 Лаборатория</a><br>
+<a href="/shop">🛒 Магазин</a><br>
+<a href="/alliance">🤝 Союз (500💎)</a>
+</div>
+
+<div class="card">
+<h3>🚑 Быстрые пациенты</h3>
+
+{% for p in patients %}
+<p>{{ p.name }} - {{ p.status }}</p>
+{% endfor %}
+
+</div>
+
+{% endblock %}
