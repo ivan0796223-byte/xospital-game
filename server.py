@@ -5,14 +5,12 @@ app.secret_key = "secret123"
 
 users = {}
 
-# ---------------- ГЛАВНАЯ ----------------
 @app.route("/")
 def home():
     if "user" in session:
         return redirect("/dashboard")
     return redirect("/login")
 
-# ---------------- РЕГИСТРАЦИЯ ----------------
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -35,7 +33,6 @@ def register():
 
     return render_template("register.html")
 
-# ---------------- ВХОД ----------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -53,7 +50,6 @@ def login():
 
     return render_template("login.html")
 
-# ---------------- DASHBOARD ----------------
 @app.route("/dashboard")
 def dashboard():
     if "user" not in session:
@@ -62,12 +58,10 @@ def dashboard():
     user = users[session["user"]]
     return render_template("dashboard.html", user=user)
 
-# ---------------- ВЫХОД ----------------
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/login")
 
-# ---------------- ЗАПУСК ----------------
 if __name__ == "__main__":
     app.run(debug=True)
