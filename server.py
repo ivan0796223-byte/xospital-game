@@ -6,25 +6,24 @@ app.secret_key = "xospital_v3"
 
 users = {}
 
-# ---- 2000 пациентов ----
+# 2000 пациентов
 patients = [{"id": i, "name": f"Пациент {i}", "status": "палата"} for i in range(1, 2001)]
 
-# ---- init игрок ----
-def init():
+def init_player():
     if "data" not in session:
         session["data"] = {
-            "coins": 500,
-            "diamonds": 200,
+            "coins": 1000,
+            "diamonds": 300,
             "exp": 0,
             "level": 1
         }
 
-# ---- HOME ----
+# ---------------- HOME ----------------
 @app.route("/")
 def home():
     return redirect("/login")
 
-# ---- REGISTER ----
+# ---------------- REGISTER ----------------
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -32,7 +31,7 @@ def register():
         return redirect("/login")
     return render_template("register.html")
 
-# ---- LOGIN ----
+# ---------------- LOGIN ----------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -41,64 +40,65 @@ def login():
 
         if u in users and users[u] == p:
             session["user"] = u
-            init()
+            init_player()
             return redirect("/dashboard")
 
     return render_template("login.html")
 
-# ---- DASHBOARD ----
+# ---------------- DASHBOARD ----------------
 @app.route("/dashboard")
 def dashboard():
     if "user" not in session:
         return redirect("/login")
 
-    init()
-    data = session["data"]
+    init_player()
+    d = session["data"]
 
     return render_template(
         "dashboard.html",
         user=session["user"],
-        data=data,
-        patients=random.sample(patients, 10),
-        online=random.randint(1, 25)
+        data=d,
+        online=random.randint(5, 50),
+        patients=random.sample(patients, 10)
     )
 
-# ---- PATIENTS ----
+# ---------------- PATIENTS ----------------
 @app.route("/patients")
 def patients_page():
-    return render_template("patients.html", patients=patients[:100])
+    return render_template("patients.html", patients=patients[:200])
 
-# ---- CALL PATIENT ----
+# ---------------- CALL PATIENT ----------------
 @app.route("/call/<int:pid>")
 def call(pid):
-    return f"🚑 Пациент {pid} вызван"
+    return f"🚑 Пациент {pid} вызван в автопарк"
 
-# ---- OPERATING (dice) ----
+# ---------------- OPERATING ----------------
 @app.route("/operate")
 def operate():
-    dice = random.randint(1, 6)
-    return f"🎲 Операция результат: {dice}"
+    return f"🎲 Кубик: {random.randint(1,6)} → решение операции"
 
-# ---- LAB ----
+# ---------------- LAB ----------------
 @app.route("/lab")
 def lab():
-    return f"🧪 Исследование: {random.choice(['кровь','МРТ','рентген','анализ'])}"
+    return render_template("lab.html",
+        result=random.choice(["кровь","МРТ","рентген","образец"])
+    )
 
-# ---- ALLIANCE ----
+# ---------------- ALLIANCE ----------------
 @app.route("/alliance")
 def alliance():
-    init()
+    init_player()
     d = session["data"]
 
     if d["diamonds"] >= 500:
         d["diamonds"] -= 500
-        return "🤝 Союз создан!"
-    return "❌ нет алмазов"
+        return "🤝 Союз создан"
+    return "❌ недостаточно алмазов"
 
-# ---- SHOP ----
+# ---------------- SHOP ----------------
 @app.route("/shop")
 def shop():
-    return "🛒 Магазин оборудования (V3)"
+    return "🛒 Магазин оборудования"
 
 if __name__ == "__main__":
     app.run()
