@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, request, redirect, session
 
 app = Flask(__name__)
 app.secret_key = "secret123"
@@ -7,9 +7,7 @@ users = {}
 
 @app.route("/")
 def home():
-    if "user" in session:
-        return redirect("/dashboard")
-    return redirect("/login")
+    return "Главная работает"
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -17,51 +15,29 @@ def register():
         login = request.form.get("login")
         password = request.form.get("password")
 
-        if not login or not password:
-            return "Заполни все поля"
+        users[login] = {"password": password}
+        return "ЗАРЕГАНО"
 
-        if login in users:
-            return "Логин занят"
-
-        users[login] = {
-            "password": password,
-            "coins": 1000,
-            "diamonds": 500
-        }
-
-        return redirect("/login")
-
-    return render_template("register.html")
+    return '''
+    <form method="post">
+        <input name="login">
+        <input name="password">
+        <button type="submit">OK</button>
+    </form>
+    '''
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        login = request.form.get("login")
-        password = request.form.get("password")
+        return "ЛОГИН ОК"
 
-        if login not in users:
-            return "Пользователь не найден"
-
-        if users[login]["password"] != password:
-            return "Неверный пароль"
-
-        session["user"] = login
-        return redirect("/dashboard")
-
-    return render_template("login.html")
-
-@app.route("/dashboard")
-def dashboard():
-    if "user" not in session:
-        return redirect("/login")
-
-    user = users[session["user"]]
-    return render_template("dashboard.html", user=user)
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/login")
+    return '''
+    <form method="post">
+        <input name="login">
+        <input name="password">
+        <button type="submit">OK</button>
+    </form>
+    '''
 
 if __name__ == "__main__":
     app.run(debug=True)
