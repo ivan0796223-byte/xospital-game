@@ -2,14 +2,11 @@
 {% block content %}
 
 <div class="card">
-<h3>👤 {{ user }}</h3>
+<h3>{{ user }}</h3>
 
-💰 {{ data.coins }} |
-💎 {{ data.diamonds }} |
-⭐ {{ data.exp }} |
-🏆 Lv {{ data.level }}
+💰 {{ data.coins }} | 💎 {{ data.diamonds }} | ⭐ {{ data.exp }} | Lv {{ data.level }}
 
-<p>🟢 Онлайн игроков: {{ online }}</p>
+<p>🟢 Онлайн: {{ online }}</p>
 
 <div class="progress">
 <div class="bar" style="width:{{ data.exp }}%"></div>
@@ -17,22 +14,26 @@
 </div>
 
 <div class="card">
-<h3>📍 Меню</h3>
-
-<a href="/patients">👥 Пациенты</a><br>
-<a href="/operate">⚕️ Операционная (кубики)</a><br>
+<a href="/patients">👥 Выбрать пациентов</a><br>
+<a href="/garage">🚑 Автопарк</a><br>
+<a href="/operate">⚕️ Операционная 🎲</a><br>
 <a href="/lab">🧪 Лаборатория</a><br>
 <a href="/shop">🛒 Магазин</a><br>
-<a href="/alliance">🤝 Союз (500💎)</a>
+<a href="/alliance">🤝 Союз (500💎)</a><br>
+<a href="/doctor">👨‍⚕️ Кабинет</a>
 </div>
 
 <div class="card">
-<h3>🚑 Быстрые пациенты</h3>
+<h3>💬 Чат</h3>
 
-{% for p in patients %}
-<p>{{ p.name }} - {{ p.status }}</p>
+<form method="post" action="/chat">
+<input name="msg">
+<button>Отправить</button>
+</form>
+
+{% for m in messages %}
+<p>{{ m }}</p>
 {% endfor %}
-
 </div>
 
 {% endblock %}
