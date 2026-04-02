@@ -1,72 +1,92 @@
-from flask import Flask, render_template, request, redirect, session
-import random
+from flask import Flask, render_template, request, jsonify, session
+import os, random
 
 app = Flask(__name__)
-app.secret_key = "super_secret_key"
+app.secret_key = "secret"
 
 users = {}
-patients = [{"id": i, "name": f"Пациент {i}"} for i in range(1, 2001)]
+
+def create_user(name, password):
+    users[name] = {
+        "password": password,
+        "money": 50000,
+        "diamonds": 0,
+        "xp": 0,
+        "level": 1,
+        "selected_patient": None,
+        "chat": [],
+        "cars": ["🚑", "🚗"],
+        "patients": []
+    }
+
+    for i in range(20):
+        users[name]["patients"].append({
+            "id": i,
+            "name": f"Пациент {i}",
+            "orvi": random.randint(50,100)
+        })
 
 @app.route("/")
-def index():
+def home():
     if "user" not in session:
-        return redirect("/login")
+        return render_template("login.html")
+    return render_template("index.html", user=users[session["user"]], name=session["user"])
 
-    return render_template(
-        "game.html",
-        user=session.get("user"),
-        coins=1000,
-        diamonds=50,
-        xp=120,
-        next_level=200,
-        online=7,
-        patients=patients[:10]
-    )
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        login = request.form.get("login")
-        password = request.form.get("password")
-
-        if login in users and users[login] == password:
-            session["user"] = login
-            return redirect("/")
-
-    return render_template("login.html")
-
-@app.route("/register", methods=["GET", "POST"])
+@app.route("/register", methods=["POST"])
 def register():
-    if request.method == "POST":
-        login = request.form.get("login")
-        password = request.form.get("password")
+    data = request.json
+    name = data["name"]
+    password = data["password"]
 
-        if login and password:
-            users[login] = password
-            return redirect("/login")
+    create_user(name, password)
+    session["user"] = name
+    return jsonify({"ok": True})
 
-    return render_template("register.html")
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.json
+    name = data["name"]
+    password = data["password"]
 
-@app.route("/patients")
-def patients_page():
-    return render_template("patients.html", patients=patients[:50])
+    if name in users and users[name]["password"] == password:
+        session["user"] = name
+        return jsonify({"ok": True})
+    return jsonify({"error": "wrong"}), 400
 
-@app.route("/garage")
-def garage():
-    return render_template("garage.html")
+@app.route("/select_patient", methods=["POST"])
+def select_patient():
+    user = users[session["user"]]
+    pid = int(request.json["id"])
 
-@app.route("/operation")
-def operation():
-    dice = random.randint(1, 6)
-    return render_template("operation.html", dice=dice)
+    for p in user["patients"]:
+        if p["id"] == pid:
+            user["selected_patient"] = p
 
-@app.route("/lab")
-def lab():
-    return render_template("lab.html")
+    return jsonify(user)
 
-@app.route("/chat")
+@app.route("/treat", methods=["POST"])
+def treat():
+    user = users[session["user"]]
+
+    if user["selected_patient"]:
+        user["selected_patient"]["orvi"] -= 10
+
+    user["xp"] += 10
+    user["diamonds"] += 1
+
+    if user["xp"] >= 100:
+        user["level"] += 1
+        user["xp"] = 0
+
+    return jsonify(user)
+
+@app.route("/chat", methods=["POST"])
 def chat():
-    return render_template("chat.html")
+    user = users[session["user"]]
+    msg = request.json["msg"]
+    user["chat"].append(msg)
+    return jsonify(user)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
