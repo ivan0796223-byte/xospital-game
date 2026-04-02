@@ -1,52 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Xospital V3</title>
-
 <style>
-body{
-    background:#0a0a0a;
-    color:white;
-    font-family:Arial;
-}
-
-.card{
-    background:#1c1c1c;
-    margin:10px;
-    padding:15px;
-    border-radius:12px;
-}
-
-.red{color:red;}
-
-button{
-    background:red;
-    color:white;
-    border:none;
-    padding:8px;
-    border-radius:8px;
-}
-
+body{background:#0a0a0a;color:white;font-family:Arial}
+.card{background:#1c1c1c;margin:10px;padding:15px;border-radius:12px}
+.red{color:red}
+button{background:red;color:white;border:none;padding:8px;border-radius:10px}
 a{color:#ff4d4d;text-decoration:none}
-
-.progress{
-    width:100%;
-    background:#333;
-    border-radius:10px;
-}
-
-.bar{
-    height:10px;
-    background:red;
-}
+.circle{width:40px;height:40px;border-radius:50%;background:red;display:inline-block;text-align:center}
+.progress{background:#333;border-radius:10px}
+.bar{height:10px;background:red}
 </style>
-
 </head>
-<body>
 
-<h2 class="red">✚ XOSPITAL V3</h2>
+<body>
+<h2 class="red">✚ XOSPITAL</h2>
 
 {% block content %}{% endblock %}
-
 </body>
 </html>
