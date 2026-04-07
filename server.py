@@ -1,92 +1,81 @@
-from flask import Flask, render_template, request, jsonify, session
-import os, random
+from flask import Flask, render_template, request, redirect, session
+import random
 
 app = Flask(__name__)
 app.secret_key = "secret"
 
 users = {}
-
-def create_user(name, password):
-    users[name] = {
-        "password": password,
-        "money": 50000,
-        "diamonds": 0,
-        "xp": 0,
-        "level": 1,
-        "selected_patient": None,
-        "chat": [],
-        "cars": ["🚑", "🚗"],
-        "patients": []
-    }
-
-    for i in range(20):
-        users[name]["patients"].append({
-            "id": i,
-            "name": f"Пациент {i}",
-            "orvi": random.randint(50,100)
-        })
+patients = [{"id": i, "name": f"Пациент {i}"} for i in range(1, 2001)]
+alliances = []
 
 @app.route("/")
-def home():
-    if "user" not in session:
-        return render_template("login.html")
-    return render_template("index.html", user=users[session["user"]], name=session["user"])
+def index():
+    return render_template("index.html")
 
-@app.route("/register", methods=["POST"])
+@app.route("/register", methods=["GET","POST"])
 def register():
-    data = request.json
-    name = data["name"]
-    password = data["password"]
+    if request.method == "POST":
+        login = request.form["login"]
+        password = request.form["password"]
 
-    create_user(name, password)
-    session["user"] = name
-    return jsonify({"ok": True})
+        users[login] = {
+            "password": password,
+            "coins": 1000,
+            "diamonds": 100,
+            "xp": 0,
+            "level": 1
+        }
+        return redirect("/login")
+    return render_template("register.html")
 
-@app.route("/login", methods=["POST"])
+@app.route("/login", methods=["GET","POST"])
 def login():
-    data = request.json
-    name = data["name"]
-    password = data["password"]
+    if request.method == "POST":
+        login = request.form["login"]
+        password = request.form["password"]
 
-    if name in users and users[name]["password"] == password:
-        session["user"] = name
-        return jsonify({"ok": True})
-    return jsonify({"error": "wrong"}), 400
+        if login in users and users[login]["password"] == password:
+            session["user"] = login
+            return redirect("/game")
+    return render_template("login.html")
 
-@app.route("/select_patient", methods=["POST"])
-def select_patient():
+@app.route("/game")
+def game():
+    if "user" not in session:
+        return redirect("/login")
+
     user = users[session["user"]]
-    pid = int(request.json["id"])
+    online = len(users)
 
-    for p in user["patients"]:
-        if p["id"] == pid:
-            user["selected_patient"] = p
+    return render_template("game.html", user=user, online=online)
 
-    return jsonify(user)
+@app.route("/wards")
+def wards():
+    return render_template("wards.html", patients=patients)
 
-@app.route("/treat", methods=["POST"])
-def treat():
-    user = users[session["user"]]
+@app.route("/operating")
+def operating():
+    dice = random.randint(1,6)
+    return render_template("operating.html", dice=dice)
 
-    if user["selected_patient"]:
-        user["selected_patient"]["orvi"] -= 10
+@app.route("/lab")
+def lab():
+    return render_template("lab.html")
 
-    user["xp"] += 10
-    user["diamonds"] += 1
+@app.route("/shop")
+def shop():
+    return render_template("shop.html")
 
-    if user["xp"] >= 100:
-        user["level"] += 1
-        user["xp"] = 0
+@app.route("/alliances", methods=["GET","POST"])
+def alliances_page():
+    if request.method == "POST":
+        name = request.form["name"]
+        user = users[session["user"]]
 
-    return jsonify(user)
+        if user["diamonds"] >= 500:
+            user["diamonds"] -= 500
+            alliances.append(name)
 
-@app.route("/chat", methods=["POST"])
-def chat():
-    user = users[session["user"]]
-    msg = request.json["msg"]
-    user["chat"].append(msg)
-    return jsonify(user)
+    return render_template("alliances.html", alliances=alliances)
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+app.run(host="0.0.0.0", port=5000)
