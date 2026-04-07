@@ -4,41 +4,32 @@ body {
     font-family: Arial;
 }
 
-header {
-    background: #111;
-    padding: 10px;
-    border-bottom: 2px solid red;
-}
-
 button {
-    background: #1a1a1a;
-    color: white;
-    border: 1px solid red;
-    padding: 10px;
-    margin: 5px;
-    border-radius: 10px;
-}
-
-.red-cross {
-    color: red;
-    font-size: 24px;
-}
-
-.card {
     background: #111;
-    padding: 15px;
-    margin: 10px;
-    border-radius: 15px;
-    border: 1px solid red;
-}
-
-.progress {
-    background: #222;
+    border: 2px solid red;
+    color: white;
+    padding: 10px;
     border-radius: 10px;
-    overflow: hidden;
 }
 
-.progress-bar {
-    background: red;
-    height: 10px;
+.cross {
+    color: red;
+    font-size: 20px;
+}
+
+.panel {
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 15px;
+    margin: 10px;
+}
+
+.circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #222;
+    display: inline-block;
+    text-align: center;
+    line-height: 60px;
 }
