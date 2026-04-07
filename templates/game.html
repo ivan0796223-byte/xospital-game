@@ -1,67 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Game</title>
-<style>
-body {background:#0b0b0b;color:white;font-family:Arial;}
-.box {background:#1a1a1a;margin:10px;padding:10px;border-radius:12px;}
-.top {padding:10px;border-bottom:2px solid red;}
-.red {color:red;}
-button {background:red;color:white;border:none;padding:10px;border-radius:20px;}
-.chat {max-height:200px;overflow:auto;background:black;padding:10px;}
-.progress {background:#333;height:10px;border-radius:10px;}
-.progress div {background:red;height:10px;}
-</style>
-</head>
 
-<body>
+<h2>❌ Hospital V3</h2>
 
-<div class="top">
-❤️ Онлайн: {{online}} |
-💰 {{user.coins}} |
-💎 {{user.diamonds}} |
-⭐ Уровень {{level}} |
-🕒 {{time.strftime("%H:%M")}}
+<div class="panel">
+    Онлайн: {{online}} <br>
+    💰 {{user.coins}} | 💎 {{user.diamonds}} | ⭐ {{user.xp}}
 </div>
 
-<div class="progress">
-<div style="width:{{progress}}%"></div>
+<a href="/wards"><button>Палаты</button></a>
+<a href="/operating"><button>Операционная 🎲</button></a>
+<a href="/lab"><button>Лаборатория</button></a>
+<a href="/shop"><button>Магазин</button></a>
+<a href="/alliances"><button>Союзы</button></a>
+
+<div class="panel">
+    Прогресс:
+    <progress value="{{user.xp}}" max="100"></progress>
 </div>
-
-<div class="box">
-<h3 class="red">ЧАТ</h3>
-
-<div class="chat">
-{% for m in msgs %}
-<p>{{m.user}}: {{m.text}}</p>
-{% endfor %}
-</div>
-
-<form method="POST" action="/send">
-<input name="text">
-<button>Отправить</button>
-</form>
-</div>
-
-<div class="box">
-<h3 class="red">Пациенты</h3>
-<a href="/patients"><button>Открыть</button></a>
-</div>
-
-<div class="box">
-<h3 class="red">Операция 🎲</h3>
-<a href="/operate"><button>Кубик</button></a>
-</div>
-
-<div class="box">
-<h3 class="red">Лаборатория 🧪</h3>
-<a href="/lab"><button>Анализ</button></a>
-</div>
-
-<div class="box">
-<h3 class="red">Обмен 💱</h3>
-<a href="/exchange"><button>Обмен</button></a>
-</div>
-
-</body>
-</html>
