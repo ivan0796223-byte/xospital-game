@@ -1,35 +1,10 @@
-{% extends "base.html" %}
-{% block content %}
+<h2>Палаты</h2>
 
-<h2>🏥 Палаты</h2>
-
-{% if selected %}
-<div class="box">
-👤 Выбран: {{ selected }}
-</div>
-{% endif %}
-
-<form method="POST" action="/select_patient">
-<div class="box">
-<h3>📋 Пациенты</h3>
-
+<form>
 {% for p in patients %}
-<button name="patient" value="{{ p }}">👤 {{ p }}</button>
-
-endfor %}
+<div class="panel">
+    {{p.name}}
+    <button>Выбрать</button>
 </div>
+{% endfor %}
 </form>
-
-<div>
-{% if page > 1 %}
-<a href="/ward?page={{ page-1 }}"><button>⬅</button></a>
-{% endif %}
-
-Страница {{ page }}
-
-{% if page*10 < total %}
-<a href="/ward?page={{ page+1 }}"><button>➡</button></a>
-{% endif %}
-</div>
-
-{% endblock %}
