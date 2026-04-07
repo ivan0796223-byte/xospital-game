@@ -1,60 +1,77 @@
+// === ЧАТ ===
+const chatInput = document.getElementById("chat-input");
+const chatBox = document.getElementById("chat-box");
 
-document.addEventListener("DOMContentLoaded", () => {
-    const moneyEl = document.getElementById("money");
-    const expEl = document.getElementById("exp");
-    const diamondsEl = document.getElementById("diamonds");
-    const chatBox = document.getElementById("chat_box");
-    const chatInput = document.getElementById("chat_input");
-    const sceneEl = document.getElementById("scene");
+function sendMessage() {
+    if (!chatInput.value) return;
 
-    const updateUI = (state) => {
-        moneyEl.textContent = `💰 Деньги: ${state.money}`;
-        expEl.textContent = `⭐ Опыт: ${state.exp}`;
-        diamondsEl.textContent = `💎 Алмазы: ${state.diamonds}`;
-        chatBox.innerHTML = state.chat.map(msg => `<div class="chat_msg">${msg}</div>`).join("");
-        chatBox.scrollTop = chatBox.scrollHeight;
+    const msg = document.createElement("div");
+    msg.className = "panel";
+    msg.innerText = "👤: " + chatInput.value;
 
-        let sceneHTML = "";
-        if(state.location === "lobby") {
-            sceneHTML = `<img src="/static/images/doctor.png" class="scene-img"><p>Вы находитесь в лобби.</p>`;
-        } else if(state.location === "room") {
-            sceneHTML = `<img src="/static/images/room.png" class="scene-img"><p>Вы в кабинете. Можно лечить пациентов.</p>`;
-        } else if(state.location === "lab") {
-            sceneHTML = `<img src="/static/images/lab.png" class="scene-img"><p>Вы в лаборатории. Можно делать анализы.</p>`;
-        }
-        sceneEl.innerHTML = sceneHTML;
-    }
+    chatBox.appendChild(msg);
+    chatInput.value = "";
 
-    const sendAction = (type) => {
-        fetch("/action", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({type})
-        })
-        .then(res => res.json())
-        .then(data => updateUI(data.state));
-    }
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-    document.getElementById("treat").addEventListener("click", () => sendAction("treat_patient"));
-    document.getElementById("lab").addEventListener("click", () => sendAction("lab_test"));
-    document.querySelectorAll(".location-btn").forEach(btn => {
-        btn.addEventListener("click", () => sendAction(btn.dataset.action));
+// Enter отправка
+if (chatInput) {
+    chatInput.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") sendMessage();
     });
+}
 
-    document.getElementById("send_msg").addEventListener("click", () => {
-        const text = chatInput.value.trim();
-        if (!text) return;
+// === КУБИК (операционная) ===
+function rollDice() {
+    const diceEl = document.getElementById("dice");
 
-        fetch("/send_message", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({text})
-        })
-        .then(res => res.json())
-        .then(data => {
-            chatBox.innerHTML = data.chat.map(msg => `<div class="chat_msg">${msg}</div>`).join("");
-            chatBox.scrollTop = chatBox.scrollHeight;
-            chatInput.value = "";
-        });
+    let rolls = 10;
+    let interval = setInterval(() => {
+        diceEl.innerText = Math.floor(Math.random() * 6) + 1;
+        rolls--;
+
+        if (rolls <= 0) {
+            clearInterval(interval);
+        }
+    }, 100);
+}
+
+// === ПОИСК ПАЦИЕНТОВ ===
+function searchPatients() {
+    const input = document.getElementById("search").value.toLowerCase();
+    const patients = document.querySelectorAll(".patient");
+
+    patients.forEach(p => {
+        const text = p.innerText.toLowerCase();
+        p.style.display = text.includes(input) ? "block" : "none";
+    });
+}
+
+// === ВЫБОР ПАЦИЕНТА ===
+let selectedPatients = [];
+
+function selectPatient(id) {
+    const el = document.getElementById("patient-" + id);
+
+    if (selectedPatients.includes(id)) {
+        selectedPatients = selectedPatients.filter(p => p !== id);
+        el.style.border = "2px solid red";
+    } else {
+        selectedPatients.push(id);
+        el.style.border = "2px solid lime";
+    }
+
+    document.getElementById("selected-count").innerText =
+        "Выбрано: " + selectedPatients.length;
+}
+
+// === АНИМАЦИЯ КНОПОК ===
+document.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("mouseover", () => {
+        btn.style.transform = "scale(1.05)";
+    });
+    btn.addEventListener("mouseout", () => {
+        btn.style.transform = "scale(1)";
     });
 });
