@@ -1,12 +1,11 @@
-{% extends "base.html" %}
-{% block content %}
 
-<h2>Создать союз (500 💎)</h2>
+<h2>Союзы</h2>
 
 <form method="post">
-    <button type="submit">Создать</button>
+    <input name="name" placeholder="Название">
+    <button>Создать (500 💎)</button>
 </form>
 
-<p>{{ message }}</p>
-
-{% endblock %}
+{% for a in alliances %}
+<div class="panel">{{a}}</div>
+{% endfor %}
