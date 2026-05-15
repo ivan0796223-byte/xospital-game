@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MEDICAL RP</title>
+<title>MEDICAL RP PRO+</title>
 
 <style>
 body{
@@ -38,14 +38,11 @@ h2{color:red;}
     cursor:pointer;
 }
 
-.item:hover{
-    background:#222;
-}
+.item:hover{background:#222;}
 
-.status{
-    font-size:12px;
-    color:lime;
-}
+.bad{color:red;}
+.good{color:lime;}
+.warn{color:orange;}
 
 .progress{
     width:100%;
@@ -53,7 +50,6 @@ h2{color:red;}
     background:#333;
     border-radius:10px;
     overflow:hidden;
-    margin-top:5px;
 }
 
 .bar{
@@ -68,9 +64,26 @@ h2{color:red;}
 
 <div class="container">
 
+<!-- 📊 СТАТ -->
+<div class="panel">
+<h2>📊 Система</h2>
+
+💰 Деньги: <span id="money">100</span><br
+XP: <span id="xp">0</span><br
+Онлайн: <span id="online">12</span>
+</div>
+
+<!-- 🧑 ВРАЧ -->
+<div class="panel">
+<h2>🏥 Роль</h2>
+<button onclick="setRole('doctor')">Стать врачом</button>
+<button onclick="setRole('surgeon')">Стать хирургом</button>
+<div>Роль: <span id="role">нет</span></div>
+</div>
+
 <!-- 🧑 ПАЦИЕНТЫ -->
 <div class="panel">
-<h2>🧑 Пациенты (клик = лечение)</h2>
+<h2>🧑 Пациенты</h2>
 <button onclick="loadPatients()">Загрузить пациентов</button>
 <div class="list" id="patients"></div>
 </div>
@@ -79,55 +92,88 @@ h2{color:red;}
 
 <script>
 
-let healing = {}; // кто лечится
+let money = 100;
+let xp = 0;
+let role = "none";
 
-// 🧑 загрузка пациентов
+// болезни
+const diseases = [
+    {name:"Грипп", level:1, reward:10},
+    {name:"Пневмония", level:2, reward:20},
+    {name:"Травма", level:2, reward:25},
+    {name:"Сердечный приступ", level:3, reward:50}
+];
+
+// онлайн (фейк)
+document.getElementById("online").innerText = Math.floor(Math.random()*40+10);
+
+// роль
+function setRole(r){
+    role = r;
+    document.getElementById("role").innerText = r;
+}
+
+// пациенты
 function loadPatients(){
     let box=document.getElementById("patients");
     box.innerHTML="";
 
-    for(let i=1;i<=50;i++){
+    for(let i=1;i<=30;i++){
+
+        let d = diseases[Math.floor(Math.random()*diseases.length)];
+
+        let time = 10 + d.level * 5;
 
         let div=document.createElement("div");
         div.className="item";
-        div.id="p"+i;
 
         div.innerHTML=`
             🧑 Пациент #${i}
-            <div class="status" id="s${i}">Готов к лечению</div>
+
+    
+    <span class="warn">Болезнь: ${d.name}</span>
+
+    
+    💉 Сложность: ${d.level}
+
+     
+   💰 Награда: ${d.reward}
             <div class="progress"><div class="bar" id="b${i}"></div></div>
         `;
 
-        div.onclick=()=>startHeal(i);
+        div.onclick=()=>heal(i,d,time);
 
         box.appendChild(div);
     }
 }
 
-// 🏥 лечение при клике
-function startHeal(id){
+// лечение
+function heal(id,d,time){
 
-    if(healing[id]) return; // уже лечится
+    let bar=document.getElementById("b"+id);
 
-    healing[id]=0;
+    if(!bar) return;
 
-    let timer=setInterval(()=>{
+    let progress=0;
 
-        healing[id]+=10;
+    let interval=setInterval(()=>{
 
-        let bar=document.getElementById("b"+id);
-        let status=document.getElementById("s"+id);
+        progress += 100/(time*2);
 
-        if(bar) bar.style.width=healing[id]+"%";
-        if(status) status.innerText="Лечение: " + healing[id] + "%";
+        bar.style.width=progress+"%";
 
-        if(healing[id]>=100){
+        if(progress>=100){
 
-            clearInterval(timer);
-            delete healing[id];
+            clearInterval(interval);
 
-            if(status) status.innerText="✅ Пациент здоров";
-            if(bar) bar.style.width="100%";
+            // награда
+            money += d.reward;
+            xp += d.level * 10;
+
+            document.getElementById("money").innerText=money;
+            document.getElementById("xp").innerText=xp;
+
+            bar.style.background="lime";
 
         }
 
