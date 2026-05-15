@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MEDICAL RP PRO+</title>
+<title>MEDICAL RP ONLINE</title>
 
 <style>
 body{
@@ -13,79 +13,159 @@ body{
     color:white;
 }
 
-.container{padding:10px;}
+header{
+    background:#111;
+    padding:10px;
+    border-bottom:2px solid red;
+}
+
+.container{
+    padding:10px;
+}
 
 .panel{
     background:#1c1c1c;
-    padding:10px;
     margin:10px 0;
+    padding:10px;
     border-radius:10px;
 }
 
-h2{color:red;}
+h2{
+    color:red;
+}
+
+input,select{
+    width:100%;
+    padding:10px;
+    margin-top:5px;
+    border:none;
+    border-radius:6px;
+}
+
+button{
+    background:red;
+    color:white;
+    border:none;
+    padding:10px;
+    margin-top:5px;
+    border-radius:6px;
+    cursor:pointer;
+}
 
 .list{
     background:#111;
-    padding:10px;
+    padding:8px;
     border-radius:8px;
-    max-height:300px;
+    max-height:250px;
     overflow:auto;
 }
 
 .item{
-    padding:8px;
+    padding:6px;
     border-bottom:1px solid #222;
-    cursor:pointer;
 }
-
-.item:hover{background:#222;}
-
-.bad{color:red;}
-.good{color:lime;}
-.warn{color:orange;}
 
 .progress{
     width:100%;
-    height:8px;
+    height:10px;
     background:#333;
     border-radius:10px;
     overflow:hidden;
+    margin-top:5px;
 }
 
 .bar{
-    height:8px;
+    height:10px;
     background:red;
     width:0%;
+}
+
+.chat{
+    background:black;
+    height:150px;
+    overflow:auto;
+    padding:5px;
+    border-radius:8px;
+}
+
+.msg{
+    padding:4px;
+    border-bottom:1px solid #222;
 }
 </style>
 </head>
 
 <body>
 
+<header>
+☩ MEDICAL RP ONLINE
+</header>
+
 <div class="container">
 
-<!-- 📊 СТАТ -->
+<!-- ВХОД -->
 <div class="panel">
-<h2>📊 Система</h2>
+<h2>🔐 Регистрация / Вход</h2>
+
+<input id="nickname" placeholder="Введите ник">
+<button onclick="login()">Войти</button>
+
+<div>
+Игрок: <span id="playerName">Гость</span>
+</div>
+</div>
+
+<!-- СТАТЫ -->
+<div class="panel">
+<h2>📊 Профиль</h2>
 
 💰 Деньги: <span id="money">100</span><br
-XP: <span id="xp">0</span><br
-Онлайн: <span id="online">12</span>
+Алмазы: <span id="diamonds">10</span>
+
+пыт: <span id="xp">0</span>
+
+ровень: <span id="level">1</span>
+
+лайн: <span id="online">127</span>
+
+<div class="progress">
+<div class="bar" id="xpBar"></div>
+</div>
 </div>
 
-<!-- 🧑 ВРАЧ -->
+<!-- АВТОПАРК -->
 <div class="panel">
-<h2>🏥 Роль</h2>
-<button onclick="setRole('doctor')">Стать врачом</button>
-<button onclick="setRole('surgeon')">Стать хирургом</button>
-<div>Роль: <span id="role">нет</span></div>
+<h2>🚑 Автопарк</h2>
+
+<button onclick="loadCars()">Загрузить машины</button>
+
+<div class="list" id="cars"></div>
 </div>
 
-<!-- 🧑 ПАЦИЕНТЫ -->
+<!-- ПАЦИЕНТЫ -->
 <div class="panel">
-<h2>🧑 Пациенты</h2>
+<h2>🧑 Пациенты (2000)</h2>
+
 <button onclick="loadPatients()">Загрузить пациентов</button>
+
 <div class="list" id="patients"></div>
+</div>
+
+<!-- ОБМЕННИК -->
+<div class="panel">
+<h2>💱 Обменник</h2>
+
+<button onclick="exchange()">Обменять 100💰 → 1💎</button>
+</div>
+
+<!-- ЧАТ -->
+<div class="panel">
+<h2>💬 Чат</h2>
+
+<div class="chat" id="chat"></div>
+
+<input id="chatInput" placeholder="Сообщение">
+<button onclick="sendMessage()">Отправить</button>
 </div>
 
 </div>
@@ -93,94 +173,75 @@ XP: <span id="xp">0</span><br
 <script>
 
 let money = 100;
+let diamonds = 10;
 let xp = 0;
-let role = "none";
+let level = 1;
 
-// болезни
-const diseases = [
-    {name:"Грипп", level:1, reward:10},
-    {name:"Пневмония", level:2, reward:20},
-    {name:"Травма", level:2, reward:25},
-    {name:"Сердечный приступ", level:3, reward:50}
-];
+// ОБНОВЛЕНИЕ
+function updateStats(){
 
-// онлайн (фейк)
-document.getElementById("online").innerText = Math.floor(Math.random()*40+10);
+    document.getElementById("money").innerText = money;
+    document.getElementById("diamonds").innerText = diamonds;
+    document.getElementById("xp").innerText = xp;
+    document.getElementById("level").innerText = level;
 
-// роль
-function setRole(r){
-    role = r;
-    document.getElementById("role").innerText = r;
+    let percent = xp % 100;
+    document.getElementById("xpBar").style.width = percent + "%";
+
+    level = Math.floor(xp / 100) + 1;
 }
 
-// пациенты
-function loadPatients(){
-    let box=document.getElementById("patients");
-    box.innerHTML="";
+// ВХОД
+function login(){
 
-    for(let i=1;i<=30;i++){
+    let nick = document.getElementById("nickname").value;
 
-        let d = diseases[Math.floor(Math.random()*diseases.length)];
+    if(nick.trim() == "") return;
 
-        let time = 10 + d.level * 5;
+    document.getElementById("playerName").innerText = nick;
+}
 
-        let div=document.createElement("div");
-        div.className="item";
+// МАШИНЫ
+function loadCars(){
 
-        div.innerHTML=`
-            🧑 Пациент #${i}
+    let cars = document.getElementById("cars");
+    cars.innerHTML = "";
 
-    
-    <span class="warn">Болезнь: ${d.name}</span>
+    for(let i=1;i<=20;i++){
 
-    
-    💉 Сложность: ${d.level}
+        let div = document.createElement("div");
+        div.className = "item";
+        div.innerText = "🚑 Машина #" + i;
 
-     
-   💰 Награда: ${d.reward}
-            <div class="progress"><div class="bar" id="b${i}"></div></div>
-        `;
-
-        div.onclick=()=>heal(i,d,time);
-
-        box.appendChild(div);
+        cars.appendChild(div);
     }
 }
 
-// лечение
-function heal(id,d,time){
+// ПАЦИЕНТЫ
+function loadPatients(){
 
-    let bar=document.getElementById("b"+id);
+    let patients = document.getElementById("patients");
+    patients.innerHTML = "";
 
-    if(!bar) return;
+    for(let i=1;i<=2000;i++){
 
-    let progress=0;
+        let div = document.createElement("div");
+        div.className = "item";
 
-    let interval=setInterval(()=>{
+        div.innerHTML = `
+            🧑 Пациент #${i}
+            <div class="progress">
+                <div class="bar" id="b${i}"></div>
+            </div>
+        `;
 
-        progress += 100/(time*2);
+        div.onclick = () => heal(i);
 
-        bar.style.width=progress+"%";
-
-        if(progress>=100){
-
-            clearInterval(interval);
-
-            // награда
-            money += d.reward;
-            xp += d.level * 10;
-
-            document.getElementById("money").innerText=money;
-            document.getElementById("xp").innerText=xp;
-
-            bar.style.background="lime";
-
-        }
-
-    },500);
+        patients.appendChild(div);
+    }
 }
 
-</script>
+// ЛЕЧЕНИЕ
+function heal(id){
 
-</body>
-</html>
+    let bar = document.getElementById("b"+id)
