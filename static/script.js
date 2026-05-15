@@ -1,77 +1,92 @@
-// === ЧАТ ===
-const chatInput = document.getElementById("chat-input");
-const chatBox = document.getElementById("chat-box");
+<script>
 
-function sendMessage() {
-    if (!chatInput.value) return;
+// ONLINE
+document.getElementById("online").innerText = Math.floor(Math.random()*50+10);
 
-    const msg = document.createElement("div");
-    msg.className = "panel";
-    msg.innerText = "👤: " + chatInput.value;
+// XP BAR
+let xp = 120;
+document.getElementById("xpBar").style.width = (xp/5) + "%";
 
-    chatBox.appendChild(msg);
-    chatInput.value = "";
+// PATIENTS
+function loadPatients(){
+    let sel = document.getElementById("patientSelect");
+    sel.innerHTML = "";
 
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-// Enter отправка
-if (chatInput) {
-    chatInput.addEventListener("keypress", function(e) {
-        if (e.key === "Enter") sendMessage();
-    });
-}
-
-// === КУБИК (операционная) ===
-function rollDice() {
-    const diceEl = document.getElementById("dice");
-
-    let rolls = 10;
-    let interval = setInterval(() => {
-        diceEl.innerText = Math.floor(Math.random() * 6) + 1;
-        rolls--;
-
-        if (rolls <= 0) {
-            clearInterval(interval);
-        }
-    }, 100);
-}
-
-// === ПОИСК ПАЦИЕНТОВ ===
-function searchPatients() {
-    const input = document.getElementById("search").value.toLowerCase();
-    const patients = document.querySelectorAll(".patient");
-
-    patients.forEach(p => {
-        const text = p.innerText.toLowerCase();
-        p.style.display = text.includes(input) ? "block" : "none";
-    });
-}
-
-// === ВЫБОР ПАЦИЕНТА ===
-let selectedPatients = [];
-
-function selectPatient(id) {
-    const el = document.getElementById("patient-" + id);
-
-    if (selectedPatients.includes(id)) {
-        selectedPatients = selectedPatients.filter(p => p !== id);
-        el.style.border = "2px solid red";
-    } else {
-        selectedPatients.push(id);
-        el.style.border = "2px solid lime";
+    for(let i=1;i<=50;i++){
+        let opt = document.createElement("option");
+        opt.text = "Пациент #" + i;
+        sel.add(opt);
     }
 
-    document.getElementById("selected-count").innerText =
-        "Выбрано: " + selectedPatients.length;
+    alert("Пациенты загружены");
 }
 
-// === АНИМАЦИЯ КНОПОК ===
-document.querySelectorAll("button").forEach(btn => {
-    btn.addEventListener("mouseover", () => {
-        btn.style.transform = "scale(1.05)";
-    });
-    btn.addEventListener("mouseout", () => {
-        btn.style.transform = "scale(1)";
-    });
-});
+function callPatient(){
+    let sel = document.getElementById("patientSelect");
+    alert("Пациент вызван: " + sel.value);
+}
+
+// AMBULANCE
+function callAmbulance(){
+    alert("🚑 Скорая выехала!");
+}
+
+// DICE
+function rollDice(){
+    let r = Math.floor(Math.random()*6)+1;
+    document.getElementById("dice").innerText = "Результат: " + r;
+}
+
+// ALLIANCE (фикс экономики)
+function createAlliance(){
+    alert("🤝 Союз создан (−500 💎)");
+}
+
+// LAB
+function takeSample(){
+    alert("🧪 Образец взят");
+}
+
+function takeAnalysis(){
+    alert("📊 Анализ взят");
+}
+
+// DOCTOR
+function openDoctor(){
+    alert("👨‍⚕️ Кабинет открыт");
+}
+
+// SEARCH (ВАЖНО: теперь правильно читаем input)
+function searchAll(){
+
+    let player = document.getElementById("searchPlayer").value;
+    let alliance = document.getElementById("searchAlliance").value;
+    let patient = document.getElementById("searchPatient").value;
+
+    alert(
+        "🔍 Поиск\n" +
+        "Игрок: " + player + "\n" +
+        "Союз: " + alliance + "\n" +
+        "Пациент: " + patient
+    );
+}
+
+// CHAT
+function sendMessage(){
+
+    let input = document.getElementById("chatInput");
+    let chat = document.getElementById("chat");
+
+    if(input.value.trim() === "") return;
+
+    let msg = document.createElement("div");
+    msg.className = "msg";
+    msg.innerText = "Игрок: " + input.value;
+
+    chat.appendChild(msg);
+
+    input.value = "";
+    chat.scrollTop = chat.scrollHeight;
+}
+
+</script>
