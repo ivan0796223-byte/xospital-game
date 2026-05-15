@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MEDICAL RP HOSPITAL</title>
+<title>MEDICAL RP</title>
 
 <style>
 body{
@@ -24,26 +24,16 @@ body{
 
 h2{color:red;}
 
-button{
-    background:red;
-    color:white;
-    border:none;
-    padding:10px;
-    margin-top:5px;
-    border-radius:6px;
-    cursor:pointer;
-}
-
 .list{
     background:#111;
     padding:10px;
     border-radius:8px;
-    max-height:200px;
+    max-height:300px;
     overflow:auto;
 }
 
 .item{
-    padding:6px;
+    padding:8px;
     border-bottom:1px solid #222;
     cursor:pointer;
 }
@@ -52,16 +42,24 @@ button{
     background:#222;
 }
 
-.room{
-    background:#111;
-    padding:8px;
-    margin:5px 0;
-    border-radius:8px;
-}
-
 .status{
     font-size:12px;
-    color:gray;
+    color:lime;
+}
+
+.progress{
+    width:100%;
+    height:8px;
+    background:#333;
+    border-radius:10px;
+    overflow:hidden;
+    margin-top:5px;
+}
+
+.bar{
+    height:8px;
+    background:red;
+    width:0%;
 }
 </style>
 </head>
@@ -72,113 +70,69 @@ button{
 
 <!-- 🧑 ПАЦИЕНТЫ -->
 <div class="panel">
-<h2>🧑 Пациенты</h2>
+<h2>🧑 Пациенты (клик = лечение)</h2>
 <button onclick="loadPatients()">Загрузить пациентов</button>
 <div class="list" id="patients"></div>
-</div>
-
-<!-- 🏥 ПАЛАТЫ -->
-<div class="panel">
-<h2>🏥 Палаты (5 мест)</h2>
-<div id="rooms"></div>
 </div>
 
 </div>
 
 <script>
 
-let rooms = [null,null,null,null,null]; // 5 палат
+let healing = {}; // кто лечится
 
 // 🧑 загрузка пациентов
 function loadPatients(){
-    let p=document.getElementById("patients");
-    p.innerHTML="";
+    let box=document.getElementById("patients");
+    box.innerHTML="";
 
     for(let i=1;i<=50;i++){
+
         let div=document.createElement("div");
         div.className="item";
-        div.innerText="Пациент #" + i;
+        div.id="p"+i;
 
-        div.onclick=()=>assignPatient(i);
+        div.innerHTML=`
+            🧑 Пациент #${i}
+            <div class="status" id="s${i}">Готов к лечению</div>
+            <div class="progress"><div class="bar" id="b${i}"></div></div>
+        `;
 
-        p.appendChild(div);
+        div.onclick=()=>startHeal(i);
+
+        box.appendChild(div);
     }
 }
 
-// 🏥 создание палат
-function renderRooms(){
-    let r=document.getElementById("rooms");
-    r.innerHTML="";
+// 🏥 лечение при клике
+function startHeal(id){
 
-    for(let i=0;i<rooms.length;i++){
+    if(healing[id]) return; // уже лечится
 
-        let div=document.createElement("div");
-        div.className="room";
-
-        if(rooms[i]==null){
-            div.innerHTML="🏥 Палата #" + (i+1) + " — пусто";
-        }else{
-            div.innerHTML=`
-                🏥 Палата #${i+1}
-
-   
-         🧑 Пациент #${rooms[i].id}
-
-    
-        <div class="status" id="st${i}">
-                    Лечение: ${rooms[i].progress}%
-                </div>
-            `;
-        }
-
-        r.appendChild(div);
-    }
-}
-
-// 🧑 назначение пациента в палату
-function assignPatient(id){
-
-    for(let i=0;i<rooms.length;i++){
-        if(rooms[i]==null){
-
-            rooms[i]={
-                id:id,
-                progress:0
-            };
-
-            renderRooms();
-            startTreatment(i);
-            return;
-        }
-    }
-
-    alert("Нет свободных палат!");
-}
-
-// 🏥 лечение
-function startTreatment(index){
+    healing[id]=0;
 
     let timer=setInterval(()=>{
 
-        if(!rooms[index]) {
+        healing[id]+=10;
+
+        let bar=document.getElementById("b"+id);
+        let status=document.getElementById("s"+id);
+
+        if(bar) bar.style.width=healing[id]+"%";
+        if(status) status.innerText="Лечение: " + healing[id] + "%";
+
+        if(healing[id]>=100){
+
             clearInterval(timer);
-            return;
+            delete healing[id];
+
+            if(status) status.innerText="✅ Пациент здоров";
+            if(bar) bar.style.width="100%";
+
         }
 
-        rooms[index].progress += 10;
-
-        if(rooms[index].progress >= 100){
-            rooms[index]=null;
-            clearInterval(timer);
-        }
-
-        renderRooms();
-
-    }, 1000);
+    },500);
 }
-
-// старт
-renderRooms();
 
 </script>
 
