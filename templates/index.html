@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>MEDICAL RP</title>
+<title>MEDICAL RP ONLINE</title>
 
 <style>
 
@@ -27,11 +26,18 @@ body{
 }
 
 .loginBox{
-    width:300px;
+    width:320px;
     background:#1c1c1c;
     padding:20px;
-    border-radius:10px;
+    border-radius:12px;
     border:2px solid red;
+}
+
+.loginTitle{
+    text-align:center;
+    color:red;
+    font-size:24px;
+    margin-bottom:10px;
 }
 
 input{
@@ -54,22 +60,77 @@ button{
     cursor:pointer;
 }
 
-#status{
-    margin-top:10px;
-    text-align:center;
-}
-
 /* GAME */
 
 #game{
     display:none;
-    padding:20px;
+}
+
+header{
+    background:#111;
+    padding:10px;
+    border-bottom:2px solid red;
+}
+
+.container{
+    padding:10px;
 }
 
 .panel{
     background:#1c1c1c;
     padding:10px;
     border-radius:10px;
+    margin-bottom:10px;
+}
+
+h2{
+    color:red;
+}
+
+.progress{
+    width:100%;
+    height:10px;
+    background:#333;
+    border-radius:10px;
+    overflow:hidden;
+    margin-top:5px;
+}
+
+.bar{
+    height:10px;
+    background:red;
+    width:0%;
+}
+
+.list{
+    background:#111;
+    border-radius:8px;
+    max-height:300px;
+    overflow:auto;
+    padding:5px;
+}
+
+.item{
+    padding:6px;
+    border-bottom:1px solid #222;
+    cursor:pointer;
+}
+
+.item:hover{
+    background:#222;
+}
+
+.chat{
+    background:black;
+    height:150px;
+    overflow:auto;
+    border-radius:8px;
+    padding:5px;
+}
+
+.msg{
+    padding:4px;
+    border-bottom:1px solid #222;
 }
 
 </style>
@@ -83,9 +144,14 @@ button{
 
     <div class="loginBox">
 
-        <h2>☩ MEDICAL RP</h2>
+        <div class="loginTitle">
+            ☩ MEDICAL RP
+        </div>
 
-        <input id="name" placeholder="Логин">
+        <input
+            id="name"
+            placeholder="Логин"
+        >
 
         <input
             id="pass"
@@ -101,7 +167,14 @@ button{
             Войти
         </button>
 
-        <div id="status"></div>
+        <div
+            id="status"
+            style="
+            margin-top:10px;
+            text-align:center;
+            color:gray;
+            "
+        ></div>
 
     </div>
 
@@ -111,87 +184,130 @@ button{
 
 <div id="game">
 
-    <div class="panel">
+<header>
+☩ MEDICAL RP ONLINE
+</header>
 
-        <h1>
-            Добро пожаловать,
-            <span id="player"></span>
-        </h1>
+<div class="container">
 
-        <p>🏥 MEDICAL RP загружен</p>
+<!-- PROFILE -->
 
-    </div>
+<div class="panel">
+
+<h2>
+Добро пожаловать,
+<span id="player"></span>
+</h2>
+
+💰 Деньги:
+<span id="money">100</span><
+
+💎 Алмазы:
+<span id="diamonds">10</span><b
+⭐ XP:
+<span id="xp">0</span><b
+🏆 Уровень:
+<span id="level">1</span><br
+ Онлайн:
+<span id="online">147</span>
+
+<div class="progress">
+<div class="bar" id="xpBar"></div>
+</div>
+
+</div>
+
+<!-- PATIENTS -->
+
+<div class="panel">
+
+<h2>🧑 Пациенты</h2>
+
+<button onclick="loadPatients()">
+Загрузить пациентов
+</button>
+
+<div
+    class="list"
+    id="patients"
+></div>
+
+</div>
+
+<!-- CHAT -->
+
+<div class="panel">
+
+<h2>💬 Чат</h2>
+
+<div
+    class="chat"
+    id="chat"
+></div>
+
+<input
+    id="chatInput"
+    placeholder="Сообщение"
+>
+
+<button onclick="sendMessage()">
+Отправить
+</button>
+
+</div>
+
+</div>
 
 </div>
 
 <script>
 
-// регистрация
+let money = 100;
+let diamonds = 10;
+let xp = 0;
+let level = 1;
+
+// STATUS
+
+function setStatus(text,color){
+
+    let s =
+        document.getElementById("status");
+
+    s.innerText = text;
+    s.style.color = color;
+}
+
+// REGISTER
+
 function register(){
 
     let name =
-        document.getElementById("name").value;
+        document.getElementById("name")
+        .value.trim();
 
     let pass =
-        document.getElementById("pass").value;
+        document.getElementById("pass")
+        .value.trim();
 
-    if(name.trim()=="" || pass.trim()==""){
+    if(name==="" || pass===""){
 
-        status("Введите данные","red");
-        return;
-    }
-
-    localStorage.setItem("rp_name",name);
-    localStorage.setItem("rp_pass",pass);
-
-    status("Аккаунт создан","lime");
-}
-
-// вход
-function login(){
-
-    let name =
-        document.getElementById("name").value;
-
-    let pass =
-        document.getElementById("pass").value;
-
-    let savedName =
-        localStorage.getItem("rp_name");
-
-    let savedPass =
-        localStorage.getItem("rp_pass");
-
-    if(name === savedName && pass === savedPass){
-
-        // скрываем логин
-        document.getElementById("loginScreen")
-            .style.display="none";
-
-        // показываем игру
-        document.getElementById("game")
-            .style.display="block";
-
-        // ник
-        document.getElementById("player")
-            .innerText=name;
+        setStatus(
+            "Введите логин и пароль",
+            "red"
+        );
 
         return;
     }
 
-    status("Неверный логин","red");
-}
+    localStorage.setItem(
+        "rp_name",
+        name
+    );
 
-// статус
-function status(text,color){
+    localStorage.setItem(
+        "rp_pass",
+        pass
+    );
 
-    let s=document.getElementById("status");
-
-    s.innerText=text;
-    s.style.color=color;
-}
-
-</script>
-
-</body>
-</html>
+    setStatus(
