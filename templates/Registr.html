@@ -1,6 +1,50 @@
-<h2>Регистрация</h2>
-<form method="post">
-<input name="login" placeholder="логин"><br>
-<input name="password" placeholder="пароль"><br>
-<button>Создать</button>
-</form>
+<script>
+
+function register(){
+
+    let name =
+        document.getElementById("name")
+        .value.trim();
+
+    let pass =
+        document.getElementById("pass")
+        .value.trim();
+
+    if(name === "" || pass === ""){
+
+        setStatus(
+            "Введите логин и пароль",
+            "red"
+        );
+
+        return;
+    }
+
+    // сохранить аккаунт
+    localStorage.setItem(
+        "rp_name",
+        name
+    );
+
+    localStorage.setItem(
+        "rp_pass",
+        pass
+    );
+
+    // скрыть логин
+    document
+        .getElementById("loginScreen")
+        .style.display = "none";
+
+    // показать игру
+    document
+        .getElementById("game")
+        .style.display = "block";
+
+    // ник
+    document
+        .getElementById("player")
+        .innerText = name;
+}
+
+</script>
