@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MEDICAL RP</title>
+<title>MEDICAL RP ECONOMY</title>
 
 <style>
 body{
@@ -13,16 +13,13 @@ body{
     color:white;
 }
 
-.container{
-    padding:10px;
-}
+.container{padding:10px;}
 
 .panel{
     background:#1c1c1c;
     padding:10px;
     margin:10px 0;
     border-radius:10px;
-    border:1px solid #222;
 }
 
 h2{color:red;}
@@ -36,27 +33,32 @@ button{
     border-radius:6px;
 }
 
-input,select{
-    padding:10px;
-    width:95%;
-    margin-top:5px;
-    border-radius:6px;
-    border:none;
-}
-
-.chat{
-    height:150px;
-    overflow:auto;
-    background:black;
-    padding:5px;
-    border-radius:6px;
-}
-
-.msg{
+.progress{
+    width:100%;
+    height:10px;
     background:#333;
-    padding:5px;
-    margin:5px 0;
-    border-radius:5px;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.bar{
+    height:10px;
+    background:red;
+    width:0%;
+}
+
+.stat{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.box{
+    background:#111;
+    padding:10px;
+    border-radius:8px;
+    flex:1;
+    min-width:100px;
 }
 </style>
 </head>
@@ -65,98 +67,114 @@ input,select{
 
 <div class="container">
 
-<!-- КУБИК -->
+<!-- 💰 СТАТЫ -->
+<div class="panel">
+<h2>📊 Игрок</h2>
+
+<div class="stat">
+<div class="box">💰 Монеты: <span id="money">100</span></div>
+<div class="box">💎 Алмазы: <span id="diamonds">10</span></div>
+<div class="box">⭐ XP: <span id="xp">0</span></div>
+</div>
+
+<div class="progress">
+<div class="bar" id="bar"></div>
+</div>
+</div>
+
+<!-- 🎲 КУБИК -->
 <div class="panel">
 <h2>🎲 Операционная</h2>
-<div id="dice">Результат: -</div>
-<button onclick="rollDice()">Кинуть кубик</button>
+<button onclick="dice()">Кинуть кубик (+XP)</button>
 </div>
 
-<!-- СОЮЗ -->
+<!-- 🤝 СОЮЗ -->
 <div class="panel">
-<h2>🤝 Союзы</h2>
-<button onclick="createAlliance()">Создать союз (−500💎)</button>
+<h2>🤝 Союз</h2>
+<button onclick="alliance()">Создать союз (-5💎)</button>
 </div>
 
-<!-- ПАЦИЕНТЫ -->
-<div class="panel">
-<h2>🧑‍🤝‍🧑 Пациенты</h2>
-
-<select id="patients"></select>
-<button onclick="loadPatients()">Загрузить пациентов</button>
-<button onclick="callPatient()">Вызвать пациента</button>
-</div>
-
-<!-- СКОРАЯ -->
+<!-- 🚑 СКОРАЯ -->
 <div class="panel">
 <h2>🚑 Автопарк</h2>
-<button onclick="ambulance()">Вызвать скорую</button>
+<button onclick="ambulance()">Вызвать скорую (+XP)</button>
 </div>
 
-<!-- ЧАТ -->
+<!-- 💎 МАГАЗИН -->
 <div class="panel">
-<h2>💬 Чат</h2>
-
-<div class="chat" id="chat"></div>
-<input id="msg" placeholder="Сообщение">
-<button onclick="send()">Отправить</button>
+<h2>🛒 Магазин</h2>
+<button onclick="buy()">Купить оборудование (-20💰 +XP)</button>
 </div>
 
 </div>
 
 <script>
 
-// 🎲 кубик
-function rollDice(){
+// ===== ДАННЫЕ =====
+let money = 100;
+let diamonds = 10;
+let xp = 0;
+
+// ===== ОБНОВЛЕНИЕ UI =====
+function update(){
+    document.getElementById("money").innerText = money;
+    document.getElementById("diamonds").innerText = diamonds;
+    document.getElementById("xp").innerText = xp;
+
+    let percent = xp % 100;
+    document.getElementById("bar").style.width = percent + "%";
+}
+
+// ===== КУБИК =====
+function dice(){
     let r = Math.floor(Math.random()*6)+1;
-    document.getElementById("dice").innerText = "Результат: " + r;
+
+    xp += 10;
+    money += 5;
+
+    alert("Выпало: " + r + " (+10 XP, +5💰)");
+    update();
 }
 
-// 🤝 союз
-function createAlliance(){
-    alert("Союз создан!");
-}
-
-// 🧑‍🤝‍🧑 пациенты
-function loadPatients(){
-    let sel = document.getElementById("patients");
-    sel.innerHTML = "";
-
-    for(let i=1;i<=20;i++){
-        let opt = document.createElement("option");
-        opt.text = "Пациент #" + i;
-        sel.add(opt);
+// ===== СОЮЗ =====
+function alliance(){
+    if(diamonds < 5){
+        alert("Нет алмазов!");
+        return;
     }
 
-    alert("Пациенты загружены");
+    diamonds -= 5;
+    xp += 20;
+
+    alert("Союз создан (-5💎 +20 XP)");
+    update();
 }
 
-function callPatient(){
-    let sel = document.getElementById("patients");
-    alert("Вызван: " + sel.value);
-}
-
-// 🚑 скорая
+// ===== СКОРАЯ =====
 function ambulance(){
-    alert("Скорая выехала!");
+    xp += 15;
+    money += 10;
+
+    alert("Скорая выехала (+XP +💰)");
+    update();
 }
 
-// 💬 чат
-function send(){
-    let input = document.getElementById("msg");
-    let chat = document.getElementById("chat");
+// ===== МАГАЗИН =====
+function buy(){
+    if(money < 20){
+        alert("Недостаточно денег!");
+        return;
+    }
 
-    if(input.value.trim()=="") return;
+    money -= 20;
+    xp += 25;
 
-    let div = document.createElement("div");
-    div.className="msg";
-    div.innerText="Игрок: " + input.value;
-
-    chat.appendChild(div);
-
-    input.value="";
-    chat.scrollTop=chat.scrollHeight;
+    alert("Оборудование куплено (-20💰 +XP)");
+    update();
 }
+
+// старт
+update();
 
 </script>
 
