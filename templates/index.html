@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MEDICAL RP ONLINE</title>
+<title>MEDICAL RP LOGIN</title>
 
 <style>
 body{
@@ -13,6 +13,53 @@ body{
     color:white;
 }
 
+/* ЭКРАН ВХОДА */
+#loginScreen{
+    position:fixed;
+    inset:0;
+    background:#0b0b0b;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+}
+
+.loginBox{
+    width:320px;
+    background:#1c1c1c;
+    padding:20px;
+    border-radius:12px;
+    border:2px solid red;
+}
+
+.loginTitle{
+    text-align:center;
+    font-size:24px;
+    color:red;
+    margin-bottom:15px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin-top:8px;
+    border:none;
+    border-radius:6px;
+    box-sizing:border-box;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    border:none;
+    border-radius:6px;
+    background:red;
+    color:white;
+    cursor:pointer;
+}
+
+/* ИГРА */
 header{
     background:#111;
     padding:10px;
@@ -34,37 +81,6 @@ h2{
     color:red;
 }
 
-input,select{
-    width:100%;
-    padding:10px;
-    margin-top:5px;
-    border:none;
-    border-radius:6px;
-}
-
-button{
-    background:red;
-    color:white;
-    border:none;
-    padding:10px;
-    margin-top:5px;
-    border-radius:6px;
-    cursor:pointer;
-}
-
-.list{
-    background:#111;
-    padding:8px;
-    border-radius:8px;
-    max-height:250px;
-    overflow:auto;
-}
-
-.item{
-    padding:6px;
-    border-bottom:1px solid #222;
-}
-
 .progress{
     width:100%;
     height:10px;
@@ -80,12 +96,25 @@ button{
     width:0%;
 }
 
+.list{
+    background:#111;
+    border-radius:8px;
+    max-height:250px;
+    overflow:auto;
+    padding:5px;
+}
+
+.item{
+    padding:6px;
+    border-bottom:1px solid #222;
+}
+
 .chat{
     background:black;
     height:150px;
     overflow:auto;
-    padding:5px;
     border-radius:8px;
+    padding:5px;
 }
 
 .msg{
@@ -97,65 +126,65 @@ button{
 
 <body>
 
+<!-- 🔐 ОТДЕЛЬНЫЙ ЭКРАН -->
+<div id="loginScreen">
+
+    <div class="loginBox">
+
+        <div class="loginTitle">
+            ☩ MEDICAL RP
+        </div>
+
+        <input id="loginName" placeholder="Никнейм">
+        <input id="loginPassword" type="password" placeholder="Пароль">
+
+        <button onclick="register()">Регистрация</button>
+        <button onclick="login()">Войти</button>
+
+    </div>
+
+</div>
+
+<!-- 🎮 ИГРА -->
+<div id="game" style="display:none;">
+
 <header>
 ☩ MEDICAL RP ONLINE
 </header>
 
 <div class="container">
 
-<!-- ВХОД -->
-<div class="panel">
-<h2>🔐 Регистрация / Вход</h2>
-
-<input id="nickname" placeholder="Введите ник">
-<button onclick="login()">Войти</button>
-
-<div>
-Игрок: <span id="playerName">Гость</span>
-</div>
-</div>
-
-<!-- СТАТЫ -->
+<!-- ПРОФИЛЬ -->
 <div class="panel">
 <h2>📊 Профиль</h2>
 
-💰 Деньги: <span id="money">100</span><br
-Алмазы: <span id="diamonds">10</span>
+👤 Игрок: <span id="playerName"></span>
 
-пыт: <span id="xp">0</span>
+еньги: <span id="money">100</span>
 
-ровень: <span id="level">1</span>
+мазы: <span id="diamonds">10</span>
 
-лайн: <span id="online">127</span>
+⭐
+ <span id="xp">0</span>
+
+🏆
+вень: <span id="level">1</span>
+
+🌐 
+йн: <span id="online">148</span>
 
 <div class="progress">
 <div class="bar" id="xpBar"></div>
 </div>
 </div>
 
-<!-- АВТОПАРК -->
-<div class="panel">
-<h2>🚑 Автопарк</h2>
-
-<button onclick="loadCars()">Загрузить машины</button>
-
-<div class="list" id="cars"></div>
-</div>
-
 <!-- ПАЦИЕНТЫ -->
 <div class="panel">
-<h2>🧑 Пациенты (2000)</h2>
+<h2>🧑 Пациенты</h2>
 
 <button onclick="loadPatients()">Загрузить пациентов</button>
 
 <div class="list" id="patients"></div>
-</div>
-
-<!-- ОБМЕННИК -->
-<div class="panel">
-<h2>💱 Обменник</h2>
-
-<button onclick="exchange()">Обменять 100💰 → 1💎</button>
 </div>
 
 <!-- ЧАТ -->
@@ -170,6 +199,8 @@ button{
 
 </div>
 
+</div>
+
 <script>
 
 let money = 100;
@@ -177,71 +208,40 @@ let diamonds = 10;
 let xp = 0;
 let level = 1;
 
-// ОБНОВЛЕНИЕ
-function updateStats(){
+// РЕГИСТРАЦИЯ
+function register(){
 
-    document.getElementById("money").innerText = money;
-    document.getElementById("diamonds").innerText = diamonds;
-    document.getElementById("xp").innerText = xp;
-    document.getElementById("level").innerText = level;
+    let name = document.getElementById("loginName").value;
+    let pass = document.getElementById("loginPassword").value;
 
-    let percent = xp % 100;
-    document.getElementById("xpBar").style.width = percent + "%";
+    if(name.trim()=="" || pass.trim()=="") return;
 
-    level = Math.floor(xp / 100) + 1;
+    localStorage.setItem("rp_name", name);
+    localStorage.setItem("rp_pass", pass);
 }
 
 // ВХОД
 function login(){
 
-    let nick = document.getElementById("nickname").value;
+    let name = document.getElementById("loginName").value;
+    let pass = document.getElementById("loginPassword").value;
 
-    if(nick.trim() == "") return;
+    let savedName = localStorage.getItem("rp_name");
+    let savedPass = localStorage.getItem("rp_pass");
 
-    document.getElementById("playerName").innerText = nick;
-}
+    if(name == savedName && pass == savedPass){
 
-// МАШИНЫ
-function loadCars(){
+        document.getElementById("loginScreen").style.display="none";
+        document.getElementById("game").style.display="block";
 
-    let cars = document.getElementById("cars");
-    cars.innerHTML = "";
-
-    for(let i=1;i<=20;i++){
-
-        let div = document.createElement("div");
-        div.className = "item";
-        div.innerText = "🚑 Машина #" + i;
-
-        cars.appendChild(div);
+        document.getElementById("playerName").innerText = name;
     }
 }
 
-// ПАЦИЕНТЫ
-function loadPatients(){
+// XP
+function update(){
 
-    let patients = document.getElementById("patients");
-    patients.innerHTML = "";
+    level = Math.floor(xp / 100) + 1;
 
-    for(let i=1;i<=2000;i++){
-
-        let div = document.createElement("div");
-        div.className = "item";
-
-        div.innerHTML = `
-            🧑 Пациент #${i}
-            <div class="progress">
-                <div class="bar" id="b${i}"></div>
-            </div>
-        `;
-
-        div.onclick = () => heal(i);
-
-        patients.appendChild(div);
-    }
-}
-
-// ЛЕЧЕНИЕ
-function heal(id){
-
-    let bar = document.getElementById("b"+id)
+    document.getElementById("money").innerText = money;
+    document.getElementById("diamonds").innerText = diamonds;
