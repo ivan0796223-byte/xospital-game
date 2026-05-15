@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MEDICAL RP ECONOMY</title>
+<title>MEDICAL RP NO POPUP</title>
 
 <style>
 body{
@@ -31,6 +31,21 @@ button{
     padding:10px;
     margin-top:5px;
     border-radius:6px;
+    cursor:pointer;
+}
+
+.stat{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.box{
+    background:#111;
+    padding:10px;
+    border-radius:8px;
+    flex:1;
+    min-width:100px;
 }
 
 .progress{
@@ -47,18 +62,18 @@ button{
     width:0%;
 }
 
-.stat{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
+.log{
+    height:150px;
+    overflow:auto;
+    background:black;
+    padding:5px;
+    border-radius:8px;
 }
 
-.box{
-    background:#111;
-    padding:10px;
-    border-radius:8px;
-    flex:1;
-    min-width:100px;
+.msg{
+    font-size:12px;
+    padding:3px;
+    border-bottom:1px solid #222;
 }
 </style>
 </head>
@@ -67,14 +82,14 @@ button{
 
 <div class="container">
 
-<!-- 💰 СТАТЫ -->
+<!-- 📊 СТАТЫ -->
 <div class="panel">
 <h2>📊 Игрок</h2>
 
 <div class="stat">
-<div class="box">💰 Монеты: <span id="money">100</span></div>
-<div class="box">💎 Алмазы: <span id="diamonds">10</span></div>
-<div class="box">⭐ XP: <span id="xp">0</span></div>
+<div class="box">💰 <span id="money">100</span></div>
+<div class="box">💎 <span id="diamonds">10</span></div>
+<div class="box">⭐ <span id="xp">0</span></div>
 </div>
 
 <div class="progress">
@@ -82,98 +97,97 @@ button{
 </div>
 </div>
 
-<!-- 🎲 КУБИК -->
+<!-- 🎮 ДЕЙСТВИЯ -->
 <div class="panel">
-<h2>🎲 Операционная</h2>
-<button onclick="dice()">Кинуть кубик (+XP)</button>
+<h2>🎮 Действия</h2>
+
+<button onclick="dice()">Кубик</button>
+<button onclick="ambulance()">Скорая</button>
+<button onclick="alliance()">Союз</button>
+<button onclick="buy()">Магазин</button>
 </div>
 
-<!-- 🤝 СОЮЗ -->
+<!-- 📜 ЛОГ -->
 <div class="panel">
-<h2>🤝 Союз</h2>
-<button onclick="alliance()">Создать союз (-5💎)</button>
-</div>
-
-<!-- 🚑 СКОРАЯ -->
-<div class="panel">
-<h2>🚑 Автопарк</h2>
-<button onclick="ambulance()">Вызвать скорую (+XP)</button>
-</div>
-
-<!-- 💎 МАГАЗИН -->
-<div class="panel">
-<h2>🛒 Магазин</h2>
-<button onclick="buy()">Купить оборудование (-20💰 +XP)</button>
+<h2>📜 Журнал действий</h2>
+<div class="log" id="log"></div>
 </div>
 
 </div>
 
 <script>
 
-// ===== ДАННЫЕ =====
 let money = 100;
 let diamonds = 10;
 let xp = 0;
 
-// ===== ОБНОВЛЕНИЕ UI =====
 function update(){
     document.getElementById("money").innerText = money;
     document.getElementById("diamonds").innerText = diamonds;
     document.getElementById("xp").innerText = xp;
 
-    let percent = xp % 100;
-    document.getElementById("bar").style.width = percent + "%";
+    document.getElementById("bar").style.width = (xp % 100) + "%";
 }
 
-// ===== КУБИК =====
+function log(text){
+    let l = document.getElementById("log");
+
+    let div = document.createElement("div");
+    div.className = "msg";
+    div.innerText = text;
+
+    l.appendChild(div);
+    l.scrollTop = l.scrollHeight;
+}
+
+// 🎲 КУБИК
 function dice(){
     let r = Math.floor(Math.random()*6)+1;
 
     xp += 10;
     money += 5;
 
-    alert("Выпало: " + r + " (+10 XP, +5💰)");
+    log("🎲 Кубик: " + r + " (+10 XP, +5💰)");
     update();
 }
 
-// ===== СОЮЗ =====
+// 🚑 СКОРАЯ
+function ambulance(){
+    xp += 15;
+    money += 10;
+
+    log("🚑 Скорая выехала (+XP +💰)");
+    update();
+}
+
+// 🤝 СОЮЗ
 function alliance(){
     if(diamonds < 5){
-        alert("Нет алмазов!");
+        log("❌ Не хватает 💎");
         return;
     }
 
     diamonds -= 5;
     xp += 20;
 
-    alert("Союз создан (-5💎 +20 XP)");
+    log("🤝 Союз создан (-5💎 +20 XP)");
     update();
 }
 
-// ===== СКОРАЯ =====
-function ambulance(){
-    xp += 15;
-    money += 10;
-
-    alert("Скорая выехала (+XP +💰)");
-    update();
-}
-
-// ===== МАГАЗИН =====
+// 🛒 МАГАЗИН
 function buy(){
     if(money < 20){
-        alert("Недостаточно денег!");
+        log("❌ Недостаточно 💰");
         return;
     }
 
     money -= 20;
     xp += 25;
 
-    alert("Оборудование куплено (-20💰 +XP)");
+    log("🛒 Куплено оборудование (-20💰 +XP)");
     update();
 }
 
-// старт
 update();
 
 </script>
