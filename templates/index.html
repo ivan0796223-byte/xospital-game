@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MEDICAL RP PRO MAX</title>
+<title>MEDICAL RP</title>
 
 <style>
 body{
@@ -36,35 +36,26 @@ button{
 
 select{
     width:100%;
-    padding:8px;
+    padding:10px;
     margin-top:5px;
 }
 
-.log{
-    height:140px;
-    overflow:auto;
-    background:black;
-    padding:5px;
-    border-radius:8px;
-}
-
-.msg{
-    font-size:12px;
-    border-bottom:1px solid #222;
-    padding:3px;
-}
-
-.grid{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-}
-
-.box{
+.list{
     background:#111;
-    padding:6px;
-    border-radius:6px;
-    font-size:12px;
+    padding:10px;
+    border-radius:8px;
+    max-height:200px;
+    overflow:auto;
+}
+
+.item{
+    padding:5px;
+    border-bottom:1px solid #222;
+    cursor:pointer;
+}
+
+.item:hover{
+    background:#222;
 }
 </style>
 </head>
@@ -73,105 +64,75 @@ select{
 
 <div class="container">
 
-<!-- 🚑 МАШИНЫ -->
-<div class="panel">
-<h2>🚑 Автопарк</h2>
-<div class="grid" id="cars"></div>
-<button onclick="loadCars()">Загрузить машины</button>
-</div>
-
 <!-- 🧑 ПАЦИЕНТЫ -->
 <div class="panel">
 <h2>🧑‍🤝‍🧑 Пациенты (2000)</h2>
 
-<select id="patients"></select>
 <button onclick="loadPatients()">Загрузить пациентов</button>
-<button onclick="sendToSurgery()">Отправить в операционную</button>
+
+<div class="list" id="patientList"></div>
 </div>
 
 <!-- 🏥 ОПЕРАЦИОННАЯ -->
 <div class="panel">
 <h2>🏥 Операционная очередь</h2>
-<div id="surgery"></div>
+
+<div class="list" id="surgery"></div>
 </div>
 
-<!-- 🧪 ЛАБА -->
+<!-- 🚑 МАШИНЫ -->
 <div class="panel">
-<h2>🧪 Лаборатория</h2>
-<button onclick="produce()">Производство медикаментов</button>
-</div>
-
-<!-- 📜 ЛОГ -->
-<div class="panel">
-<h2>📜 Журнал</h2>
-<div class="log" id="log"></div>
+<h2>🚑 Автопарк</h2>
+<button onclick="loadCars()">Показать машины</button>
+<div class="list" id="cars"></div>
 </div>
 
 </div>
 
 <script>
 
-function log(text){
-    let l = document.getElementById("log");
-    let div = document.createElement("div");
-    div.className="msg";
-    div.innerText=text;
-    l.appendChild(div);
-    l.scrollTop=l.scrollHeight;
-}
-
-// 🚑 МАШИНЫ
-function loadCars(){
-    let cars = document.getElementById("cars");
-    cars.innerHTML="";
-
-    let list = ["🚑 Ambulance A","🚑 Ambulance B","🚑 Ambulance C","🚑 Ambulance D"];
-
-    list.forEach(c=>{
-        let d=document.createElement("div");
-        d.className="box";
-        d.innerText=c;
-        cars.appendChild(d);
-    });
-
-    log("🚑 Автопарк загружен");
-}
-
-// 🧑 ПАЦИЕНТЫ 2000 (оптимизировано)
+// 🧑 2000 пациентов
 function loadPatients(){
-    let sel=document.getElementById("patients");
-    sel.innerHTML="";
+    let list=document.getElementById("patientList");
+    list.innerHTML="";
 
     for(let i=1;i<=2000;i++){
-        let opt=document.createElement("option");
-        opt.textContent="Пациент #" + i;
-        sel.appendChild(opt);
-    }
+        let div=document.createElement("div");
+        div.className="item";
+        div.innerText="Пациент #" + i;
 
-    log("🧑 Загружено 2000 пациентов");
+        div.onclick=function(){
+            sendToSurgery(i);
+        };
+
+        list.appendChild(div);
+    }
 }
 
-// 🏥 В ОПЕРАЦИОННУЮ
-function sendToSurgery(){
-    let sel=document.getElementById("patients");
+// 🏥 отправка в операционную
+function sendToSurgery(id){
     let surgery=document.getElementById("surgery");
 
-    let p=sel.value;
-
     let div=document.createElement("div");
-    div.className="box";
-    div.innerText="🏥 " + p + " → операция";
+    div.className="item";
+    div.innerText="🏥 Пациент #" + id + " → операция";
 
     surgery.appendChild(div);
-
-    log("➡ " + p + " отправлен в операционную");
 }
 
-// 🧪 ПРОИЗВОДСТВО
-function produce(){
-    let meds = Math.floor(Math.random()*5)+1;
+// 🚑 машины
+function loadCars(){
+    let cars=document.getElementById("cars");
+    cars.innerHTML="";
 
-    log("🧪 Производство: +" + meds + " медикаментов");
+    let list=["🚑 Ambulance A","🚑 Ambulance B","🚑 Ambulance C","🚑 Ambulance D"];
+
+    list.forEach(c=>{
+        let div=document.createElement("div");
+        div.className="item";
+        div.innerText=c;
+        cars.appendChild(div);
+    });
 }
 
 </script>
