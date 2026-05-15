@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MEDICAL RP PRO</title>
+<title>MEDICAL RP</title>
 
 <style>
 body{
@@ -13,78 +13,43 @@ body{
     color:white;
 }
 
-header{
-    padding:15px;
-    background:#111;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:2px solid red;
-}
-
-.red-cross{
-    color:red;
-    font-size:20px;
-    font-weight:bold;
-}
-
 .container{
     padding:10px;
 }
 
 .panel{
     background:#1c1c1c;
-    margin:10px 0;
     padding:10px;
+    margin:10px 0;
     border-radius:10px;
     border:1px solid #222;
 }
 
-h2{
-    color:#ff3b3b;
-}
+h2{color:red;}
 
 button{
     background:red;
     color:white;
     border:none;
-    padding:8px;
+    padding:10px;
     margin-top:5px;
-    border-radius:5px;
+    border-radius:6px;
 }
 
-input, select{
-    padding:8px;
+input,select{
+    padding:10px;
     width:95%;
     margin-top:5px;
-    border-radius:5px;
+    border-radius:6px;
     border:none;
 }
 
-.grid{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-.icon{
-    width:70px;
-    height:70px;
-    border-radius:50%;
-    background:#222;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:22px;
-    border:2px solid red;
-}
-
 .chat{
-    height:180px;
+    height:150px;
     overflow:auto;
     background:black;
     padding:5px;
-    border-radius:8px;
+    border-radius:6px;
 }
 
 .msg{
@@ -93,67 +58,31 @@ input, select{
     margin:5px 0;
     border-radius:5px;
 }
-
-.progress{
-    width:100%;
-    height:10px;
-    background:#333;
-    border-radius:10px;
-}
-
-.bar{
-    height:10px;
-    background:red;
-    width:30%;
-    border-radius:10px;
-}
-.small{
-    font-size:12px;
-    color:gray;
-}
 </style>
 </head>
 
 <body>
 
-<header>
-<div>☩ MEDICAL RP PRO</div>
-<div>Онлайн: <span id="online">12</span></div>
-</header>
-
 <div class="container">
 
-<!-- СТАТ -->
+<!-- КУБИК -->
 <div class="panel">
-<h2>📊 Профиль</h2>
-
-💰 Монеты: <span id="money">1000</span><b
- Алмазы: <span id="diamonds">600</span><br
-Опыт: <span id="xp">120</span>
-
-<div class="progress">
-<div class="bar" id="xpBar"></div>
-</div>
+<h2>🎲 Операционная</h2>
+<div id="dice">Результат: -</div>
+<button onclick="rollDice()">Кинуть кубик</button>
 </div>
 
-<!-- ИКОНКИ -->
+<!-- СОЮЗ -->
 <div class="panel">
-<h2>🏥 Быстрые меню</h2>
-
-<div class="grid">
-<div class="icon">🚑</div>
-<div class="icon">🏥</div>
-<div class="icon">🧪</div>
-<div class="icon">👨‍⚕️</div>
-</div>
+<h2>🤝 Союзы</h2>
+<button onclick="createAlliance()">Создать союз (−500💎)</button>
 </div>
 
 <!-- ПАЦИЕНТЫ -->
 <div class="panel">
-<h2>🧑‍🤝‍🧑 Пациенты (2000)</h2>
+<h2>🧑‍🤝‍🧑 Пациенты</h2>
 
-<select id="patientSelect"></select>
-
+<select id="patients"></select>
 <button onclick="loadPatients()">Загрузить пациентов</button>
 <button onclick="callPatient()">Вызвать пациента</button>
 </div>
@@ -161,85 +90,75 @@ input, select{
 <!-- СКОРАЯ -->
 <div class="panel">
 <h2>🚑 Автопарк</h2>
-
-<button onclick="callAmbulance()">Вызвать скорую</button>
-<div class="small">Машины доступны для выезда</div>
-</div>
-
-<!-- ОПЕРАЦИОННАЯ -->
-<div class="panel">
-<h2>🎲 Операционная</h2>
-
-<p>Кто выполняет действие определяется кубиком</p>
-
-<button onclick="rollDice()">Кинуть кубик</button>
-<div id="dice">Результат: -</div>
-</div>
-
-<!-- СОЮЗ -->
-<div class="panel">
-<h2>🤝 Союзы</h2>
-
-<button onclick="createAlliance()">Создать союз (500💎)</button>
-<input placeholder="Поиск союзов">
-</div>
-
-<!-- ЛАБОРАТОРИЯ -->
-<div class="panel">
-<h2>🧪 Лаборатория</h2>
-
-<button onclick="takeSample()">Взять образец</button>
-<button onclick="takeAnalysis()">Взять анализ</button>
-</div>
-
-<!-- КАБИНЕТ -->
-<div class="panel">
-<h2>👨‍⚕️ Кабинет врача</h2>
-
-<button onclick="openDoctor()">Войти в кабинет</button>
-</div>
-
-<!-- МАГАЗИН -->
-<div class="panel">
-<h2>🛒 Магазин</h2>
-
-<div>Монитор пациента</div>
-<div>Дефибриллятор</div>
-<div>Аппарат ИВЛ</div>
-</div>
-
-<!-- ПОИСК -->
-<div class="panel">
-<h2>🔍 Поиск</h2>
-
-<input id="searchPlayer" placeholder="Игрок">
-<input id="searchAlliance" placeholder="Союз">
-<input id="searchPatient" placeholder="Пациент">
-
-<button onclick="searchAll()">Искать</button>
-</div>
-
-<!-- СОБЫТИЯ -->
-<div class="panel">
-<h2>📅 События (МСК)</h2>
-
-<div>18:00 — Массовое ДТП</div>
-<div>20:00 — Эпидемия</div>
-<div>22:00 — Пожар</div>
+<button onclick="ambulance()">Вызвать скорую</button>
 </div>
 
 <!-- ЧАТ -->
 <div class="panel">
-<h2>💬 Чат ☩</h2>
+<h2>💬 Чат</h2>
 
 <div class="chat" id="chat"></div>
-
-<input id="chatInput" placeholder="Сообщение">
-<button onclick="sendMessage()">Отправить</button>
+<input id="msg" placeholder="Сообщение">
+<button onclick="send()">Отправить</button>
 </div>
 
 </div>
 
 <script>
-// ONLINE
-document.getElementById("online").innerText = Math.floor
+
+// 🎲 кубик
+function rollDice(){
+    let r = Math.floor(Math.random()*6)+1;
+    document.getElementById("dice").innerText = "Результат: " + r;
+}
+
+// 🤝 союз
+function createAlliance(){
+    alert("Союз создан!");
+}
+
+// 🧑‍🤝‍🧑 пациенты
+function loadPatients(){
+    let sel = document.getElementById("patients");
+    sel.innerHTML = "";
+
+    for(let i=1;i<=20;i++){
+        let opt = document.createElement("option");
+        opt.text = "Пациент #" + i;
+        sel.add(opt);
+    }
+
+    alert("Пациенты загружены");
+}
+
+function callPatient(){
+    let sel = document.getElementById("patients");
+    alert("Вызван: " + sel.value);
+}
+
+// 🚑 скорая
+function ambulance(){
+    alert("Скорая выехала!");
+}
+
+// 💬 чат
+function send(){
+    let input = document.getElementById("msg");
+    let chat = document.getElementById("chat");
+
+    if(input.value.trim()=="") return;
+
+    let div = document.createElement("div");
+    div.className="msg";
+    div.innerText="Игрок: " + input.value;
+
+    chat.appendChild(div);
+
+    input.value="";
+    chat.scrollTop=chat.scrollHeight;
+}
+
+</script>
+
+</body>
+</html>
