@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MEDICAL RP</title>
+<title>MEDICAL RP HOSPITAL</title>
 
 <style>
 body{
@@ -34,12 +34,6 @@ button{
     cursor:pointer;
 }
 
-select{
-    width:100%;
-    padding:10px;
-    margin-top:5px;
-}
-
 .list{
     background:#111;
     padding:10px;
@@ -49,13 +43,25 @@ select{
 }
 
 .item{
-    padding:5px;
+    padding:6px;
     border-bottom:1px solid #222;
     cursor:pointer;
 }
 
 .item:hover{
     background:#222;
+}
+
+.room{
+    background:#111;
+    padding:8px;
+    margin:5px 0;
+    border-radius:8px;
+}
+
+.status{
+    font-size:12px;
+    color:gray;
 }
 </style>
 </head>
@@ -66,74 +72,113 @@ select{
 
 <!-- 🧑 ПАЦИЕНТЫ -->
 <div class="panel">
-<h2>🧑‍🤝‍🧑 Пациенты (2000)</h2>
-
+<h2>🧑 Пациенты</h2>
 <button onclick="loadPatients()">Загрузить пациентов</button>
-
-<div class="list" id="patientList"></div>
+<div class="list" id="patients"></div>
 </div>
 
-<!-- 🏥 ОПЕРАЦИОННАЯ -->
+<!-- 🏥 ПАЛАТЫ -->
 <div class="panel">
-<h2>🏥 Операционная очередь</h2>
-
-<div class="list" id="surgery"></div>
-</div>
-
-<!-- 🚑 МАШИНЫ -->
-<div class="panel">
-<h2>🚑 Автопарк</h2>
-<button onclick="loadCars()">Показать машины</button>
-<div class="list" id="cars"></div>
+<h2>🏥 Палаты (5 мест)</h2>
+<div id="rooms"></div>
 </div>
 
 </div>
 
 <script>
 
-// 🧑 2000 пациентов
-function loadPatients(){
-    let list=document.getElementById("patientList");
-    list.innerHTML="";
+let rooms = [null,null,null,null,null]; // 5 палат
 
-    for(let i=1;i<=2000;i++){
+// 🧑 загрузка пациентов
+function loadPatients(){
+    let p=document.getElementById("patients");
+    p.innerHTML="";
+
+    for(let i=1;i<=50;i++){
         let div=document.createElement("div");
         div.className="item";
         div.innerText="Пациент #" + i;
 
-        div.onclick=function(){
-            sendToSurgery(i);
-        };
+        div.onclick=()=>assignPatient(i);
 
-        list.appendChild(div);
+        p.appendChild(div);
     }
 }
 
-// 🏥 отправка в операционную
-function sendToSurgery(id){
-    let surgery=document.getElementById("surgery");
+// 🏥 создание палат
+function renderRooms(){
+    let r=document.getElementById("rooms");
+    r.innerHTML="";
 
-    let div=document.createElement("div");
-    div.className="item";
-    div.innerText="🏥 Пациент #" + id + " → операция";
+    for(let i=0;i<rooms.length;i++){
 
-    surgery.appendChild(div);
-}
-
-// 🚑 машины
-function loadCars(){
-    let cars=document.getElementById("cars");
-    cars.innerHTML="";
-
-    let list=["🚑 Ambulance A","🚑 Ambulance B","🚑 Ambulance C","🚑 Ambulance D"];
-
-    list.forEach(c=>{
         let div=document.createElement("div");
-        div.className="item";
-        div.innerText=c;
-        cars.appendChild(div);
-    });
+        div.className="room";
+
+        if(rooms[i]==null){
+            div.innerHTML="🏥 Палата #" + (i+1) + " — пусто";
+        }else{
+            div.innerHTML=`
+                🏥 Палата #${i+1}
+
+   
+         🧑 Пациент #${rooms[i].id}
+
+    
+        <div class="status" id="st${i}">
+                    Лечение: ${rooms[i].progress}%
+                </div>
+            `;
+        }
+
+        r.appendChild(div);
+    }
 }
+
+// 🧑 назначение пациента в палату
+function assignPatient(id){
+
+    for(let i=0;i<rooms.length;i++){
+        if(rooms[i]==null){
+
+            rooms[i]={
+                id:id,
+                progress:0
+            };
+
+            renderRooms();
+            startTreatment(i);
+            return;
+        }
+    }
+
+    alert("Нет свободных палат!");
+}
+
+// 🏥 лечение
+function startTreatment(index){
+
+    let timer=setInterval(()=>{
+
+        if(!rooms[index]) {
+            clearInterval(timer);
+            return;
+        }
+
+        rooms[index].progress += 10;
+
+        if(rooms[index].progress >= 100){
+            rooms[index]=null;
+            clearInterval(timer);
+        }
+
+        renderRooms();
+
+    }, 1000);
+}
+
+// старт
+renderRooms();
 
 </script>
 
