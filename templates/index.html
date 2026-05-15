@@ -3,19 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MEDICAL RP ONLINE</title>
+<title>MEDICAL RP</title>
 
 <style>
-
 body{
     margin:0;
+    font-family:Arial;
     background:#0b0b0b;
     color:white;
-    font-family:Arial;
 }
 
 /* LOGIN */
-
 #loginScreen{
     position:fixed;
     inset:0;
@@ -33,20 +31,12 @@ body{
     border:2px solid red;
 }
 
-.loginTitle{
-    text-align:center;
-    color:red;
-    font-size:24px;
-    margin-bottom:10px;
-}
-
 input{
     width:100%;
     padding:10px;
     margin-top:10px;
     border:none;
     border-radius:6px;
-    box-sizing:border-box;
 }
 
 button{
@@ -61,53 +51,26 @@ button{
 }
 
 /* GAME */
-
 #game{
     display:none;
-}
-
-header{
-    background:#111;
-    padding:10px;
-    border-bottom:2px solid red;
-}
-
-.container{
     padding:10px;
 }
 
 .panel{
     background:#1c1c1c;
     padding:10px;
+    margin:10px 0;
     border-radius:10px;
-    margin-bottom:10px;
 }
 
-h2{
-    color:red;
-}
-
-.progress{
-    width:100%;
-    height:10px;
-    background:#333;
-    border-radius:10px;
-    overflow:hidden;
-    margin-top:5px;
-}
-
-.bar{
-    height:10px;
-    background:red;
-    width:0%;
-}
+h2{color:red;}
 
 .list{
     background:#111;
+    padding:10px;
     border-radius:8px;
-    max-height:300px;
+    max-height:250px;
     overflow:auto;
-    padding:5px;
 }
 
 .item{
@@ -120,141 +83,63 @@ h2{
     background:#222;
 }
 
-.chat{
-    background:black;
-    height:150px;
-    overflow:auto;
-    border-radius:8px;
-    padding:5px;
+.progress{
+    width:100%;
+    height:8px;
+    background:#333;
+    border-radius:10px;
+    overflow:hidden;
 }
 
-.msg{
-    padding:4px;
-    border-bottom:1px solid #222;
+.bar{
+    height:8px;
+    background:red;
+    width:0%;
 }
-
 </style>
 </head>
 
 <body>
 
 <!-- LOGIN -->
-
 <div id="loginScreen">
 
     <div class="loginBox">
 
-        <div class="loginTitle">
-            ☩ MEDICAL RP
-        </div>
+        <h2>☩ MEDICAL RP</h2>
 
-        <input
-            id="name"
-            placeholder="Логин"
-        >
+        <input id="name" placeholder="Логин">
+        <input id="pass" type="password" placeholder="Пароль">
 
-        <input
-            id="pass"
-            type="password"
-            placeholder="Пароль"
-        >
+        <button onclick="register()">Регистрация</button>
+        <button onclick="login()">Войти</button>
 
-        <button onclick="register()">
-            Регистрация
-        </button>
-
-        <button onclick="login()">
-            Войти
-        </button>
-
-        <div
-            id="status"
-            style="
-            margin-top:10px;
-            text-align:center;
-            color:gray;
-            "
-        ></div>
+        <div id="status" style="margin-top:10px;color:gray;text-align:center;"></div>
 
     </div>
 
 </div>
 
 <!-- GAME -->
-
 <div id="game">
-
-<header>
-☩ MEDICAL RP ONLINE
-</header>
-
-<div class="container">
-
-<!-- PROFILE -->
 
 <div class="panel">
 
-<h2>
-Добро пожаловать,
-<span id="player"></span>
-</h2>
+<h2>👤 Игрок: <span id="player"></span></h2>
 
-💰 Деньги:
-<span id="money">100</span><
-
-💎 Алмазы:
-<span id="diamonds">10</span><b
-⭐ XP:
-<span id="xp">0</span><b
-🏆 Уровень:
-<span id="level">1</span><br
- Онлайн:
-<span id="online">147</span>
-
-<div class="progress">
-<div class="bar" id="xpBar"></div>
-</div>
+💰 Деньги: <span id="money">100</span><b
+ Алмазы: <span id="diamonds">10</span><br
+XP: <span id="xp">0</span>
 
 </div>
-
-<!-- PATIENTS -->
 
 <div class="panel">
 
 <h2>🧑 Пациенты</h2>
 
-<button onclick="loadPatients()">
-Загрузить пациентов
-</button>
+<button onclick="loadPatients()">Загрузить</button>
 
-<div
-    class="list"
-    id="patients"
-></div>
-
-</div>
-
-<!-- CHAT -->
-
-<div class="panel">
-
-<h2>💬 Чат</h2>
-
-<div
-    class="chat"
-    id="chat"
-></div>
-
-<input
-    id="chatInput"
-    placeholder="Сообщение"
->
-
-<button onclick="sendMessage()">
-Отправить
-</button>
-
-</div>
+<div class="list" id="patients"></div>
 
 </div>
 
@@ -262,52 +147,100 @@ h2{
 
 <script>
 
-let money = 100;
-let diamonds = 10;
-let xp = 0;
-let level = 1;
+let money=100;
+let diamonds=10;
+let xp=0;
 
-// STATUS
-
-function setStatus(text,color){
-
-    let s =
-        document.getElementById("status");
-
-    s.innerText = text;
-    s.style.color = color;
+// статус
+function setStatus(t,c){
+    let s=document.getElementById("status");
+    s.innerText=t;
+    s.style.color=c;
 }
 
-// REGISTER
-
+// 🔥 РЕГИСТРАЦИЯ (СРАЗУ В ИГРУ)
 function register(){
 
-    let name =
-        document.getElementById("name")
-        .value.trim();
+    let name=document.getElementById("name").value.trim();
+    let pass=document.getElementById("pass").value.trim();
 
-    let pass =
-        document.getElementById("pass")
-        .value.trim();
-
-    if(name==="" || pass===""){
-
-        setStatus(
-            "Введите логин и пароль",
-            "red"
-        );
-
+    if(name===""||pass===""){
+        setStatus("Введите данные","red");
         return;
     }
 
-    localStorage.setItem(
-        "rp_name",
-        name
-    );
+    localStorage.setItem("rp_name",name);
+    localStorage.setItem("rp_pass",pass);
 
-    localStorage.setItem(
-        "rp_pass",
-        pass
-    );
+    openGame(name);
+}
 
-    setStatus(
+// 🔑 ВХОД
+function login(){
+
+    let name=document.getElementById("name").value.trim();
+    let pass=document.getElementById("pass").value.trim();
+
+    let sName=localStorage.getItem("rp_name");
+    let sPass=localStorage.getItem("rp_pass");
+
+    if(name===sName && pass===sPass){
+        openGame(name);
+    }else{
+        setStatus("Неверный логин","red");
+    }
+}
+
+// 🚀 ОТКРЫТИЕ ИГРЫ
+function openGame(name){
+
+    document.getElementById("loginScreen").style.display="none";
+    document.getElementById("game").style.display="block";
+    document.getElementById("player").innerText=name;
+}
+
+// 🧑 ПАЦИЕНТЫ
+function loadPatients(){
+
+    let box=document.getElementById("patients");
+    box.innerHTML="";
+
+    for(let i=1;i<=50;i++){
+
+        let div=document.createElement("div");
+        div.className="item";
+
+        div.innerHTML=`
+            🧑 Пациент #${i}
+            <div class="progress">
+                <div class="bar" id="b${i}"></div>
+            </div>
+        `;
+
+        div.onclick=()=>heal(i);
+
+        box.appendChild(div);
+    }
+}
+
+// ❤️ ЛЕЧЕНИЕ
+function heal(id){
+
+    let bar=document.getElementById("b"+id);
+
+    let p=0;
+
+    let t=setInterval(()=>{
+
+        p+=10;
+
+        bar.style.width=p+"%";
+
+        if(p>=100){
+
+            clearInterval(t);
+
+            money+=20;
+            xp+=15;
+
+            document
