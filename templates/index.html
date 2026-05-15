@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MEDICAL RP NO POPUP</title>
+<title>MEDICAL RP PRO MAX</title>
 
 <style>
 body{
@@ -34,36 +34,14 @@ button{
     cursor:pointer;
 }
 
-.stat{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-.box{
-    background:#111;
-    padding:10px;
-    border-radius:8px;
-    flex:1;
-    min-width:100px;
-}
-
-.progress{
+select{
     width:100%;
-    height:10px;
-    background:#333;
-    border-radius:10px;
-    overflow:hidden;
-}
-
-.bar{
-    height:10px;
-    background:red;
-    width:0%;
+    padding:8px;
+    margin-top:5px;
 }
 
 .log{
-    height:150px;
+    height:140px;
     overflow:auto;
     background:black;
     padding:5px;
@@ -72,8 +50,21 @@ button{
 
 .msg{
     font-size:12px;
-    padding:3px;
     border-bottom:1px solid #222;
+    padding:3px;
+}
+
+.grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+}
+
+.box{
+    background:#111;
+    padding:6px;
+    border-radius:6px;
+    font-size:12px;
 }
 </style>
 </head>
@@ -82,34 +73,37 @@ button{
 
 <div class="container">
 
-<!-- 📊 СТАТЫ -->
+<!-- 🚑 МАШИНЫ -->
 <div class="panel">
-<h2>📊 Игрок</h2>
-
-<div class="stat">
-<div class="box">💰 <span id="money">100</span></div>
-<div class="box">💎 <span id="diamonds">10</span></div>
-<div class="box">⭐ <span id="xp">0</span></div>
+<h2>🚑 Автопарк</h2>
+<div class="grid" id="cars"></div>
+<button onclick="loadCars()">Загрузить машины</button>
 </div>
 
-<div class="progress">
-<div class="bar" id="bar"></div>
-</div>
-</div>
-
-<!-- 🎮 ДЕЙСТВИЯ -->
+<!-- 🧑 ПАЦИЕНТЫ -->
 <div class="panel">
-<h2>🎮 Действия</h2>
+<h2>🧑‍🤝‍🧑 Пациенты (2000)</h2>
 
-<button onclick="dice()">Кубик</button>
-<button onclick="ambulance()">Скорая</button>
-<button onclick="alliance()">Союз</button>
-<button onclick="buy()">Магазин</button>
+<select id="patients"></select>
+<button onclick="loadPatients()">Загрузить пациентов</button>
+<button onclick="sendToSurgery()">Отправить в операционную</button>
+</div>
+
+<!-- 🏥 ОПЕРАЦИОННАЯ -->
+<div class="panel">
+<h2>🏥 Операционная очередь</h2>
+<div id="surgery"></div>
+</div>
+
+<!-- 🧪 ЛАБА -->
+<div class="panel">
+<h2>🧪 Лаборатория</h2>
+<button onclick="produce()">Производство медикаментов</button>
 </div>
 
 <!-- 📜 ЛОГ -->
 <div class="panel">
-<h2>📜 Журнал действий</h2>
+<h2>📜 Журнал</h2>
 <div class="log" id="log"></div>
 </div>
 
@@ -117,78 +111,68 @@ button{
 
 <script>
 
-let money = 100;
-let diamonds = 10;
-let xp = 0;
-
-function update(){
-    document.getElementById("money").innerText = money;
-    document.getElementById("diamonds").innerText = diamonds;
-    document.getElementById("xp").innerText = xp;
-
-    document.getElementById("bar").style.width = (xp % 100) + "%";
-}
-
 function log(text){
     let l = document.getElementById("log");
-
     let div = document.createElement("div");
-    div.className = "msg";
-    div.innerText = text;
-
+    div.className="msg";
+    div.innerText=text;
     l.appendChild(div);
-    l.scrollTop = l.scrollHeight;
+    l.scrollTop=l.scrollHeight;
 }
 
-// 🎲 КУБИК
-function dice(){
-    let r = Math.floor(Math.random()*6)+1;
+// 🚑 МАШИНЫ
+function loadCars(){
+    let cars = document.getElementById("cars");
+    cars.innerHTML="";
 
-    xp += 10;
-    money += 5;
+    let list = ["🚑 Ambulance A","🚑 Ambulance B","🚑 Ambulance C","🚑 Ambulance D"];
 
-    log("🎲 Кубик: " + r + " (+10 XP, +5💰)");
-    update();
+    list.forEach(c=>{
+        let d=document.createElement("div");
+        d.className="box";
+        d.innerText=c;
+        cars.appendChild(d);
+    });
+
+    log("🚑 Автопарк загружен");
 }
 
-// 🚑 СКОРАЯ
-function ambulance(){
-    xp += 15;
-    money += 10;
+// 🧑 ПАЦИЕНТЫ 2000 (оптимизировано)
+function loadPatients(){
+    let sel=document.getElementById("patients");
+    sel.innerHTML="";
 
-    log("🚑 Скорая выехала (+XP +💰)");
-    update();
-}
-
-// 🤝 СОЮЗ
-function alliance(){
-    if(diamonds < 5){
-        log("❌ Не хватает 💎");
-        return;
+    for(let i=1;i<=2000;i++){
+        let opt=document.createElement("option");
+        opt.textContent="Пациент #" + i;
+        sel.appendChild(opt);
     }
 
-    diamonds -= 5;
-    xp += 20;
-
-    log("🤝 Союз создан (-5💎 +20 XP)");
-    update();
+    log("🧑 Загружено 2000 пациентов");
 }
 
-// 🛒 МАГАЗИН
-function buy(){
-    if(money < 20){
-        log("❌ Недостаточно 💰");
-        return;
-    }
+// 🏥 В ОПЕРАЦИОННУЮ
+function sendToSurgery(){
+    let sel=document.getElementById("patients");
+    let surgery=document.getElementById("surgery");
 
-    money -= 20;
-    xp += 25;
+    let p=sel.value;
 
-    log("🛒 Куплено оборудование (-20💰 +XP)");
-    update();
+    let div=document.createElement("div");
+    div.className="box";
+    div.innerText="🏥 " + p + " → операция";
+
+    surgery.appendChild(div);
+
+    log("➡ " + p + " отправлен в операционную");
 }
 
-update();
+// 🧪 ПРОИЗВОДСТВО
+function produce(){
+    let meds = Math.floor(Math.random()*5)+1;
+
+    log("🧪 Производство: +" + meds + " медикаментов");
+}
 
 </script>
 
