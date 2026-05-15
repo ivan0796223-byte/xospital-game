@@ -1,100 +1,162 @@
-// ЖДЁМ загрузку страницы (очень важно)
-document.addEventListener("DOMContentLoaded", function () {
+<script>
 
-    // ONLINE
-    const online = document.getElementById("online");
-    if (online) online.innerText = Math.floor(Math.random() * 50 + 10);
+let money = 100;
+let diamonds = 10;
+let xp = 0;
+let level = 1;
 
-    // XP BAR
-    const xpBar = document.getElementById("xpBar");
-    if (xpBar) xpBar.style.width = "30%";
+// СТАТУС
+function showStatus(text,color="lime"){
 
-});
+    let status = document.getElementById("status");
 
-// 🎲 КУБИК
-function rollDice() {
-    const dice = document.getElementById("dice");
-    if (!dice) return;
-
-    const r = Math.floor(Math.random() * 6) + 1;
-    dice.innerText = "Результат: " + r;
+    status.innerText = text;
+    status.style.color = color;
 }
 
-// 🤝 СОЮЗ
-function createAlliance() {
-    alert("Союз создан (−500 💎)");
-}
+// РЕГИСТРАЦИЯ
+function register(){
 
-// 🧑‍🤝‍🧑 ПАЦИЕНТЫ
-function loadPatients() {
-    const sel = document.getElementById("patientSelect");
-    if (!sel) return;
+    let name =
+        document.getElementById("loginName").value.trim();
 
-    sel.innerHTML = "";
+    let pass =
+        document.getElementById("loginPassword").value.trim();
 
-    for (let i = 1; i <= 50; i++) {
-        let opt = document.createElement("option");
-        opt.textContent = "Пациент #" + i;
-        sel.appendChild(opt);
+    if(name === "" || pass === ""){
+
+        showStatus("Введите логин и пароль","red");
+        return;
     }
 
-    alert("Пациенты загружены");
+    localStorage.setItem("rp_name",name);
+    localStorage.setItem("rp_pass",pass);
+
+    showStatus("Аккаунт создан");
 }
 
-function callPatient() {
-    const sel = document.getElementById("patientSelect");
-    if (!sel) return;
+// ВХОД
+function login(){
 
-    alert("Вызван: " + sel.value);
+    let name =
+        document.getElementById("loginName").value.trim();
+
+    let pass =
+        document.getElementById("loginPassword").value.trim();
+
+    let savedName = localStorage.getItem("rp_name");
+    let savedPass = localStorage.getItem("rp_pass");
+
+    if(savedName === null){
+
+        showStatus("Сначала зарегистрируйтесь","orange");
+        return;
+    }
+
+    if(name === savedName && pass === savedPass){
+
+        document.getElementById("loginScreen").style.display="none";
+
+        document.getElementById("game").style.display="block";
+
+        document.getElementById("playerName").innerText=name;
+
+        return;
+    }
+
+    showStatus("Неверный логин или пароль","red");
 }
 
-// 🚑 СКОРАЯ
-function callAmbulance() {
-    alert("🚑 Скорая выехала");
+// XP
+function update(){
+
+    level = Math.floor(xp / 100) + 1;
+
+    document.getElementById("money").innerText = money;
+    document.getElementById("diamonds").innerText = diamonds;
+    document.getElementById("xp").innerText = xp;
+    document.getElementById("level").innerText = level;
+
+    document.getElementById("xpBar").style.width =
+        (xp % 100) + "%";
 }
 
-// 🧪 ЛАБА
-function takeSample() {
-    alert("Образец взят");
+// ПАЦИЕНТЫ
+function loadPatients(){
+
+    let box = document.getElementById("patients");
+    box.innerHTML = "";
+
+    for(let i=1;i<=100;i++){
+
+        let div = document.createElement("div");
+        div.className = "item";
+
+        div.innerHTML = `
+            🧑 Пациент #${i}
+            <div class="progress">
+                <div class="bar" id="b${i}"></div>
+            </div>
+        `;
+
+        div.onclick = ()=>heal(i);
+
+        box.appendChild(div);
+    }
 }
 
-function takeAnalysis() {
-    alert("Анализ взят");
+// ЛЕЧЕНИЕ
+function heal(id){
+
+    let bar = document.getElementById("b"+id);
+
+    if(!bar) return;
+
+    let progress = 0;
+
+    let timer = setInterval(()=>{
+
+        progress += 10;
+
+        bar.style.width = progress + "%";
+
+        if(progress >= 100){
+
+            clearInterval(timer);
+
+            money += 20;
+            xp += 15;
+
+            update();
+
+            bar.style.background = "lime";
+        }
+
+    },300);
 }
 
-// 👨‍⚕️ КАБИНЕТ
-function openDoctor() {
-    alert("Кабинет открыт");
-}
+// ЧАТ
+function sendMessage(){
 
-// 🔍 ПОИСК (ИСПРАВЛЕНО)
-function searchAll() {
-    const player = document.getElementById("searchPlayer")?.value || "";
-    const alliance = document.getElementById("searchAlliance")?.value || "";
-    const patient = document.getElementById("searchPatient")?.value || "";
+    let input = document.getElementById("chatInput");
+    let chat = document.getElementById("chat");
 
-    alert(
-        "Поиск:\n" +
-        "Игрок: " + player + "\n" +
-        "Союз: " + alliance + "\n" +
-        "Пациент: " + patient
-    );
-}
+    if(input.value.trim()=="") return;
 
-// 💬 ЧАТ
-function sendMessage() {
-    const input = document.getElementById("chatInput");
-    const chat = document.getElementById("chat");
+    let div = document.createElement("div");
+    div.className = "msg";
 
-    if (!input || !chat) return;
-    if (input.value.trim() === "") return;
+    div.innerText =
+        document.getElementById("playerName").innerText +
+        ": " + input.value;
 
-    const msg = document.createElement("div");
-    msg.className = "msg";
-    msg.textContent = "Игрок: " + input.value;
-
-    chat.appendChild(msg);
+    chat.appendChild(div);
 
     input.value = "";
+
     chat.scrollTop = chat.scrollHeight;
 }
+
+update();
+
+</script>
