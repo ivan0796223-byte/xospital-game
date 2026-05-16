@@ -8,9 +8,9 @@
 <style>
 body{
 margin:0;
-font-family:Arial;
 background:#111;
 color:white;
+font-family:Arial;
 }
 
 header{
@@ -18,6 +18,7 @@ background:#1c1c1c;
 padding:15px;
 text-align:center;
 border-bottom:3px solid red;
+font-size:22px;
 }
 
 .panel{
@@ -30,12 +31,13 @@ border-radius:12px;
 
 input{
 width:100%;
-padding:10px;
+padding:12px;
 margin-top:8px;
 border:none;
 border-radius:10px;
 background:#222;
 color:white;
+box-sizing:border-box;
 }
 
 button{
@@ -46,30 +48,21 @@ background:red;
 border:none;
 color:white;
 border-radius:10px;
+font-size:16px;
 cursor:pointer;
 }
 
-button:hover{opacity:0.9;}
+button:hover{
+opacity:0.9;
+}
 
-#game{display:none;}
-
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
+#game{
+display:none;
 }
 
 .small{
 font-size:13px;
 opacity:0.8;
-}
-
-.list{
-height:150px;
-overflow:auto;
-background:#111;
-padding:10px;
-border-radius:10px;
 }
 </style>
 </head>
@@ -78,7 +71,7 @@ border-radius:10px;
 
 <header>☩ MEDICAL RP ONLINE</header>
 
-<!-- ГЛАВНАЯ -->
+<!-- РЕГИСТРАЦИЯ -->
 <div id="auth">
 
 <div class="panel">
@@ -100,124 +93,70 @@ border-radius:10px;
 <!-- ИГРА -->
 <div id="game">
 
-<div class="panel grid">
-
-<div>
-<h3>💎 Баланс</h3>
-<p>Алмазы: <span id="diamonds">50</span></p>
-<p>Монеты: <span id="coins">0</span></p>
-</div>
-
-<div>
-<h3>🏥 Больница</h3>
-<p>Палаты: <span id="rooms">10</span></p>
-<p>Лаборатории: <span id="labs">1</span></p>
-<p>Машины: <span id="cars">3</span></p>
-</div>
-
+<div class="panel">
+<h3>🏥 MEDICAL RP</h3>
+<p class="small">Регистрация работает ✔</p>
+<p class="small">Вход работает ✔</p>
 </div>
 
 <div class="panel">
-
-<h3>👨‍⚕️ Пациенты (2000)</h3>
-<div class="list" id="patients"></div>
-
-</div>
-
-<div class="panel">
-
-<h3>🏥 Магазин улучшений</h3>
-
-<button onclick="buyRoom()">Купить палату (10💎)</button>
-<button onclick="buyLab()">Купить лабораторию (20💎)</button>
-<button onclick="buyCar()">Купить машину (15💎)</button>
-
+<h3>👨‍⚕️ Пациенты</h3>
+<div class="small" id="patients"></div>
 </div>
 
 </div>
 
 <script>
 
-let diamonds = 50;
-let coins = 0;
-let rooms = 10;
-let labs = 1;
-let cars = 3;
-
 function register(){
-let l = regL.value;
-let p = regP.value;
+
+let l = document.getElementById("regL").value;
+let p = document.getElementById("regP").value;
 
 if(!l || !p){
 alert("Заполните поля");
 return;
 }
 
-localStorage.setItem("u", l);
-localStorage.setItem("p", p);
+localStorage.setItem("login", l);
+localStorage.setItem("pass", p);
 
-alert("Аккаунт создан");
+alert("Регистрация успешна ✔");
 }
 
 function login(){
 
-let l = logL.value;
-let p = logP.value;
+let l = document.getElementById("logL").value;
+let p = document.getElementById("logP").value;
 
-if(l === localStorage.getItem("u") &&
-p === localStorage.getItem("p")){
+let savedL = localStorage.getItem("login");
+let savedP = localStorage.getItem("pass");
 
-auth.style.display="none";
-game.style.display="block";
-initGame();
+if(!savedL || !savedP){
+alert("Сначала зарегистрируйтесь");
+return;
+}
+
+if(l === savedL && p === savedP){
+
+document.getElementById("auth").style.display = "none";
+document.getElementById("game").style.display = "block";
+
+initPatients();
 
 }else{
-alert("Ошибка входа");
+alert("Неверный логин или пароль");
 }
 
 }
 
-// 2000 пациентов (виртуально, без лагов)
-function initGame(){
-
-let html="";
+// 2000 пациентов (без лагов)
+function initPatients(){
+let html = "";
 for(let i=1;i<=2000;i++){
-html += "Пациент #" + i + " - статус: ожидает
-";
-}
-p
-nts.innerHTML = html;
-
-updateUI();
-}
-
-function updateUI(){
-diamondsEl.innerText = diamonds;
-coinsEl.innerText = coins;
-roomsEl.innerText = rooms;
-labsEl.innerText = labs;
-carsEl.innerText = cars;
-}
-
-function buyRoom(){
-if(diamonds < 10){alert("Нет алмазов"); return;}
-diamonds -= 10;
-rooms += 1;
-updateUI();
-}
-
-function buyLab(){
-if(diamonds < 20){alert("Нет алмазов"); return;}
-diamonds -= 20;
-labs += 1;
-updateUI();
-}
-
-function buyCar(){
-if(diamonds < 15){alert("Нет алмазов"); return;}
-diamonds -= 15;
-cars += 1;
-updateUI();
+html += "Пациент #" + i + " — ожидает лечения
+"
+document.getElementById("patients").innerHTML = html;
 }
 
 </script>
