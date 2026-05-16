@@ -1,103 +1,156 @@
-ment.getElementById("level").innerHTML =
-level;
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEDICAL RP</title>
 
-document.getElementById("xp").innerHTML =
-xp + " / 100";
-
-document.getElementById("xp-bar").style.width =
-xp + "%";
-
+<style>
+body{
+    margin:0;
+    background:#111;
+    color:white;
+    font-family:Arial;
 }
 
-function takeCall(){
+header{
+    background:#1c1c1c;
+    padding:15px;
+    text-align:center;
+    border-bottom:3px solid red;
+    font-size:28px;
+}
 
+.panel{
+    margin:20px;
+    padding:20px;
+    background:#1c1c1c;
+    border:2px solid red;
+    border-radius:15px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    background:#222;
+    color:white;
+    box-sizing:border-box;
+}
+
+button{
+    width:100%;
+    padding:15px;
+    margin-top:10px;
+    background:red;
+    border:none;
+    color:white;
+    border-radius:10px;
+    font-size:16px;
+}
+
+#game{ display:none; }
+
+#status{
+    padding:10px;
+    background:#222;
+    border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>☩ MEDICAL RP ONLINE</header>
+
+<div id="auth">
+
+<div class="panel">
+<h2>Регистрация</h2>
+<input id="regLogin" placeholder="Логин">
+<input id="regPass" type="password" placeholder="Пароль">
+<button onclick="register()">Регистрация</button>
+</div>
+
+<div class="panel">
+<h2>Вход</h2>
+<input id="logLogin" placeholder="Логин">
+<input id="logPass" type="password" placeholder="Пароль">
+<button onclick="login()">Войти</button>
+</div>
+
+</div>
+
+<div id="game">
+
+<div class="panel">
+
+<h2>Пациент</h2>
+
+<div id="status">Ожидание вызова</div>
+
+<button onclick="call()">🚑 Принять вызов</button>
+<button onclick="op()">🏥 В операционную</button>
+<button onclick="heal()">💊 Лечить</button>
+
+</div>
+
+</div>
+
+<script>
+
+let accepted = false;
+let operation = false;
+
+function register(){
+let l = regLogin.value;
+let p = regPass.value;
+
+if(!l || !p){ alert("Заполните поля"); return; }
+
+localStorage.setItem("l", l);
+localStorage.setItem("p", p);
+
+alert("ОК");
+}
+
+function login(){
+let l = logLogin.value;
+let p = logPass.value;
+
+if(l === localStorage.getItem("l") &&
+p === localStorage.getItem("p")){
+auth.style.display="none";
+game.style.display="block";
+}else{
+alert("Ошибка");
+}
+}
+
+function call(){
 accepted = true;
-
-document.getElementById("status").innerHTML =
-"🚑 Вызов принят";
-
+status.innerText = "Вызов принят";
 }
 
-function goOperation(){
-
-if(!accepted){
-
-alert("Сначала примите вызов");
-return;
-
-}
-
+function op(){
+if(!accepted){ alert("Сначала вызов"); return; }
 operation = true;
-
-document.getElementById("status").innerHTML =
-"🏥 Пациент в операционной";
-
+status.innerText = "В операционной";
 }
 
-function healPatient(){
-
-if(!accepted){
-
-alert("Сначала примите вызов");
+function heal(){
+if(!accepted || !operation){
+alert("Ошибка этапов");
 return;
-
 }
-
-if(!operation){
-
-alert("Сначала отправьте пациента в операционную");
-return;
-
-}
-
-document.getElementById("status").innerHTML =
-"💊 Пациент вылечен";
-
-coins += 100;
-xp += 25;
-
-if(xp >= 100){
-
-xp = 0;
-level += 1;
-
-alert("🎉 Новый уровень!");
-
-}
-
-updateStats();
-
+status.innerText = "Пациент вылечен";
 accepted = false;
 operation = false;
-
 }
-
-function sendMessage(){
-
-let message =
-document.getElementById("message");
-
-let chat =
-document.getElementById("chat");
-
-if(message.value.trim() != ""){
-
-chat.innerHTML +=
-"<p>👤 " + message.value + "</p>";
-
-message.value = "";
-
-chat.scrollTop = chat.scrollHeight;
-
-}
-
-}
-
-updateStats();
 
 </script>
 
 </body>
-</html>;
-
-docu
+</html>
