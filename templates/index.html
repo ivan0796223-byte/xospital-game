@@ -1,45 +1,139 @@
-дится в операционной.";
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MEDICAL RP</title>
+
+<style>
+
+body{
+    margin:0;
+    background:#111;
+    color:white;
+    font-family:Arial;
+}
+
+header{
+    background:#1c1c1c;
+    padding:15px;
+    text-align:center;
+    border-bottom:3px solid red;
+    font-size:28px;
+}
+
+.panel{
+    margin:20px;
+    padding:20px;
+    background:#1c1c1c;
+    border:2px solid red;
+    border-radius:15px;
+}
+
+button{
+    width:100%;
+    padding:15px;
+    margin-top:10px;
+    background:red;
+    border:none;
+    color:white;
+    border-radius:10px;
+    font-size:16px;
+}
+
+#status{
+    padding:10px;
+    background:#222;
+    border-radius:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+☩ MEDICAL RP ONLINE
+</header>
+
+<div class="panel">
+
+<h2>Пациент</h2>
+
+<div id="status">
+Ожидание вызова
+</div>
+
+<button onclick="takeCall()">
+🚑 Принять вызов
+</button>
+
+<button onclick="goOperation()">
+🏥 В операционную
+</button>
+
+<button onclick="healPatient()">
+💊 Лечить пациента
+</button>
+
+</div>
+
+<script>
+
+let accepted = false;
+let operation = false;
+
+function takeCall(){
+
+accepted = true;
+
+document.getElementById("status").innerHTML =
+"🚑 Вызов принят";
+
+}
+
+function goOperation(){
+
+if(!accepted){
+
+alert("Сначала примите вызов");
+return;
+
+}
+
+operation = true;
+
+document.getElementById("status").innerHTML =
+"🏥 Пациент в операционной";
 
 }
 
 function healPatient(){
 
 if(!accepted){
-    alert("Сначала примите вызов");
-    return;
+
+alert("Сначала примите вызов");
+return;
+
 }
 
-if(!surgery){
-    alert("Сначала отправьте пациента в операционную");
-    return;
+if(!operation){
+
+alert("Сначала отправьте пациента в операционную");
+return;
+
 }
 
-document.getElementById("patient-status").innerHTML =
-"💊 Пациент успешно вылечен.";
+document.getElementById("status").innerHTML =
+"💊 Пациент вылечен";
 
 accepted = false;
-surgery = false;
-
-}
-
-function sendMessage(){
-
-let input = document.getElementById("chat-input");
-let chat = document.getElementById("chat-box");
-
-if(input.value.trim() !== ""){
-
-chat.innerHTML += "<p>👤 " + input.value + "</p>";
-
-input.value = "";
-
-chat.scrollTop = chat.scrollHeight;
-
-}
+operation = false;
 
 }
 
 </script>
 
 </body>
-</html> нахо
+</html>
