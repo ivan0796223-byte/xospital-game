@@ -13,6 +13,13 @@ color:white;
 font-family:Arial;
 }
 
+header{
+background:#1c1c1c;
+padding:15px;
+text-align:center;
+border-bottom:3px solid red;
+}
+
 .panel{
 margin:15px;
 padding:15px;
@@ -43,79 +50,227 @@ border-radius:10px;
 cursor:pointer;
 }
 
-#game{
-display:none;
+button:hover{opacity:0.9;}
+
+#game{display:none;}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
 }
 
+.list{
+height:120px;
+overflow:auto;
+background:#111;
+padding:10px;
+border-radius:10px;
+font-size:13px;
+}
+
+.small{font-size:13px;opacity:0.8;}
 </style>
 </head>
 
 <body>
 
+<header>☩ MEDICAL RP ONLINE</header>
+
+<!-- AUTH -->
 <div id="auth">
 
 <div class="panel">
 <h3>Регистрация</h3>
-<input id="regLogin" placeholder="Логин">
-<input id="regPass" type="password" placeholder="Пароль">
+<input id="regL" placeholder="Логин">
+<input id="regP" type="password" placeholder="Пароль">
 <button onclick="register()">Регистрация</button>
 </div>
 
 <div class="panel">
 <h3>Вход</h3>
-<input id="logLogin" placeholder="Логин">
-<input id="logPass" type="password" placeholder="Пароль">
+<input id="logL" placeholder="Логин">
+<input id="logP" type="password" placeholder="Пароль">
 <button onclick="login()">Войти</button>
 </div>
 
 </div>
 
-<div id="game" class="panel">
-<h2>ИГРА ЗАПУЩЕНА ✔</h2>
-<p>Регистрация работает</p>
+<!-- GAME -->
+<div id="game">
+
+<div class="panel grid">
+
+<div>
+<h3>💰 Монеты</h3>
+<p id="coins">0</p>
+
+<h3>💎 Алмазы</h3>
+<p id="diamonds">50</p>
+</div>
+
+<div>
+<h3>🏥 Больница</h3>
+<p>Палаты: <span id="rooms">10</span></p>
+<p>Лаборатории: <span id="labs">1</span></p>
+<p>Машины: <span id="cars">3</span></p>
+</div>
+
+</div>
+
+<!-- PATIENTS -->
+<div class="panel">
+
+<h3>👨‍⚕️ Пациенты</h3>
+<button onclick="nextPatient()">Следующий пациент</button>
+<div class="list" id="patientBox"></div>
+
+</div>
+
+<!-- TREATMENT -->
+<div class="panel">
+
+<h3>🚑 Лечение</h3>
+
+<button onclick="treat()">💊 Лечить пациента</button>
+
+</div>
+
+<!-- OPERATIONS -->
+<div class="panel">
+
+<h3>🎲 Операция (кубик)</h3>
+
+<button onclick="operation()">Бросить кубик</button>
+<div class="small" id="opResult"></div>
+
+</div>
+
+<!-- SHOP -->
+<div class="panel">
+
+<h3>🏪 Магазин</h3>
+
+<button onclick="buyRoom()">Купить палату (10💎)</button>
+<button onclick="buyLab()">Купить лабораторию (20💎)</button>
+<button onclick="buyCar()">Купить машину (15💎)</button>
+
+</div>
+
 </div>
 
 <script>
 
+let coins = 0;
+let diamonds = 50;
+
+let rooms = 10;
+let labs = 1;
+let cars = 3;
+
+let patientId = 0;
+
+// AUTH
 function register(){
+let l = regL.value;
+let p = regP.value;
 
-let login = document.getElementById("regLogin").value;
-let pass = document.getElementById("regPass").value;
+if(!l || !p){alert("Заполните поля");return;}
 
-if(login === "" || pass === ""){
-alert("Заполните поля");
-return;
-}
+localStorage.setItem("l", l);
+localStorage.setItem("p", p);
 
-localStorage.setItem("user_login", login);
-localStorage.setItem("user_pass", pass);
-
-alert("Регистрация успешна ✔");
+alert("ОК");
 }
 
 function login(){
+if(logL.value===localStorage.getItem("l") &&
+logP.value===localStorage.getItem("p")){
+auth.style.display="none";
+game.style.display="block";
+}else{
+alert("Ошибка входа");
+}
+}
 
-let login = document.getElementById("logLogin").value;
-let pass = document.getElementById("logPass").value;
+// PATIENTS
+function nextPatient(){
+patientId++;
 
-let savedLogin = localStorage.getItem("user_login");
-let savedPass = localStorage.getItem("user_pass");
+let types = ["простуда","перелом","инфаркт","ожог","инфекция"];
+let t = types[Math.floor(Math.random()*types.length)];
 
-if(!savedLogin || !savedPass){
-alert("Сначала зарегистрируйтесь");
+patientBox.innerHTML +=
+"Пациент #" + patientId + " ("+t+")<br>";
+}
+
+// TREAT
+function treat(){
+
+if(patientId===0){
+alert("Нет пациентов");
 return;
 }
 
-if(login === savedLogin && pass === savedPass){
+coins += 20;
+diamonds += 2;
 
-document.getElementById("auth").style.display = "none";
-document.getElementById("game").style.display = "block";
+alert("Пациент вылечен +награда");
 
+update();
+}
+
+// OPERATION
+function operation(){
+
+let a = Math.floor(Math.random()*6)+1;
+let b = Math.floor(Math.random()*6)+1;
+
+let res = "";
+
+if(a>b){
+res = "УСПЕХ операции ✔";
+coins += 50;
 }else{
-alert("Неверный логин или пароль");
+res = "ОСЛОЖНЕНИЕ ⚠";
+coins += 10;
 }
 
+opResult.innerHTML =
+"Врач: "+a+" | Система: "+b+"<br>"+res;
+
+update();
 }
+
+// SHOP
+function buyRoom(){
+if(diamonds<10)return alert("нет алмазов");
+diamonds-=10; rooms++;
+update();
+}
+
+function buyLab(){
+if(diamonds<20)return alert("нет алмазов");
+diamonds-=20; labs++;
+update();
+}
+
+function buyCar(){
+if(diamonds<15)return alert("нет алмазов");
+diamonds-=15; cars++;
+update();
+}
+
+// UPDATE
+function update(){
+coinsEl.innerText=coins;
+diamondsEl.innerText=diamonds;
+roomsEl.innerText=rooms;
+labsEl.innerText=labs;
+carsEl.innerText=cars;
+}
+
+update();
 
 </script>
 
