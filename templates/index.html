@@ -29,6 +29,17 @@ header{
     border-radius:15px;
 }
 
+input{
+    width:100%;
+    padding:12px;
+    margin-top:8px;
+    border:none;
+    border-radius:10px;
+    background:#222;
+    color:white;
+    box-sizing:border-box;
+}
+
 button{
     width:100%;
     padding:12px;
@@ -37,18 +48,12 @@ button{
     border:none;
     color:white;
     border-radius:10px;
+    font-size:16px;
 }
 
-input{
-    width:100%;
-    padding:10px;
-    margin-top:8px;
-    border:none;
-    border-radius:10px;
-    background:#222;
-    color:white;
-    box-sizing:border-box;
-}
+button:hover{opacity:0.9;}
+
+#game{display:none;}
 
 .chat{
     height:120px;
@@ -59,14 +64,8 @@ input{
     margin-top:10px;
 }
 
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-}
-
 .small{
-    font-size:14px;
+    font-size:13px;
     opacity:0.8;
 }
 </style>
@@ -74,157 +73,95 @@ input{
 
 <body>
 
-<header>
-☩ MEDICAL RP | <span id="time"></span> МСК
-</header>
+<header>☩ MEDICAL RP ONLINE</header>
 
 <div class="panel">
 
-<h3>Вход</h3>
-
-<input id="login" placeholder="Логин">
-<input id="pass" type="password" placeholder="Пароль">
-
+<h3>Регистрация</h3>
+<input id="regLogin" placeholder="Логин">
+<input id="regPass" type="password" placeholder="Пароль">
 <button onclick="register()">Регистрация</button>
+
+<hr style="border:1px solid #333;margin:10px 0;">
+
+<h3>Вход</h3>
+<input id="logLogin" placeholder="Логин">
+<input id="logPass" type="password" placeholder="Пароль">
 <button onclick="login()">Войти</button>
 
 </div>
 
-<div id="game" style="display:none;">
-
-<div class="panel grid">
-
-<div>
-<h3>🏥 Палаты (2000)</h3>
-<div class="small" id="rooms"></div>
-</div>
-
-<div>
-<h3>🚑 Автопарк (2000)</h3>
-<div class="small" id="cars"></div>
-</div>
-
-</div>
+<div id="game">
 
 <div class="panel">
 
-<h3>👨‍⚕️ Пациенты (2000)</h3>
-<div class="small" id="patients"></div>
+<h3>🏥 Больница</h3>
 
-</div>
-
-<div class="panel">
-
-<h3>🏥 Операционная (Кубик)</h3>
-
-<button onclick="rollDice()">🎲 Бросить кубик</button>
-
-<div id="oplog" class="small"></div>
+<div class="small">2000 палат | 2000 машин | пациенты онлайн</div>
 
 </div>
 
 <div class="panel">
 
 <h3>💬 Чат пациентов</h3>
-<div class="chat" id="chat1"></div>
-<input id="msg1" placeholder="Сообщение">
-<button onclick="send1()">Отправить</button>
-</div>
+<div class="chat" id="chat"></div>
 
-<div class="panel">
+<input id="msg" placeholder="Сообщение">
+<button onclick="send()">Отправить</button>
 
-<h3>🏨 Чат палат</h3>
-<div class="chat" id="chat2"></div>
-<input id="msg2" placeholder="Сообщение">
-<button onclick="send2()">Отправить</button>
 </div>
 
 </div>
 
 <script>
 
-let players = [];
-
 function register(){
-localStorage.setItem("l", login.value);
-localStorage.setItem("p", pass.value);
-alert("OK");
+
+let l = document.getElementById("regLogin").value;
+let p = document.getElementById("regPass").value;
+
+if(!l || !p){
+alert("Заполните поля");
+return;
+}
+
+localStorage.setItem("user_login", l);
+localStorage.setItem("user_pass", p);
+
+alert("Регистрация успешна");
 }
 
 function login(){
-if(login.value===localStorage.getItem("l") && pass.value===localStorage.getItem("p")){
-document.getElementById("game").style.display="block";
+
+let l = document.getElementById("logLogin").value;
+let p = document.getElementById("logPass").value;
+
+let savedL = localStorage.getItem("user_login");
+let savedP = localStorage.getItem("user_pass");
+
+if(!savedL || !savedP){
+alert("Сначала зарегистрируйтесь");
+return;
+}
+
+if(l === savedL && p === savedP){
+document.getElementById("game").style.display = "block";
 }else{
-alert("Ошибка");
-}
-}
-
-// генерация 2000 данных (оптимально)
-function init(){
-
-let r = "";
-let c = "";
-let p = "";
-
-for(let i=1;i<=2000;i++){
-r += "Палата #" + i + "
-";
-c +
-ашина #" + i + "
-";
-
-if
-50){
-p += "Пациент #" + i + " (ожидает)
-";
-}
-}
-oms.innerHTML = r;
-cars.innerHTML = c;
-patients.innerHTML = p;
+alert("Неверный логин или пароль");
 }
 
-function rollDice(){
-
-let d1 = Math.floor(Math.random()*6)+1;
-let d2 = Math.floor(Math.random()*6)+1;
-
-let winner = d1>d2 ? "Врач 1" : "Врач 2";
-
-oplog.innerHTML =
-"🎲 Врач1: " + d1 + "
-🎲 Врач2
-+ d2 +
-"
-<b>Побед
-" + winner + "</b>";
 }
 
-function send1(){
-if(msg1.value=="")return;
-chat1.innerHTML += "<p>👤 " + msg1.value + "</p>";
-msg1.value="";
-chat1.scrollTop=999999;
+function send(){
+
+let m = document.getElementById("msg");
+
+if(!m.value) return;
+
+document.getElementById("chat").innerHTML += "<p>👤 " + m.value + "</p>";
+
+m.value = "";
 }
-
-function send2(){
-if(msg2.value=="")return;
-chat2.innerHTML += "<p>🏨 " + msg2.value + "</p>";
-msg2.value="";
-chat2.scrollTop=999999;
-}
-
-// время МСК
-function time(){
-let d=new Date();
-let msk=new Date(d.getTime()+3*60*60*1000);
-time.innerText = msk.toTimeString().split(" ")[0];
-}
-
-setInterval(time,1000);
-time();
-
-init();
 
 </script>
 
