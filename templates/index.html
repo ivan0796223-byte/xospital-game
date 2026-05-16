@@ -31,6 +31,22 @@ header{
     border-radius:15px;
 }
 
+.stats{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.card{
+    flex:1;
+    min-width:120px;
+    background:#222;
+    border:1px solid red;
+    border-radius:12px;
+    padding:15px;
+    text-align:center;
+}
+
 button{
     width:100%;
     padding:15px;
@@ -40,12 +56,53 @@ button{
     color:white;
     border-radius:10px;
     font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:0.9;
 }
 
 #status{
     padding:10px;
     background:#222;
     border-radius:10px;
+    margin-bottom:10px;
+}
+
+.progress{
+    width:100%;
+    height:25px;
+    background:#222;
+    border-radius:20px;
+    overflow:hidden;
+    margin-top:10px;
+}
+
+.progress-bar{
+    width:0%;
+    height:100%;
+    background:red;
+}
+
+.chat{
+    height:180px;
+    overflow:auto;
+    background:#111;
+    border-radius:10px;
+    padding:10px;
+    margin-bottom:10px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    background:#222;
+    color:white;
+    box-sizing:border-box;
 }
 
 </style>
@@ -56,6 +113,44 @@ button{
 <header>
 ☩ MEDICAL RP ONLINE
 </header>
+
+<div class="panel">
+
+<h2>Статистика врача</h2>
+
+<div class="stats">
+
+<div class="card">
+💰
+<h3>Монеты</h3>
+<p id="coins">0</p>
+</div>
+
+<div class="card">
+⭐
+<h3>Уровень</h3>
+<p id="level">1</p>
+</div>
+
+<div class="card">
+🧪
+<h3>Опыт</h3>
+<p id="xp">0 / 100</p>
+</div>
+
+<div class="card">
+👨‍⚕️
+<h3>Онлайн</h3>
+<p>148</p>
+</div>
+
+</div>
+
+<div class="progress">
+<div class="progress-bar" id="xp-bar"></div>
+</div>
+
+</div>
 
 <div class="panel">
 
@@ -79,10 +174,42 @@ button{
 
 </div>
 
+<div class="panel">
+
+<h2>Чат</h2>
+
+<div class="chat" id="chat"></div>
+
+<input type="text" id="message" placeholder="Сообщение">
+
+<button onclick="sendMessage()">
+📨 Отправить
+</button>
+
+</div>
+
 <script>
 
 let accepted = false;
 let operation = false;
+
+let coins = 0;
+let xp = 0;
+let level = 1;
+
+function updateStats(){
+
+document.getElementById("coins").innerHTML = coins;
+
+document.getElementById("level").innerHTML = level;
+
+document.getElementById("xp").innerHTML =
+xp + " / 100";
+
+document.getElementById("xp-bar").style.width =
+xp + "%";
+
+}
 
 function takeCall(){
 
@@ -128,10 +255,47 @@ return;
 document.getElementById("status").innerHTML =
 "💊 Пациент вылечен";
 
+coins += 100;
+xp += 25;
+
+if(xp >= 100){
+
+xp = 0;
+level += 1;
+
+alert("🎉 Новый уровень!");
+
+}
+
+updateStats();
+
 accepted = false;
 operation = false;
 
 }
+
+function sendMessage(){
+
+let message =
+document.getElementById("message");
+
+let chat =
+document.getElementById("chat");
+
+if(message.value.trim() != ""){
+
+chat.innerHTML +=
+"<p>👤 " + message.value + "</p>";
+
+message.value = "";
+
+chat.scrollTop = chat.scrollHeight;
+
+}
+
+}
+
+updateStats();
 
 </script>
 
