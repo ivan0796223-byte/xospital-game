@@ -49,9 +49,16 @@ button{
     color:white;
     border-radius:10px;
     font-size:16px;
+    cursor:pointer;
 }
 
-#game{ display:none; }
+button:hover{
+    opacity:0.9;
+}
+
+#game{
+    display:none;
+}
 
 #status{
     padding:10px;
@@ -91,9 +98,9 @@ button{
 
 <div id="status">Ожидание вызова</div>
 
-<button onclick="call()">🚑 Принять вызов</button>
-<button onclick="op()">🏥 В операционную</button>
-<button onclick="heal()">💊 Лечить</button>
+<button onclick="takeCall()">🚑 Принять вызов</button>
+<button onclick="goOperation()">🏥 В операционную</button>
+<button onclick="healPatient()">💊 Лечить пациента</button>
 
 </div>
 
@@ -105,47 +112,63 @@ let accepted = false;
 let operation = false;
 
 function register(){
-let l = regLogin.value;
-let p = regPass.value;
 
-if(!l || !p){ alert("Заполните поля"); return; }
+let l = document.getElementById("regLogin").value;
+let p = document.getElementById("regPass").value;
 
-localStorage.setItem("l", l);
-localStorage.setItem("p", p);
+if(l === "" || p === ""){
+alert("Заполните поля");
+return;
+}
 
-alert("ОК");
+localStorage.setItem("login", l);
+localStorage.setItem("pass", p);
+
+alert("Регистрация успешна");
 }
 
 function login(){
-let l = logLogin.value;
-let p = logPass.value;
 
-if(l === localStorage.getItem("l") &&
-p === localStorage.getItem("p")){
-auth.style.display="none";
-game.style.display="block";
-}else{
-alert("Ошибка");
-}
-}
+let l = document.getElementById("logLogin").value;
+let p = document.getElementById("logPass").value;
 
-function call(){
-accepted = true;
-status.innerText = "Вызов принят";
-}
+let savedL = localStorage.getItem("login");
+let savedP = localStorage.getItem("pass");
 
-function op(){
-if(!accepted){ alert("Сначала вызов"); return; }
-operation = true;
-status.innerText = "В операционной";
-}
-
-function heal(){
-if(!accepted || !operation){
-alert("Ошибка этапов");
+if(!savedL || !savedP){
+alert("Сначала зарегистрируйтесь");
 return;
 }
-status.innerText = "Пациент вылечен";
+
+if(l === savedL && p === savedP){
+document.getElementById("auth").style.display = "none";
+document.getElementById("game").style.display = "block";
+}else{
+alert("Неверный логин или пароль");
+}
+
+}
+
+function takeCall(){
+accepted = true;
+status.innerText = "🚑 Вызов принят";
+}
+
+function goOperation(){
+if(!accepted){
+alert("Сначала примите вызов");
+return;
+}
+operation = true;
+status.innerText = "🏥 Пациент в операционной";
+}
+
+function healPatient(){
+if(!accepted || !operation){
+alert("Неправильный порядок действий");
+return;
+}
+status.innerText = "💊 Пациент вылечен";
 accepted = false;
 operation = false;
 }
