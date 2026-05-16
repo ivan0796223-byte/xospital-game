@@ -7,66 +7,69 @@
 
 <style>
 body{
-    margin:0;
-    background:#111;
-    color:white;
-    font-family:Arial;
+margin:0;
+font-family:Arial;
+background:#111;
+color:white;
 }
 
 header{
-    background:#1c1c1c;
-    padding:15px;
-    text-align:center;
-    border-bottom:3px solid red;
-    font-size:22px;
+background:#1c1c1c;
+padding:15px;
+text-align:center;
+border-bottom:3px solid red;
 }
 
 .panel{
-    margin:15px;
-    padding:15px;
-    background:#1c1c1c;
-    border:2px solid red;
-    border-radius:15px;
+margin:15px;
+padding:15px;
+background:#1c1c1c;
+border:2px solid red;
+border-radius:12px;
 }
 
 input{
-    width:100%;
-    padding:12px;
-    margin-top:8px;
-    border:none;
-    border-radius:10px;
-    background:#222;
-    color:white;
-    box-sizing:border-box;
+width:100%;
+padding:10px;
+margin-top:8px;
+border:none;
+border-radius:10px;
+background:#222;
+color:white;
 }
 
 button{
-    width:100%;
-    padding:12px;
-    margin-top:8px;
-    background:red;
-    border:none;
-    color:white;
-    border-radius:10px;
-    font-size:16px;
+width:100%;
+padding:12px;
+margin-top:8px;
+background:red;
+border:none;
+color:white;
+border-radius:10px;
+cursor:pointer;
 }
 
 button:hover{opacity:0.9;}
 
 #game{display:none;}
 
-.chat{
-    height:120px;
-    overflow:auto;
-    background:#111;
-    padding:10px;
-    border-radius:10px;
-    margin-top:10px;
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
 }
 
 .small{
-    font-size:13px;
-    opacity:0.8;
+font-size:13px;
+opacity:0.8;
+}
+
+.list{
+height:150px;
+overflow:auto;
+background:#111;
+padding:10px;
+border-radius:10px;
 }
 </style>
 </head>
@@ -75,39 +78,59 @@ button:hover{opacity:0.9;}
 
 <header>☩ MEDICAL RP ONLINE</header>
 
+<!-- ГЛАВНАЯ -->
+<div id="auth">
+
 <div class="panel">
-
 <h3>Регистрация</h3>
-<input id="regLogin" placeholder="Логин">
-<input id="regPass" type="password" placeholder="Пароль">
-<button onclick="register()">Регистрация</button>
+<input id="regL" placeholder="Логин">
+<input id="regP" type="password" placeholder="Пароль">
+<button onclick="register()">Создать аккаунт</button>
+</div>
 
-<hr style="border:1px solid #333;margin:10px 0;">
-
+<div class="panel">
 <h3>Вход</h3>
-<input id="logLogin" placeholder="Логин">
-<input id="logPass" type="password" placeholder="Пароль">
+<input id="logL" placeholder="Логин">
+<input id="logP" type="password" placeholder="Пароль">
 <button onclick="login()">Войти</button>
+</div>
 
 </div>
 
+<!-- ИГРА -->
 <div id="game">
 
-<div class="panel">
+<div class="panel grid">
 
+<div>
+<h3>💎 Баланс</h3>
+<p>Алмазы: <span id="diamonds">50</span></p>
+<p>Монеты: <span id="coins">0</span></p>
+</div>
+
+<div>
 <h3>🏥 Больница</h3>
-
-<div class="small">2000 палат | 2000 машин | пациенты онлайн</div>
+<p>Палаты: <span id="rooms">10</span></p>
+<p>Лаборатории: <span id="labs">1</span></p>
+<p>Машины: <span id="cars">3</span></p>
+</div>
 
 </div>
 
 <div class="panel">
 
-<h3>💬 Чат пациентов</h3>
-<div class="chat" id="chat"></div>
+<h3>👨‍⚕️ Пациенты (2000)</h3>
+<div class="list" id="patients"></div>
 
-<input id="msg" placeholder="Сообщение">
-<button onclick="send()">Отправить</button>
+</div>
+
+<div class="panel">
+
+<h3>🏥 Магазин улучшений</h3>
+
+<button onclick="buyRoom()">Купить палату (10💎)</button>
+<button onclick="buyLab()">Купить лабораторию (20💎)</button>
+<button onclick="buyCar()">Купить машину (15💎)</button>
 
 </div>
 
@@ -115,52 +138,86 @@ button:hover{opacity:0.9;}
 
 <script>
 
-function register(){
+let diamonds = 50;
+let coins = 0;
+let rooms = 10;
+let labs = 1;
+let cars = 3;
 
-let l = document.getElementById("regLogin").value;
-let p = document.getElementById("regPass").value;
+function register(){
+let l = regL.value;
+let p = regP.value;
 
 if(!l || !p){
 alert("Заполните поля");
 return;
 }
 
-localStorage.setItem("user_login", l);
-localStorage.setItem("user_pass", p);
+localStorage.setItem("u", l);
+localStorage.setItem("p", p);
 
-alert("Регистрация успешна");
+alert("Аккаунт создан");
 }
 
 function login(){
 
-let l = document.getElementById("logLogin").value;
-let p = document.getElementById("logPass").value;
+let l = logL.value;
+let p = logP.value;
 
-let savedL = localStorage.getItem("user_login");
-let savedP = localStorage.getItem("user_pass");
+if(l === localStorage.getItem("u") &&
+p === localStorage.getItem("p")){
 
-if(!savedL || !savedP){
-alert("Сначала зарегистрируйтесь");
-return;
-}
+auth.style.display="none";
+game.style.display="block";
+initGame();
 
-if(l === savedL && p === savedP){
-document.getElementById("game").style.display = "block";
 }else{
-alert("Неверный логин или пароль");
+alert("Ошибка входа");
 }
 
 }
 
-function send(){
+// 2000 пациентов (виртуально, без лагов)
+function initGame(){
 
-let m = document.getElementById("msg");
+let html="";
+for(let i=1;i<=2000;i++){
+html += "Пациент #" + i + " - статус: ожидает
+";
+}
+p
+nts.innerHTML = html;
 
-if(!m.value) return;
+updateUI();
+}
 
-document.getElementById("chat").innerHTML += "<p>👤 " + m.value + "</p>";
+function updateUI(){
+diamondsEl.innerText = diamonds;
+coinsEl.innerText = coins;
+roomsEl.innerText = rooms;
+labsEl.innerText = labs;
+carsEl.innerText = cars;
+}
 
-m.value = "";
+function buyRoom(){
+if(diamonds < 10){alert("Нет алмазов"); return;}
+diamonds -= 10;
+rooms += 1;
+updateUI();
+}
+
+function buyLab(){
+if(diamonds < 20){alert("Нет алмазов"); return;}
+diamonds -= 20;
+labs += 1;
+updateUI();
+}
+
+function buyCar(){
+if(diamonds < 15){alert("Нет алмазов"); return;}
+diamonds -= 15;
+cars += 1;
+updateUI();
 }
 
 </script>
