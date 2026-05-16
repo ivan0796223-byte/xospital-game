@@ -13,14 +13,6 @@ color:white;
 font-family:Arial;
 }
 
-header{
-background:#1c1c1c;
-padding:15px;
-text-align:center;
-border-bottom:3px solid red;
-font-size:22px;
-}
-
 .panel{
 margin:15px;
 padding:15px;
@@ -48,115 +40,81 @@ background:red;
 border:none;
 color:white;
 border-radius:10px;
-font-size:16px;
 cursor:pointer;
-}
-
-button:hover{
-opacity:0.9;
 }
 
 #game{
 display:none;
 }
 
-.small{
-font-size:13px;
-opacity:0.8;
-}
 </style>
 </head>
 
 <body>
 
-<header>☩ MEDICAL RP ONLINE</header>
-
-<!-- РЕГИСТРАЦИЯ -->
 <div id="auth">
 
 <div class="panel">
 <h3>Регистрация</h3>
-<input id="regL" placeholder="Логин">
-<input id="regP" type="password" placeholder="Пароль">
-<button onclick="register()">Создать аккаунт</button>
+<input id="regLogin" placeholder="Логин">
+<input id="regPass" type="password" placeholder="Пароль">
+<button onclick="register()">Регистрация</button>
 </div>
 
 <div class="panel">
 <h3>Вход</h3>
-<input id="logL" placeholder="Логин">
-<input id="logP" type="password" placeholder="Пароль">
+<input id="logLogin" placeholder="Логин">
+<input id="logPass" type="password" placeholder="Пароль">
 <button onclick="login()">Войти</button>
 </div>
 
 </div>
 
-<!-- ИГРА -->
-<div id="game">
-
-<div class="panel">
-<h3>🏥 MEDICAL RP</h3>
-<p class="small">Регистрация работает ✔</p>
-<p class="small">Вход работает ✔</p>
-</div>
-
-<div class="panel">
-<h3>👨‍⚕️ Пациенты</h3>
-<div class="small" id="patients"></div>
-</div>
-
+<div id="game" class="panel">
+<h2>ИГРА ЗАПУЩЕНА ✔</h2>
+<p>Регистрация работает</p>
 </div>
 
 <script>
 
 function register(){
 
-let l = document.getElementById("regL").value;
-let p = document.getElementById("regP").value;
+let login = document.getElementById("regLogin").value;
+let pass = document.getElementById("regPass").value;
 
-if(!l || !p){
+if(login === "" || pass === ""){
 alert("Заполните поля");
 return;
 }
 
-localStorage.setItem("login", l);
-localStorage.setItem("pass", p);
+localStorage.setItem("user_login", login);
+localStorage.setItem("user_pass", pass);
 
 alert("Регистрация успешна ✔");
 }
 
 function login(){
 
-let l = document.getElementById("logL").value;
-let p = document.getElementById("logP").value;
+let login = document.getElementById("logLogin").value;
+let pass = document.getElementById("logPass").value;
 
-let savedL = localStorage.getItem("login");
-let savedP = localStorage.getItem("pass");
+let savedLogin = localStorage.getItem("user_login");
+let savedPass = localStorage.getItem("user_pass");
 
-if(!savedL || !savedP){
+if(!savedLogin || !savedPass){
 alert("Сначала зарегистрируйтесь");
 return;
 }
 
-if(l === savedL && p === savedP){
+if(login === savedLogin && pass === savedPass){
 
 document.getElementById("auth").style.display = "none";
 document.getElementById("game").style.display = "block";
-
-initPatients();
 
 }else{
 alert("Неверный логин или пароль");
 }
 
-}
-
-// 2000 пациентов (без лагов)
-function initPatients(){
-let html = "";
-for(let i=1;i<=2000;i++){
-html += "Пациент #" + i + " — ожидает лечения
-"
-document.getElementById("patients").innerHTML = html;
 }
 
 </script>
