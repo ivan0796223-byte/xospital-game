@@ -6,140 +6,180 @@
 <title>MEDICAL RP</title>
 
 <style>
+
 body{
     margin:0;
-    font-family:Arial;
-    background:#0b0b0b;
+    background:#111;
     color:white;
+    font-family:Arial;
 }
 
-/* LOGIN */
-#loginScreen{
-    position:fixed;
-    inset:0;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:#0b0b0b;
+header{
+    background:#1b1b1b;
+    padding:15px;
+    text-align:center;
+    font-size:28px;
+    border-bottom:3px solid red;
 }
 
-.loginBox{
+#auth{
     width:320px;
+    margin:60px auto;
     background:#1c1c1c;
     padding:20px;
-    border-radius:12px;
+    border-radius:15px;
     border:2px solid red;
+    box-shadow:0 0 20px rgba(255,0,0,0.3);
+}
+
+#auth h2{
+    text-align:center;
+    color:red;
 }
 
 input{
     width:100%;
-    padding:10px;
+    padding:12px;
     margin-top:10px;
     border:none;
-    border-radius:6px;
+    border-radius:10px;
+    background:#2b2b2b;
+    color:white;
+    box-sizing:border-box;
 }
 
 button{
     width:100%;
-    padding:10px;
-    margin-top:10px;
+    padding:12px;
+    margin-top:12px;
+    border:none;
+    border-radius:10px;
     background:red;
     color:white;
-    border:none;
-    border-radius:6px;
+    font-size:16px;
     cursor:pointer;
+    transition:0.2s;
 }
 
-/* GAME */
+button:hover{
+    transform:scale(1.03);
+}
+
 #game{
     display:none;
-    padding:10px;
+    padding:20px;
 }
 
 .panel{
     background:#1c1c1c;
-    padding:10px;
-    margin:10px 0;
-    border-radius:10px;
+    padding:15px;
+    margin-top:15px;
+    border-radius:15px;
+    border:2px solid red;
 }
 
-h2{color:red;}
+.stats{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
 
-.list{
+.card{
+    flex:1;
+    min-width:120px;
+    background:#222;
+    padding:15px;
+    border-radius:12px;
+    text-align:center;
+    border:1px solid red;
+}
+
+.chat{
+    height:200px;
+    overflow:auto;
     background:#111;
     padding:10px;
-    border-radius:8px;
-    max-height:250px;
-    overflow:auto;
-}
-
-.item{
-    padding:6px;
-    border-bottom:1px solid #222;
-    cursor:pointer;
-}
-
-.item:hover{
-    background:#222;
-}
-
-.progress{
-    width:100%;
-    height:8px;
-    background:#333;
     border-radius:10px;
-    overflow:hidden;
+    margin-bottom:10px;
 }
 
-.bar{
-    height:8px;
-    background:red;
-    width:0%;
-}
 </style>
 </head>
-
 <body>
 
-<!-- LOGIN -->
-<div id="loginScreen">
+<header>
+☩ MEDICAL RP ONLINE
+</header>
 
-    <div class="loginBox">
+<div id="auth">
 
-        <h2>☩ MEDICAL RP</h2>
+<h2>Регистрация / Вход</h2>
 
-        <input id="name" placeholder="Логин">
-        <input id="pass" type="password" placeholder="Пароль">
+<input type="text" id="login" placeholder="Логин">
 
-        <button onclick="register()">Регистрация</button>
-        <button onclick="login()">Войти</button>
+<input type="password" id="password" placeholder="Пароль">
 
-        <div id="status" style="margin-top:10px;color:gray;text-align:center;"></div>
+<button onclick="register()">Регистрация</button>
 
-    </div>
+<button onclick="login()">Войти</button>
 
 </div>
 
-<!-- GAME -->
 <div id="game">
 
+<h1>Добро пожаловать в MEDICAL RP</h1>
+
 <div class="panel">
 
-<h2>👤 Игрок: <span id="player"></span></h2>
+<div class="stats">
 
-💰 Деньги: <span id="money">100</span><b
- Алмазы: <span id="diamonds">10</span><br
-XP: <span id="xp">0</span>
+<div class="card">
+❤️
+<h3>HP</h3>
+<p>100</p>
+</div>
+
+<div class="card">
+💎
+<h3>Алмазы</h3>
+<p>25</p>
+</div>
+
+<div class="card">
+💰
+<h3>Монеты</h3>
+<p>500</p>
+</div>
+
+<div class="card">
+👨‍⚕️
+<h3>Онлайн</h3>
+<p>148</p>
+</div>
+
+</div>
 
 </div>
 
 <div class="panel">
 
-<h2>🧑 Пациенты</h2>
+<h2>Вызовы пациентов</h2>
 
-<button onclick="loadPatients()">Загрузить</button>
+<button>🚑 Принять вызов</button>
+<button>🏥 В операционную</button>
+<button>💊 Лечить пациента</button>
 
-<div class="list" id="patients"></div>
+</div>
+
+<div class="panel">
+
+<h2>Чат</h2>
+
+<div class="chat" id="chat-box"></div>
+
+<input type="text" id="chat-input" placeholder="Сообщение">
+
+<button onclick="sendMessage()">Отправить</button>
 
 </div>
 
@@ -147,100 +187,65 @@ XP: <span id="xp">0</span>
 
 <script>
 
-let money=100;
-let diamonds=10;
-let xp=0;
-
-// статус
-function setStatus(t,c){
-    let s=document.getElementById("status");
-    s.innerText=t;
-    s.style.color=c;
-}
-
-// 🔥 РЕГИСТРАЦИЯ (СРАЗУ В ИГРУ)
 function register(){
 
-    let name=document.getElementById("name").value.trim();
-    let pass=document.getElementById("pass").value.trim();
+let login = document.getElementById("login").value;
+let password = document.getElementById("password").value;
 
-    if(name===""||pass===""){
-        setStatus("Введите данные","red");
-        return;
-    }
-
-    localStorage.setItem("rp_name",name);
-    localStorage.setItem("rp_pass",pass);
-
-    openGame(name);
+if(login === "" || password === ""){
+    alert("Заполните поля");
+    return;
 }
 
-// 🔑 ВХОД
+localStorage.setItem("login", login);
+localStorage.setItem("password", password);
+
+alert("Регистрация успешна");
+
+document.getElementById("auth").style.display = "none";
+document.getElementById("game").style.display = "block";
+
+}
+
 function login(){
 
-    let name=document.getElementById("name").value.trim();
-    let pass=document.getElementById("pass").value.trim();
+let login = document.getElementById("login").value;
+let password = document.getElementById("password").value;
 
-    let sName=localStorage.getItem("rp_name");
-    let sPass=localStorage.getItem("rp_pass");
+let savedLogin = localStorage.getItem("login");
+let savedPassword = localStorage.getItem("password");
 
-    if(name===sName && pass===sPass){
-        openGame(name);
-    }else{
-        setStatus("Неверный логин","red");
-    }
+if(login === savedLogin && password === savedPassword){
+
+    alert("Вход выполнен");
+
+    document.getElementById("auth").style.display = "none";
+    document.getElementById("game").style.display = "block";
+
+}else{
+    alert("Неверный логин или пароль");
 }
 
-// 🚀 ОТКРЫТИЕ ИГРЫ
-function openGame(name){
-
-    document.getElementById("loginScreen").style.display="none";
-    document.getElementById("game").style.display="block";
-    document.getElementById("player").innerText=name;
 }
 
-// 🧑 ПАЦИЕНТЫ
-function loadPatients(){
+function sendMessage(){
 
-    let box=document.getElementById("patients");
-    box.innerHTML="";
+let input = document.getElementById("chat-input");
+let chat = document.getElementById("chat-box");
 
-    for(let i=1;i<=50;i++){
+if(input.value.trim() !== ""){
 
-        let div=document.createElement("div");
-        div.className="item";
+chat.innerHTML += "<p>👤 " + input.value + "</p>";
 
-        div.innerHTML=`
-            🧑 Пациент #${i}
-            <div class="progress">
-                <div class="bar" id="b${i}"></div>
-            </div>
-        `;
+input.value = "";
 
-        div.onclick=()=>heal(i);
+chat.scrollTop = chat.scrollHeight;
 
-        box.appendChild(div);
-    }
 }
 
-// ❤️ ЛЕЧЕНИЕ
-function heal(id){
+}
 
-    let bar=document.getElementById("b"+id);
+</script>
 
-    let p=0;
-
-    let t=setInterval(()=>{
-
-        p+=10;
-
-        bar.style.width=p+"%";
-
-        if(p>=100){
-
-            clearInterval(t);
-
-            money+=20;
-            xp+=15;
-
-            document
+</body>
+</html>
