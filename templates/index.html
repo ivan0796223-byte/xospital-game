@@ -18,21 +18,31 @@ header{
     padding:15px;
     text-align:center;
     border-bottom:3px solid red;
-    font-size:28px;
+    font-size:22px;
 }
 
 .panel{
-    margin:20px;
-    padding:20px;
+    margin:15px;
+    padding:15px;
     background:#1c1c1c;
     border:2px solid red;
     border-radius:15px;
 }
 
-input{
+button{
     width:100%;
     padding:12px;
-    margin-top:10px;
+    margin-top:8px;
+    background:red;
+    border:none;
+    color:white;
+    border-radius:10px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin-top:8px;
     border:none;
     border-radius:10px;
     background:#222;
@@ -40,206 +50,181 @@ input{
     box-sizing:border-box;
 }
 
-button{
-    width:100%;
-    padding:15px;
-    margin-top:10px;
-    background:red;
-    border:none;
-    color:white;
-    border-radius:10px;
-    font-size:16px;
-    cursor:pointer;
-}
-
-button:hover{
-    opacity:0.9;
-}
-
-#game{ display:none; }
-
-#status{
-    padding:10px;
-    background:#222;
-    border-radius:10px;
-    margin-bottom:10px;
-}
-
-.stats{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-.card{
-    flex:1;
-    min-width:120px;
-    background:#222;
-    border:1px solid red;
-    border-radius:12px;
-    padding:15px;
-    text-align:center;
-}
-
 .chat{
-    height:150px;
+    height:120px;
     overflow:auto;
     background:#111;
     padding:10px;
     border-radius:10px;
-    margin-bottom:10px;
+    margin-top:10px;
 }
 
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.small{
+    font-size:14px;
+    opacity:0.8;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-☩ MEDICAL RP ONLINE | <span id="time">00:00:00</span> МСК
+☩ MEDICAL RP | <span id="time"></span> МСК
 </header>
 
-<div id="auth">
-
 <div class="panel">
-<h2>Регистрация</h2>
-<input id="regLogin" placeholder="Логин">
-<input id="regPass" type="password" placeholder="Пароль">
+
+<h3>Вход</h3>
+
+<input id="login" placeholder="Логин">
+<input id="pass" type="password" placeholder="Пароль">
+
 <button onclick="register()">Регистрация</button>
-</div>
-
-<div class="panel">
-<h2>Вход</h2>
-<input id="logLogin" placeholder="Логин">
-<input id="logPass" type="password" placeholder="Пароль">
 <button onclick="login()">Войти</button>
-</div>
 
 </div>
 
-<div id="game">
+<div id="game" style="display:none;">
 
-<div class="panel">
+<div class="panel grid">
 
-<h2>Статистика</h2>
-
-<div class="stats">
-
-<div class="card">
-🏥 Палаты
-<p>2000</p>
+<div>
+<h3>🏥 Палаты (2000)</h3>
+<div class="small" id="rooms"></div>
 </div>
 
-<div class="card">
-🚑 Автопарк
-<p>2000</p>
-</div>
-
-<div class="card">
-👨‍⚕️ Онлайн
-<p>148</p>
-</div>
-
+<div>
+<h3>🚑 Автопарк (2000)</h3>
+<div class="small" id="cars"></div>
 </div>
 
 </div>
 
 <div class="panel">
 
-<h2>Пациент</h2>
-
-<div id="status">Ожидание вызова</div>
-
-<button onclick="takeCall()">🚑 Принять вызов</button>
-<button onclick="goOperation()">🏥 В операционную</button>
-<button onclick="healPatient()">💊 Лечить пациента</button>
+<h3>👨‍⚕️ Пациенты (2000)</h3>
+<div class="small" id="patients"></div>
 
 </div>
 
 <div class="panel">
 
-<h2>Чат палаты пациентов</h2>
+<h3>🏥 Операционная (Кубик)</h3>
 
-<div class="chat" id="chat"></div>
+<button onclick="rollDice()">🎲 Бросить кубик</button>
 
-<input id="msg" placeholder="Сообщение">
-<button onclick="sendMsg()">Отправить</button>
+<div id="oplog" class="small"></div>
 
+</div>
+
+<div class="panel">
+
+<h3>💬 Чат пациентов</h3>
+<div class="chat" id="chat1"></div>
+<input id="msg1" placeholder="Сообщение">
+<button onclick="send1()">Отправить</button>
+</div>
+
+<div class="panel">
+
+<h3>🏨 Чат палат</h3>
+<div class="chat" id="chat2"></div>
+<input id="msg2" placeholder="Сообщение">
+<button onclick="send2()">Отправить</button>
 </div>
 
 </div>
 
 <script>
 
-let accepted = false;
-let operation = false;
+let players = [];
 
 function register(){
-let l = regLogin.value;
-let p = regPass.value;
-
-if(!l || !p){
-alert("Заполните поля");
-return;
-}
-
-localStorage.setItem("login", l);
-localStorage.setItem("pass", p);
-
-alert("ОК");
+localStorage.setItem("l", login.value);
+localStorage.setItem("p", pass.value);
+alert("OK");
 }
 
 function login(){
-let l = logLogin.value;
-let p = logPass.value;
-
-if(l === localStorage.getItem("login") &&
-p === localStorage.getItem("pass")){
-auth.style.display="none";
-game.style.display="block";
+if(login.value===localStorage.getItem("l") && pass.value===localStorage.getItem("p")){
+document.getElementById("game").style.display="block";
 }else{
 alert("Ошибка");
 }
 }
 
-function takeCall(){
-accepted = true;
-status.innerText = "🚑 Вызов принят";
+// генерация 2000 данных (оптимально)
+function init(){
+
+let r = "";
+let c = "";
+let p = "";
+
+for(let i=1;i<=2000;i++){
+r += "Палата #" + i + "
+";
+c +
+ашина #" + i + "
+";
+
+if
+50){
+p += "Пациент #" + i + " (ожидает)
+";
+}
+}
+oms.innerHTML = r;
+cars.innerHTML = c;
+patients.innerHTML = p;
 }
 
-function goOperation(){
-if(!accepted){ alert("Сначала вызов"); return; }
-operation = true;
-status.innerText = "🏥 В операционной";
+function rollDice(){
+
+let d1 = Math.floor(Math.random()*6)+1;
+let d2 = Math.floor(Math.random()*6)+1;
+
+let winner = d1>d2 ? "Врач 1" : "Врач 2";
+
+oplog.innerHTML =
+"🎲 Врач1: " + d1 + "
+🎲 Врач2
++ d2 +
+"
+<b>Побед
+" + winner + "</b>";
 }
 
-function healPatient(){
-if(!accepted || !operation){
-alert("Ошибка");
-return;
-}
-status.innerText = "💊 Пациент вылечен";
-accepted = false;
-operation = false;
+function send1(){
+if(msg1.value=="")return;
+chat1.innerHTML += "<p>👤 " + msg1.value + "</p>";
+msg1.value="";
+chat1.scrollTop=999999;
 }
 
-function sendMsg(){
-let m = msg.value;
-if(!m) return;
-
-chat.innerHTML += "<p>👤 " + m + "</p>";
-msg.value = "";
-chat.scrollTop = chat.scrollHeight;
+function send2(){
+if(msg2.value=="")return;
+chat2.innerHTML += "<p>🏨 " + msg2.value + "</p>";
+msg2.value="";
+chat2.scrollTop=999999;
 }
 
-function updateTime(){
-let now = new Date();
-let msk = new Date(now.getTime() + (3*60*60*1000));
+// время МСК
+function time(){
+let d=new Date();
+let msk=new Date(d.getTime()+3*60*60*1000);
 time.innerText = msk.toTimeString().split(" ")[0];
 }
 
-setInterval(updateTime,1000);
-updateTime();
+setInterval(time,1000);
+time();
+
+init();
 
 </script>
 
